@@ -1,0 +1,4 @@
+node_modules/
+__pycache__/
+indico_jpsp_ab.egg-info/
+indico_jpsp_ab/static/

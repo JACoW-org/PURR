@@ -1,0 +1,27 @@
+{
+  "build": {
+    "clientPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-plugin-ab/indico_jpsp_ab/client",
+    "distPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-plugin-ab/indico_jpsp_ab/static/dist",
+    "distURL": "/static/plugins/jpsp_ab/dist/",
+    "indicoSourcePath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src",
+    "rootPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-plugin-ab/indico_jpsp_ab",
+    "staticPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-plugin-ab/indico_jpsp_ab/static",
+    "staticURL": "/static/plugins/jpsp_ab/",
+    "urlMapPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-plugin-ab/url_map.json"
+  },
+  "indico": {
+    "build": {
+      "baseURLPath": "/",
+      "clientPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src/indico/web/client",
+      "distPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src/indico/web/static/dist",
+      "distURL": "/dist/",
+      "rootPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src/indico",
+      "staticPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src/indico/web/static",
+      "staticURL": "/",
+      "urlMapPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src/url_map.json"
+    }
+  },
+  "isPlugin": true,
+  "plugin": "jpsp_ab",
+  "themes": {}
+}

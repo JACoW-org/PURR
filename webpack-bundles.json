@@ -1,0 +1,7 @@
+{
+    "entry": {
+      "script": "./app/jpsp-ab.app.js",
+      "style": "./css/global.scss"
+    }
+  }
+  

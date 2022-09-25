@@ -1,0 +1,10 @@
+@import "base/palette";
+@import "base/typography";
+
+.jpsp-btn {
+    width: 110px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-content: stretch;
+}
