@@ -28868,6 +28868,283 @@
         }
       ]
     },
+    "event_notes.api": {
+      "endpoint": "event_notes.api",
+      "rules": [
+        {
+          "args": [
+            "contrib_id",
+            "event_id",
+            "object_type",
+            "subcontrib_id"
+          ],
+          "converters": {
+            "contrib_id": "IntegerConverter",
+            "event_id": "IntegerConverter",
+            "subcontrib_id": "IntegerConverter"
+          },
+          "defaults": {
+            "object_type": "subcontribution"
+          },
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "contributions",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "contrib_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "subcontributions",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "subcontrib_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "note",
+              "isDynamic": false
+            }
+          ]
+        },
+        {
+          "args": [
+            "event_id",
+            "object_type",
+            "session_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter",
+            "session_id": "IntegerConverter"
+          },
+          "defaults": {
+            "object_type": "session"
+          },
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "sessions",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "session_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "note",
+              "isDynamic": false
+            }
+          ]
+        },
+        {
+          "args": [
+            "contrib_id",
+            "event_id",
+            "object_type"
+          ],
+          "converters": {
+            "contrib_id": "IntegerConverter",
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {
+            "object_type": "contribution"
+          },
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "contributions",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "contrib_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "note",
+              "isDynamic": false
+            }
+          ]
+        },
+        {
+          "args": [
+            "event_id",
+            "object_type"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {
+            "object_type": "event"
+          },
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "api",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "note",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "event_notes.compile": {
       "endpoint": "event_notes.compile",
       "rules": [
@@ -28908,7 +29185,7 @@
               "isDynamic": false
             },
             {
-              "data": "note",
+              "data": "api",
               "isDynamic": false
             },
             {
@@ -28916,561 +29193,7 @@
               "isDynamic": false
             },
             {
-              "data": "compile",
-              "isDynamic": false
-            }
-          ]
-        }
-      ]
-    },
-    "event_notes.delete": {
-      "endpoint": "event_notes.delete",
-      "rules": [
-        {
-          "args": [
-            "contrib_id",
-            "event_id",
-            "object_type",
-            "subcontrib_id"
-          ],
-          "converters": {
-            "contrib_id": "IntegerConverter",
-            "event_id": "IntegerConverter",
-            "subcontrib_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "subcontribution"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contributions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contrib_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "subcontributions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "subcontrib_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "delete",
-              "isDynamic": false
-            }
-          ]
-        },
-        {
-          "args": [
-            "event_id",
-            "object_type",
-            "session_id"
-          ],
-          "converters": {
-            "event_id": "IntegerConverter",
-            "session_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "session"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "sessions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "session_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "delete",
-              "isDynamic": false
-            }
-          ]
-        },
-        {
-          "args": [
-            "contrib_id",
-            "event_id",
-            "object_type"
-          ],
-          "converters": {
-            "contrib_id": "IntegerConverter",
-            "event_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "contribution"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contributions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contrib_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "delete",
-              "isDynamic": false
-            }
-          ]
-        },
-        {
-          "args": [
-            "event_id",
-            "object_type"
-          ],
-          "converters": {
-            "event_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "event"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "delete",
-              "isDynamic": false
-            }
-          ]
-        }
-      ]
-    },
-    "event_notes.edit": {
-      "endpoint": "event_notes.edit",
-      "rules": [
-        {
-          "args": [
-            "contrib_id",
-            "event_id",
-            "object_type",
-            "subcontrib_id"
-          ],
-          "converters": {
-            "contrib_id": "IntegerConverter",
-            "event_id": "IntegerConverter",
-            "subcontrib_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "subcontribution"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contributions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contrib_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "subcontributions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "subcontrib_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "edit",
-              "isDynamic": false
-            }
-          ]
-        },
-        {
-          "args": [
-            "event_id",
-            "object_type",
-            "session_id"
-          ],
-          "converters": {
-            "event_id": "IntegerConverter",
-            "session_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "session"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "sessions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "session_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "edit",
-              "isDynamic": false
-            }
-          ]
-        },
-        {
-          "args": [
-            "contrib_id",
-            "event_id",
-            "object_type"
-          ],
-          "converters": {
-            "contrib_id": "IntegerConverter",
-            "event_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "contribution"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contributions",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "contrib_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "edit",
-              "isDynamic": false
-            }
-          ]
-        },
-        {
-          "args": [
-            "event_id",
-            "object_type"
-          ],
-          "converters": {
-            "event_id": "IntegerConverter"
-          },
-          "defaults": {
-            "object_type": "event"
-          },
-          "trace": [
-            {
-              "data": "|",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "event_id",
-              "isDynamic": true
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "note",
-              "isDynamic": false
-            },
-            {
-              "data": "/",
-              "isDynamic": false
-            },
-            {
-              "data": "edit",
+              "data": "scheduled-notes",
               "isDynamic": false
             }
           ]
@@ -44731,6 +44454,66 @@
         }
       ]
     },
+    "persons.manage_person_lists": {
+      "endpoint": "persons.manage_person_lists",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "persons",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "person-lists",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "persons.person_list": {
       "endpoint": "persons.person_list",
       "rules": [
@@ -44909,6 +44692,66 @@
         }
       ]
     },
+    "plugin_jpsp_ab.event-files-json": {
+      "endpoint": "plugin_jpsp_ab.event-files-json",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp_ab",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event-files-json",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "plugin_jpsp_ab.event-json": {
       "endpoint": "plugin_jpsp_ab.event-json",
       "rules": [
@@ -44969,8 +44812,8 @@
         }
       ]
     },
-    "plugin_jpsp_ab.get-ab": {
-      "endpoint": "plugin_jpsp_ab.get-ab",
+    "plugin_jpsp_ab.jpsp-home": {
+      "endpoint": "plugin_jpsp_ab.jpsp-home",
       "rules": [
         {
           "args": [
@@ -45022,7 +44865,7 @@
               "isDynamic": false
             },
             {
-              "data": "get-ab",
+              "data": "jpsp-home",
               "isDynamic": false
             }
           ]
@@ -60612,5 +60455,5 @@
       ]
     }
   },
-  "version": "ab21add91af9a6a79ba4ca2e9fb5b6fd"
+  "version": "18f08f60ce53d59ef7bfdc5024c87fb7"
 }

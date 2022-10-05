@@ -1,13 +1,15 @@
-from indico_jpsp_ab.controllers import RH_get_ab_page, RH_get_event_json
 from indico.core.plugins import IndicoPluginBlueprint
 
+from indico_jpsp_ab.controllers import RH_jpsp_home_page, RH_get_event_json, RH_get_event_files_json
 
-IndicoJpspAbPBlueprint = IndicoPluginBlueprint(
+
+JpspAbPBlueprint = IndicoPluginBlueprint(
     'jpsp_ab', __name__,
     url_prefix='/event/<int:event_id>/manage/jpsp_ab'
 )
 
 
-IndicoJpspAbPBlueprint.add_url_rule('/get-ab', 'get-ab', view_func=RH_get_ab_page)
-IndicoJpspAbPBlueprint.add_url_rule('/event-json', 'event-json', view_func=RH_get_event_json)
+JpspAbPBlueprint.add_url_rule('/jpsp-home', 'jpsp-home', view_func=RH_jpsp_home_page)
+JpspAbPBlueprint.add_url_rule('/event-json', 'event-json', view_func=RH_get_event_json)
+JpspAbPBlueprint.add_url_rule('/event-files-json', 'event-files-json', view_func=RH_get_event_files_json)
 

@@ -6,7 +6,7 @@ from indico.web.forms.base import IndicoForm
 
 
 
-from indico_jpsp_ab.blueprint import IndicoJpspAbPBlueprint
+from indico_jpsp_ab.blueprint import JpspAbPBlueprint
 
 
 class SettingsForm(IndicoForm):
@@ -14,7 +14,7 @@ class SettingsForm(IndicoForm):
     show_message = BooleanField('Show Message')
 
 
-class IndicoJpspAbPlugin(IndicoPlugin):
+class JpspNgPlugin(IndicoPlugin):
 
     configurable = True
     settings_form = SettingsForm
@@ -22,11 +22,11 @@ class IndicoJpspAbPlugin(IndicoPlugin):
                         'show_message': False}
     
     def init(self):
-        super(IndicoJpspAbPlugin, self).init()
+        super(JpspNgPlugin, self).init()
         self.register_assets()
 
     def get_blueprints(self):
-        return IndicoJpspAbPBlueprint
+        return JpspAbPBlueprint
 
     def register_assets(self):
         
