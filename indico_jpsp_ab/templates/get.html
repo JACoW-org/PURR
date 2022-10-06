@@ -6,6 +6,38 @@
 {% endblock title %}
 {% block content %}
     {{ template_hook('event-actions', event=event) }}
-    <script src="https://github.com/mde/ejs/releases/download/v3.1.8/ejs.min.js"></script>
-    <div id="jpsp-app" class="page-content"></div>    
+    <div class="action-box fixed-width">
+        <div class="section">
+            <span class="icon icon-file-download"></span>
+            <div class="text">
+                <div class="label">Download Abstract Booklet</div>
+                <div class="description">You can attach files or links using the buttons on the right.</div>
+            </div>
+            <div class="toolbar">
+                <a href="#"
+                    class="download i-button icon-file-openoffice"
+                    data-title="Download Abstract Booklet"
+                    data-qtip-oldtitle="Download Abstract Booklet">
+                        Download
+                </a>
+            </div>
+        </div>
+    </div> 
+    <div class="action-box fixed-width">
+        <div class="section">
+            <span class="icon icon-file-download"></span>
+            <div class="text">
+                <div class="label">Check event pdf files</div>
+                <div class="description">Check event pdf files.</div>
+            </div>
+            <div class="toolbar">
+                <a href="#"
+                    class="check i-button icon-file-openoffice"
+                    data-title="Check PDF Files"
+                    data-qtip-oldtitle="Check PDF Files">
+                        Check
+                </a>
+            </div>
+        </div>
+    </div> 
 {% endblock content %}

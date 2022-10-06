@@ -3,6 +3,22 @@ export const name = 'jpsp-abstract-booklet'
 
 // Runs once on creation
 export function setup(_props) {
+
+    this.ulid = ULID();
+
+    const ws = this.websocket = new WebSocket(`ws://127.0.0.1:8000/socket/jpsp:feed`);
+
+    ws.addEventListener('open', (ev) => {
+
+        console.log('onopen', ev)
+
+        ws.addEventListener("message", ({ data }) => {
+            const event = JSON.parse(data);
+            console.log(event)
+        });
+
+    });
+
     this.downloading = false;
     this.checking = false;
     this.label = 'Download Abstract Booklet';
@@ -26,7 +42,6 @@ export function render() {
                         <jpsp-download-button class="download"></jpsp-download-button>
                     <% } %>
 
-
                     <% if (checking) { %>
                         <jpsp-download-progress class="progress"></jpsp-download-progress>
                     <% } else { %>
@@ -40,37 +55,85 @@ export function render() {
 
 // Runs after body update
 export function run(_props) {
-    this._on('.download', 'download', () => Promise.resolve()
-        .then(() => console.log('>>>'))
-        .then(() => this.downloading = true)
-        .then(() => fetchEventJson())
-        .then((evt) => createEventAb(evt))
-        .then((dat) => {
-            const a = document.createElement("a");
-            a.href = window.URL.createObjectURL(dat);
-            a.download = "ab.odt";
-            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-            a.click();
-            a.remove(); //afterwards we remove the element again
-        })
-        .catch((err) => console.error(err))
-        .finally(() => this.downloading = false)
-    );
 
-    this._on('.check', 'check', () => Promise.resolve()
-        .then(() => console.log('>>>'))
-        .then(() => this.check = true)
-        .then(() => fetchEventFilesJson())
-        .then((dat) => {
-            console.log(dat)
+    const ws = this.websocket;
+
+    this._on('.download', 'download', () => {
+
+        setTimeout(() => {
+
+            const start = new Date().getTime();
+
+            Promise.resolve()
+                .then(() => console.log('>>> download'))
+                .then(() => this.downloading = true)
+                .then(() => fetchEventJson())
+                .then((evt) => createEventAb(evt))
+                .then((dat) => {
+                    const a = document.createElement("a");
+                    a.href = window.URL.createObjectURL(dat);
+                    a.download = "ab.odt";
+                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                    a.click();
+                    a.remove(); //afterwards we remove the element again
+                })
+                .catch((err) => console.error(err))
+                .finally(() => {
+                    this.downloading = false
+                    const end = new Date().getTime();
+                    console.log('duration: ', (end - start))
+                })
+            
         })
-        .catch((err) => console.error(err))
-        .finally(() => this.check = false)
-    )
+
+    });
+
+    this._on('.check', 'check', () => {
+
+        setTimeout(() => {
+
+            const start = new Date().getTime();
+
+            Promise.resolve()
+                .then(() => console.log('>>> check'))
+                .then(() => this.checking = true)
+                .then(() => fetchEventFilesJson())
+                .then((params) => {
+                    params.contributions.forEach(contribution => {
+                        ws.send(JSON.stringify({
+                            head: {
+                                code: 'exec_task',
+                                uuid: this.ulid(),
+                                time: `${new Date().getTime()}`
+                            },
+                            body: {
+                                method: 'check_pdf',
+                                params: {
+                                    contributions: [contribution]
+                                }
+                            },
+                        }));
+                    });
+                })
+                .then((dat) => {
+                    console.log(dat)
+                })
+                .catch((err) => console.error(err))
+                .finally(() => {
+                    this.checking = false
+                    const end = new Date().getTime();
+                    console.log('duration: ', (end - start));
+                })
+
+            })
+
+    })
 }
 
 
 function fetchEventJson() {
+    console.log('[INDICO-PLUGIN] >>> fetchEventJson')
+
     const url = `event-json`;
 
     const opts = {
@@ -90,6 +153,8 @@ function fetchEventJson() {
 }
 
 function fetchEventFilesJson() {
+    console.log('[INDICO-PLUGIN] >>> fetchEventFilesJson')
+
     const url = `event-files-json`;
 
     const opts = {
@@ -108,15 +173,8 @@ function fetchEventFilesJson() {
     return fetch(url, opts).then((res) => res.json());
 }
 
-function fetchReportJson() {
-
-    const event = {
-        "url": "https://indico.jacow.org/event/44/contributions/349/attachments/227/751/AppleIII-Development_Tischer_FEL2022-THBI1.pdf",
-        "_url": "https://vtechworks.lib.vt.edu/bitstream/handle/10919/73229/Base%2014%20Fonts.pdf?sequence=1&isAllowed=y",
-        "name": "AppleIII-Development_Tischer_FEL2022-THBI1.pdf",
-        "size": 4227793,
-        "checksum": "1da86ed088b37886969d71876ac0ced6"
-    };
+function fetchEventFilesReport(params) {
+    console.log('[JPSP-NG] >>> fetchEventFilesReport')
 
     const url = `http://127.0.0.1:8000/api/event-pdf-check`;
 
@@ -130,13 +188,15 @@ function fetchReportJson() {
         },
         redirect: "follow", // manual, *follow, error
         referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify(event), // body data type must match "Content-Type" header
+        body: JSON.stringify(params), // body data type must match "Content-Type" header
     };
 
-    return fetch(url, opts).then((res) => res.blob());
+    return fetch(url, opts).then((res) => res.json()); 
 }
 
-function createEventAb(event) {
+function createEventAb(req) {
+    console.log('[JPSP-NG] >>> createEventAb')
+
     const url = `http://127.0.0.1:8000/api/generate-event-ab.odt`;
 
     const opts = {
@@ -149,8 +209,59 @@ function createEventAb(event) {
         },
         redirect: "follow", // manual, *follow, error
         referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-        body: JSON.stringify(event), // body data type must match "Content-Type" header
+        body: JSON.stringify(req), // body data type must match "Content-Type" header
     };
 
     return fetch(url, opts).then((res) => res.blob());
+}
+
+
+
+function ULID() {
+    const BASE32 = [
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+        'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q',
+        'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'
+    ];
+    let last = -1;
+    /* Pre-allocate work buffers / views */
+    let ulid = new Uint8Array(16);
+    let time = new DataView(ulid.buffer, 0, 6);
+    let rand = new Uint8Array(ulid.buffer, 6, 10);
+    let dest = new Array(26);
+
+    function encode(ulid) {
+        dest[0] = BASE32[ulid[0] >> 5];
+        dest[1] = BASE32[(ulid[0] >> 0) & 0x1f];
+        for (let i = 0; i < 3; i++) {
+            dest[i * 8 + 2] = BASE32[ulid[i * 5 + 1] >> 3];
+            dest[i * 8 + 3] = BASE32[(ulid[i * 5 + 1] << 2 | ulid[i * 5 + 2] >> 6) & 0x1f];
+            dest[i * 8 + 4] = BASE32[(ulid[i * 5 + 2] >> 1) & 0x1f];
+            dest[i * 8 + 5] = BASE32[(ulid[i * 5 + 2] << 4 | ulid[i * 5 + 3] >> 4) & 0x1f];
+            dest[i * 8 + 6] = BASE32[(ulid[i * 5 + 3] << 1 | ulid[i * 5 + 4] >> 7) & 0x1f];
+            dest[i * 8 + 7] = BASE32[(ulid[i * 5 + 4] >> 2) & 0x1f];
+            dest[i * 8 + 8] = BASE32[(ulid[i * 5 + 4] << 3 | ulid[i * 5 + 5] >> 5) & 0x1f];
+            dest[i * 8 + 9] = BASE32[(ulid[i * 5 + 5] >> 0) & 0x1f];
+        }
+        return dest.join('');
+    }
+
+    return function () {
+        let now = Date.now();
+        if (now === last) {
+            /* 80-bit overflow is so incredibly unlikely that it's not
+             * considered as a possiblity here.
+             */
+            for (let i = 9; i >= 0; i--)
+                if (rand[i]++ < 255)
+                    break;
+        } else {
+            last = now;
+            time.setUint16(0, (now / 4294967296.0) | 0);
+            time.setUint32(2, now | 0);
+            window.crypto.getRandomValues(rand);
+        }
+        return encode(ulid);
+    };
 }

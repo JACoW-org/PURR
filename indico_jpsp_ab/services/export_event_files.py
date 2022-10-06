@@ -25,12 +25,14 @@ class ABCExportEventFiles(ABC):
         elements = [self._serialize_contribution(
             event, contribution) for contribution in contributions]
 
-        return [el for el in elements if el.get('revisions', None) is not None]
+        return {
+            'contributions': [el for el in elements if el.get('revisions', None) is not None]
+        }
 
     def _serialize_contribution(self, event, contribution):
-        
-        editable = self._serialize_editable(event, contribution);
-        
+
+        editable = self._serialize_editable(event, contribution)
+
         return {
             "id": contribution.id,
             "code": contribution.code,
@@ -47,12 +49,13 @@ class ABCExportEventFiles(ABC):
                     .first())
 
         if editable is not None:
-            
+
             elements = [
-                self._serialize_editable_revision(event, contribution, revision)
+                self._serialize_editable_revision(
+                    event, contribution, revision)
                 for revision in editable.revisions
             ]
-            
+
             return {
                 "id": editable.id,
                 "type": editable.type,
@@ -87,7 +90,9 @@ class ABCExportEventFiles(ABC):
         # revision_id: 5949
         # url: "http://127.0.0.1:8005/event/12/contributions/2591/editing/paper/5949/16664/WEP60.pdf"
 
-        download_url = f"/event/{event.id}/contributions/{contribution.id}/editing/paper/{revision.id}/{file.id}/{file.filename}"
+        base_url = "http://127.0.0.1:8005"
+        contribution_url = f"event/{event.id}/contributions/{contribution.id}"
+        file_url = f"editing/paper/{revision.id}/{file.id}/{file.filename}"
 
         return {
             "id": file.id,
@@ -97,7 +102,7 @@ class ABCExportEventFiles(ABC):
             "event_id": event.id,
             "contribution_id": contribution.id,
             "revision_id": revision.id,
-            "download_url": download_url
+            "download_url": f"{base_url}/{contribution_url}/{file_url}"
 
             # "download_url": url_for('.download_archive', event, type="paper", uuid=file.uuid) # archive_type=archive_type,
             # "external_download_url": url_for('attachments.download', filename=file.filename, _external=True)
