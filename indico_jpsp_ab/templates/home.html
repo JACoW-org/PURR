@@ -1,0 +1,152 @@
+{% extends "events/management/base.html" %}
+{% from '_sortable_list.html' import sortable_list %}
+{% from 'events/management/_settings.html' import render_event_settings %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
+{% block title %}
+    {% trans %}JPSP-NG{% endtrans %}
+{% endblock title %}
+{% block content %}
+    {{ template_hook('event-actions', event=event) }}
+
+    <div id="jpsp-ng-home"></div>
+    
+    <div class="jpsp-ng">
+
+        <div class="action-box fixed-width">
+            <div class="section">
+                <span class="icon icon-link"></span>
+                <div class="text">
+                    <div class="label">
+                        {% if connected %}
+                        {% trans %}Plugin connected{% endtrans %}</div>
+                        {% else %}
+                        {% trans %}Plugin disconnected{% endtrans %}</div>
+                        {% endif %} 
+                    <div class="description">
+                        {% if connected %}
+                            {{ settings.api_url }}
+                        {% else %}
+                            {% trans %}Click "Connect" to configuer JPSP-NG Api Server..{% endtrans %}                      
+                        {% endif %} 
+                    </div>
+                </div>
+                <div class="toolbar">
+
+                    {% if connected %}
+
+                    <button class="jpsp i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
+                        data-href="{{ url_for('plugin_jpsp_ab.jpsp-disconnect', event) }}"
+                        data-title="{% trans %}JPSP-NG - Disconnect{% endtrans %}"
+                        data-reload-after data-ajax-dialog>
+                        {% trans %}Disconnect{% endtrans %}
+                    </button>
+
+                    {% else %}
+
+                    <button class="jpsp i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
+                        data-href="{{ url_for('plugin_jpsp_ab.jpsp-connect', event) }}"
+                        data-title="{% trans %}JPSP-NG - Connect{% endtrans %}"
+                        data-reload-after data-ajax-dialog>
+                        {% trans %}Connect{% endtrans %}
+                    </button>
+                    
+                    {% endif %}
+
+                </div>
+            </div>
+        </div> 
+
+        {% if connected %}        
+
+        <div class="action-box fixed-width">
+            <div class="section">
+                <span class="icon icon-package-download"></span>
+                <div class="text">
+                    <div class="label">Abstract Booklet ODT</div>
+                    <div class="description">You can attach files or links using the buttons on the right.</div>
+                </div>
+                <div class="toolbar">
+                    <a href="#"
+                        class="jpsp jpsp-btn download i-button icon-file-openoffice"
+                        data-title="Download Abstract Booklet"
+                        data-qtip-oldtitle="Download Abstract Booklet">
+                            Download
+                    </a>
+                </div>
+            </div>
+        </div> 
+
+        <div class="action-box files-box fixed-width fixed-height">
+            <div class="section">
+                <span class="icon icon-user-check"></span>
+                <div class="text">
+                    <div class="label">Check event pdf files</div>
+                    <div class="description">Check event pdf files.</div>
+                </div>
+                <div class="toolbar">
+                    <a href="#"
+                        class="jpsp jpsp-btn clear i-button icon-remove"
+                        data-title="Clear PDF Files"
+                        data-qtip-oldtitle="Clear PDF Files">
+                            Clear
+                    </a>
+                    <a href="#"
+                        class="jpsp jpsp-btn check i-button icon-file-check"
+                        data-title="Check PDF Files"
+                        data-qtip-oldtitle="Check PDF Files">
+                            Check
+                    </a>
+                </div>
+            </div>
+        </div> 
+        
+        <!-- div v-scope="SettingsBox({ initialConnected: false })"></div -->
+
+        {% endif %}
+    </div>
+
+    <script type="module">
+        import { createApp } from 'https://unpkg.com/petite-vue?module'
+        
+        bootstrapJpspNg(createApp)
+
+
+        function bootstrapJpspNg(createApp) {
+
+            function SettingsBox(props) {
+                return {
+                  $template: '#settings-template',
+                  connected: !!props.initialConnected,
+                  toggleConnect() {
+                    this.connected = !this.connected;
+                  }
+                }
+            }
+            
+            createApp({
+                SettingsBox
+            }).mount();
+        
+        }
+    </script>
+
+    {% raw %}
+        <template id="settings-template">
+            <div class="action-box fixed-width">
+                <div class="section">
+                    <span class="icon icon-settings"></span>
+                    <div class="text">
+                        <div class="label">JPSP-NG Settings</div>
+                        <div class="description">Api Url: - Api Key: </div>
+                    </div>
+                    <div class="toolbar">
+                        <button class="jpsp jpsp-btn i-button icon-settings" @click="toggleConnect">
+                            {{ connected ? 'Disconnect' : 'Connect' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    {% endraw %}
+
+{% endblock content %}

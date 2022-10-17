@@ -44872,6 +44872,66 @@
         }
       ]
     },
+    "plugin_jpsp_ab.jpsp-settings": {
+      "endpoint": "plugin_jpsp_ab.jpsp-settings",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp_ab",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp-settings",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "plugin_jpsp_ab.static": {
       "endpoint": "plugin_jpsp_ab.static",
       "rules": [
@@ -60455,5 +60515,5 @@
       ]
     }
   },
-  "version": "74f53cf295d67a4028a81bff3b34b3bb"
+  "version": "a9ef5157a7146346df85eaa925002946"
 }
