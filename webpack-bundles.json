@@ -1,7 +1,6 @@
 {
-    "entry": {
-      "script": "./app/jpsp-ng.app.js",
-      "style": "./css/jpsp-ng.app.scss"
-    }
+  "entry": {
+    "script": "./app/jpsp-ng.app.js",
+    "style": "./css/jpsp-ng.app.scss"
   }
-  
+}

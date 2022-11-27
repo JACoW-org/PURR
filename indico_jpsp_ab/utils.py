@@ -18,15 +18,10 @@ def default_timezone():
     return timezone('UTC')
 
 
-def json_decode(data: str) -> Any:   
+def json_decode(data: bytes) -> Any:   
     return orjson.loads(data)
 
-def json_encode(data: Any) -> str:
-    def __date(obj: Any) -> str:
-        if isinstance(obj, (datetime, date)):
-            return obj.isoformat()
-        raise TypeError ("Type %s not serializable" % type(obj))
-    
+def json_encode(data: Any) -> bytes:    
     return orjson.dumps(data)
 
 

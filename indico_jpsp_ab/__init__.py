@@ -22,5 +22,5 @@ plugin = JpspNgPlugin
 @signals.menu.items.connect_via('event-management-sidemenu')
 def jpsp_ab_sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
-        yield SideMenuItem('jpsp', _('Abstract Booklet'), url_for('plugin_jpsp_ab.jpsp-home', event), 0, section='workflows', icon='pdf')
+        yield SideMenuItem('jpsp', _('JPSP NG'), url_for('plugin_jpsp_ab.jpsp-home', event), 0, section='workflows', icon='pdf')
             

@@ -24,6 +24,23 @@ class JpspSettingsModel(db.Model):
         default=''
     )
     
+    pdf_page_width = db.Column(
+        db.Float,
+        nullable=False,
+        default=0.0
+    )
+    
+    pdf_page_height = db.Column(
+        db.Float,
+        nullable=False,
+        default=0.0
+    )
+    
+    custom_fields = db.Column(
+        db.String,
+        nullable=True
+    )
+    
     #: ID of the user
     user_id = db.Column(
         db.Integer,
@@ -61,4 +78,4 @@ class JpspSettingsModel(db.Model):
     )
 
     def __repr__(self):
-        return u'<JpspSettingsModel({}, {}, {}, {})>'.format(self.id, self.api_url, self.api_key, self.event_id)
+        return u'<JpspSettingsModel({}, {}, {}, {})>'.format(self.id, self.api_url, self.api_key, self.custom_fields, self.event_id)

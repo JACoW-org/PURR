@@ -6,7 +6,12 @@
     {% trans %}JPSP-NG{% endtrans %}
 {% endblock title %}
 {% block content %}
+
     {{ template_hook('event-actions', event=event) }}
+
+    {% if connected %}
+        <script id="jpsp-ng-settings" type="application/json">{{ settings | tojson }}</script>
+    {% endif %} 
 
     <div id="jpsp-ng-home"></div>
     
@@ -18,10 +23,11 @@
                 <div class="text">
                     <div class="label">
                         {% if connected %}
-                            {% trans %}Plugin connected{% endtrans %}</div>
+                            {% trans %}Plugin connected{% endtrans %}
                         {% else %}
-                            {% trans %}Plugin disconnected{% endtrans %}</div>
+                            {% trans %}Plugin disconnected{% endtrans %}
                         {% endif %} 
+                    </div>
                     <div class="description">
                         {% if connected %}
                             {{ settings.api_url }}
@@ -34,7 +40,12 @@
 
                     {% if connected %}
 
-                    <button class="jpsp i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
+                    <button class="i-button info icon-settings" title="{% trans %}Settings{% endtrans %}"
+                        data-href="{{ url_for('plugin_jpsp_ab.jpsp-settings', event) }}"
+                        data-title="{% trans %}JPSP-NG - Settings{% endtrans %}"
+                        data-ajax-dialog></button>
+
+                    <button class="i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
                         data-href="{{ url_for('plugin_jpsp_ab.jpsp-disconnect', event) }}"
                         data-title="{% trans %}JPSP-NG - Disconnect{% endtrans %}"
                         data-reload-after data-ajax-dialog>
@@ -43,7 +54,7 @@
 
                     {% else %}
 
-                    <button class="jpsp i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
+                    <button class="i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
                         data-href="{{ url_for('plugin_jpsp_ab.jpsp-connect', event) }}"
                         data-title="{% trans %}JPSP-NG - Connect{% endtrans %}"
                         data-reload-after data-ajax-dialog>
@@ -58,7 +69,7 @@
 
         {% if connected %}        
 
-        <div class="action-box fixed-width">
+        <div class="action-box fixed-width" data-v-app>
             <div class="section">
                 <span class="icon icon-package-download"></span>
                 <div class="text">
@@ -76,7 +87,7 @@
             </div>
         </div> 
 
-        <div class="action-box files-box fixed-width fixed-height">
+        <div class="action-box fixed-width fixed-height" data-v-app>
             <div class="section">
                 <span class="icon icon-user-check"></span>
                 <div class="text">
@@ -98,55 +109,15 @@
                     </a>
                 </div>
             </div>
-        </div> 
-        
-        <!-- div v-scope="SettingsBox({ initialConnected: false })"></div -->
+        </div>
+
+        <div class="action-box files-box fixed-width fixed-height" style="display: none" data-v-app></div>
 
         {% endif %}
     </div>
 
-    <script type="module">
-        import { createApp } from 'https://unpkg.com/petite-vue?module'
-        
-        bootstrapJpspNg(createApp)
-
-
-        function bootstrapJpspNg(createApp) {
-
-            function SettingsBox(props) {
-                return {
-                  $template: '#settings-template',
-                  connected: !!props.initialConnected,
-                  toggleConnect() {
-                    this.connected = !this.connected;
-                  }
-                }
-            }
-            
-            createApp({
-                SettingsBox
-            }).mount();
-        
-        }
-    </script>
-
     {% raw %}
-        <template id="settings-template">
-            <div class="action-box fixed-width">
-                <div class="section">
-                    <span class="icon icon-settings"></span>
-                    <div class="text">
-                        <div class="label">JPSP-NG Settings</div>
-                        <div class="description">Api Url: - Api Key: </div>
-                    </div>
-                    <div class="toolbar">
-                        <button class="jpsp jpsp-btn i-button icon-settings" @click="toggleConnect">
-                            {{ connected ? 'Disconnect' : 'Connect' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </template>
+        <div id="app"></div>
     {% endraw %}
 
 {% endblock content %}

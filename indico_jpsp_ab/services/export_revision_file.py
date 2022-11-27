@@ -1,3 +1,4 @@
+
 from indico_jpsp_ab.services.export_file import ABCExportFile
 
 from sqlalchemy.orm import joinedload
@@ -11,25 +12,27 @@ from indico.modules.events.editing.models.revisions import EditingRevision, Init
 from indico.web.flask.util import url_for
 
 
-class ABCExportEventFiles(ABCExportFile):
+
+
+class ABCExportRevisionFile(ABCExportFile):
     """ """
 
-    def _build_event_files_api_data(self, event):
-
-        contributions = (Contribution.query
+    def _build_event_files_api_data(self, event, contrib_id, type, revision_id):
+   
+        contribution = (Contribution.query
                          .with_parent(event)
                          .options(joinedload('editables'))
+                         .filter_by(id=contrib_id)
                          .order_by(Contribution.friendly_id)
-                         .all())
+                         .first())
 
-        elements = [self._serialize_contribution(
-            event, contribution) for contribution in contributions]
+        element = self._serialize_contribution(event, contribution, type, revision_id)
 
-        return [el for el in elements if el.get('revisions', None) is not None]
+        return element.get('revisions', None)
 
-    def _serialize_contribution(self, event, contribution):
+    def _serialize_contribution(self, event, contribution, type, revision_id):
 
-        editable = self._serialize_editable(event, contribution)
+        editable = self._serialize_editable(event, contribution, type, revision_id)
 
         return {
             "id": contribution.id,
@@ -39,19 +42,21 @@ class ABCExportEventFiles(ABCExportFile):
             "revisions":  editable.get('revisions', None) if editable else None
         }
 
-    def _serialize_editable(self, event, contribution):
+    def _serialize_editable(self, event, contribution, type, revision_id):
 
         editable = (Editable.query
                     .with_parent(contribution)
                     .filter_by(type=1)
                     .first())
 
+        revisions = [rev for rev in editable.revisions if rev.id == revision_id]
+
         if editable is not None:
 
             elements = [
                 self._serialize_editable_revision(
                     event, contribution, revision)
-                for revision in editable.revisions
+                for revision in revisions
             ]
 
             return {
@@ -62,3 +67,5 @@ class ABCExportEventFiles(ABCExportFile):
             }
 
         return None
+
+    

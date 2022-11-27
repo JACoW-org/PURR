@@ -44812,6 +44812,126 @@
         }
       ]
     },
+    "plugin_jpsp_ab.jpsp-connect": {
+      "endpoint": "plugin_jpsp_ab.jpsp-connect",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp_ab",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp-connect",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
+    "plugin_jpsp_ab.jpsp-disconnect": {
+      "endpoint": "plugin_jpsp_ab.jpsp-disconnect",
+      "rules": [
+        {
+          "args": [
+            "event_id"
+          ],
+          "converters": {
+            "event_id": "IntegerConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp_ab",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp-disconnect",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
     "plugin_jpsp_ab.jpsp-home": {
       "endpoint": "plugin_jpsp_ab.jpsp-home",
       "rules": [
@@ -44926,6 +45046,112 @@
             },
             {
               "data": "jpsp-settings",
+              "isDynamic": false
+            }
+          ]
+        }
+      ]
+    },
+    "plugin_jpsp_ab.revision_check_pdf": {
+      "endpoint": "plugin_jpsp_ab.revision_check_pdf",
+      "rules": [
+        {
+          "args": [
+            "contrib_id",
+            "event_id",
+            "revision_id",
+            "type"
+          ],
+          "converters": {
+            "contrib_id": "IntegerConverter",
+            "event_id": "IntegerConverter",
+            "revision_id": "IntegerConverter",
+            "type": "AnyConverter"
+          },
+          "defaults": {},
+          "trace": [
+            {
+              "data": "|",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "event_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "manage",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "jpsp_ab",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "contributions",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "contrib_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "editing",
+              "isDynamic": false
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "type",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "revision_id",
+              "isDynamic": true
+            },
+            {
+              "data": "/",
+              "isDynamic": false
+            },
+            {
+              "data": "check-pdf",
               "isDynamic": false
             }
           ]
@@ -60515,5 +60741,5 @@
       ]
     }
   },
-  "version": "a9ef5157a7146346df85eaa925002946"
+  "version": "bc6fe3adab3200ffb9570f75492d5eb8"
 }

@@ -20,26 +20,66 @@
 
 
 
+import { createApp as c } from 'vue'
 
+import RootComponent from './jpsp-ng.root.js'
 
+import SettingsBox from './components/jpsp-ng.settings.js'
+import DownloadBox from './components/jpsp-ng.download.js'
+import ReportBox from './components/jpsp-ng.report.js'
 
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    // c(RootComponent)
+    // 
+    //     .component('SettingsBox', SettingsBox)
+    //     .component('DownloadBox', DownloadBox)
+    //     .component('ReportBox', ReportBox)
+    // 
+    //     .mount('#app')
+
+})
+
+function get_settings() {
+    try {
+        return JSON.parse(
+            document.querySelector('#jpsp-ng-settings').textContent
+        );
+    } catch (e) {
+        return undefined;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const jpsp_ng_settings = get_settings();
+
+    if (!jpsp_ng_settings) { return; }
+
     const jpsp_ng_element = document.querySelector(".jpsp-ng");
+
+    if (!jpsp_ng_element) { return; }
 
     const ulid = ULID();
 
-    const ws = (() => {
+    const ws = (settings => {
+
+        //console.log(settings);
+
         const store = {};
-        const handlers = {
-            // check_pdf: ({ head, body }) => { console.log({ head, body }) },
-            // event_ab: ({ head, body }) => console.log({ head, body })
-        };
 
-        document.cookie = "X-API-Key=01GDWDBTHHJNZ0KAVKZ1YP320S" + "; path=/";
+        // const handlers = {
+        //     // check_pdf: ({ head, body }) => { console.log({ head, body }) },
+        //     // event_ab: ({ head, body }) => console.log({ head, body })
+        // };        
 
-        const ws = new WebSocket(`ws://127.0.0.1:8000/socket/jpsp:feed`);
+        const api_url = new URL(settings.api_url);
+        const api_pro = 'https:' === api_url.protocol ? 'wss:' : 'ws:';
+
+        document.cookie = `X-API-KEY=${settings.api_key}` + "; path=/";
+
+        const ws = new WebSocket(`${api_pro}//${api_url.host}/socket/jpsp:feed`);
 
         ws.addEventListener("open", (ev) => {
             document
@@ -114,9 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            if (body.method in handlers) {
-                handlers[body.method].call(null, { head, body });
-            }
+            // if (body.method in handlers) {
+            //     handlers[body.method].call(null, { head, body });
+            // }
         }
 
         function log_data({ head, body }) {
@@ -151,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
         }
-    })();
+    })(jpsp_ng_settings);
 
     document.querySelector(".download").addEventListener("click", (ev) => {
         const loader = createLoader("Downloading...");
@@ -218,6 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
         files_box
             .querySelectorAll(".section.section-added")
             .forEach((el) => el.parentNode.removeChild(el));
+        files_box.style.display = 'none';
     });
 
     document.querySelector(".check").addEventListener("click", (ev) => {
@@ -227,6 +268,8 @@ document.addEventListener("DOMContentLoaded", () => {
         files_box
             .querySelectorAll(".section.section-added")
             .forEach((el) => el.parentNode.removeChild(el));
+
+        files_box.style.display = 'block';
 
         const progress = Object.assign(document.createElement("section"), {
             className: "section section-added",
@@ -275,9 +318,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     files_box.appendChild(
                         Object.assign(document.createElement("section"), {
                             className: "section section-added",
-                            innerHTML: `<span class="icon icon-small icon-file-pdf"></span>
+                            innerHTML: `
                                 <div class="text">
-                                    <div class="label">File: ${body.params.progress.file.filename} - Fonts (ok), Size (ok)</div>
+                                    <div class="jpsp-row">
+                                        <div class="jpsp-col jpsp-col-grow">
+                                            <span class="icon icon-small icon-file-pdf"></span>
+                                            <span class="label">File:</span> 
+                                            ${body.params.progress.file.filename}
+                                        </div>
+                                        <div class="jpsp-col jpsp-col-grow">
+                                            <span class="label">Fonts:</span>
+                                            <span class="icon icon-small icon-checkbox-checked"></span>
+                                        </div>
+                                        <div class="jpsp-col jpsp-col-grow">
+                                            <span class="label">Page Size:</span>
+                                            <span class="icon icon-small icon-checkbox-checked"></span>
+                                        </div>
+                                        <div class="jpsp-col">
+                                            <a href="/${body.params.progress.file.contribution_url}/editing/paper">Go</a>
+                                        </div>
+                                    <div>
                                 </div>`,
                         })
                     );

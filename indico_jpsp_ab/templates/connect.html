@@ -10,13 +10,10 @@
     {{ form_row(form.api_url) }}
     {{ form_row(form.api_key) }}
 
-    {% call(custom_field) sortable_list(event.contribution_fields, id="custom-fields", classes='tiles disable-if-locked') %}
-        <a class="icon-edit js-action-button js-edit-contribution-field" 
-            title="{% trans %}Select custom field{% endtrans %}"></a>
-    {% endcall %}
-
     {% call form_footer(form, skip_label=true) %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Connect{% endtrans %}" data-disabled-until-change>
+        <input class="i-button big highlight" type="submit" 
+            value="{% trans %}Connect{% endtrans %}" 
+            data-disabled-until-change>
     {% endcall %}
 
 {% endblock %}

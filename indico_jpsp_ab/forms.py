@@ -1,13 +1,12 @@
 from wtforms.validators import URL, DataRequired, Email, InputRequired
 
-from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
+from wtforms import BooleanField, EmailField, FloatField, SelectField, SelectMultipleField, StringField, TextAreaField
 from wtforms.fields import IntegerField, URLField
 
 from indico.util.i18n import _
 from indico.util.string import validate_email
-from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm
 
+from indico.web.forms.base import IndicoForm
 
 
 class JpspConnectForm(IndicoForm):
@@ -17,6 +16,14 @@ class JpspConnectForm(IndicoForm):
     
 class JpspDisconnectForm(IndicoForm):
     connected = BooleanField(_('CONNECTED'), [DataRequired()])
+
+
+class JpspSettingsForm(IndicoForm):
+    pdf_page_width = FloatField(_('PDF PAGE WIDTH'), [DataRequired()])
+    pdf_page_height = FloatField(_('PDF PAGE HEIGHT'), [DataRequired()])
+    ab_session_h1 = FloatField(_('PDF SESSION H1'), [DataRequired()])
+    ab_session_h2 = FloatField(_('PDF SESSION H2'), [DataRequired()])
+    ab_contribution_h1 = FloatField(_('AB CONTRIBUTION H1'), [DataRequired()])
     
     
 # class SettingsForm(IndicoForm):

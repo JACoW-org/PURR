@@ -347,7 +347,7 @@ class ABCExportEvent(ABC):
         # return [self._serialize_session_block(b, serialized_session, session_access_list)
         #         for b in session_.blocks]
 
-    def _build_event_api_data(self, event):
+    def _build_event_api_data(self, event, contributions=True, sessions=True, occurrences=True):
         
         start_date = datetime.now().timestamp()
                 
@@ -429,28 +429,37 @@ class ABCExportEvent(ABC):
         #         for session_ in event.sessions:
         #             data['sessions'].extend(
         #                 self._build_session_api_data(session_))
+        
+        if contributions:
 
-        data['contributions'] = []
-        
-        for contribution in event.contributions:
-            serialized_contrib = self._serialize_contribution(contribution)
-            data['contributions'].append(serialized_contrib)
-
-        logger.error(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
-        start_date = datetime.now().timestamp()
-        
-        data['sessions'] = []
-        
-        for session_ in event.sessions:
-            data['sessions'].extend(
-                self._build_session_api_data(session_))
+            data['contributions'] = []
             
-        logger.error(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
-        start_date = datetime.now().timestamp()
+            for contribution in event.contributions:
+                serialized_contrib = self._serialize_contribution(contribution)
+                data['contributions'].append(serialized_contrib)
 
-        data['occurrences'] = self._serialize_event_occurrences(event)
+            logger.error(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
+            
+        if sessions:
+            
+            start_date = datetime.now().timestamp()       
+            
+            data['sessions'] = []
+            
+            for session_ in event.sessions:
+                data['sessions'].extend(
+                    self._build_session_api_data(session_))
+                
+            logger.error(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
+            
         
-        logger.error(f'[delta] occurrences -> {(datetime.now().timestamp() - start_date)}')
-        start_date = datetime.now().timestamp()
+        if occurrences:
+            
+            start_date = datetime.now().timestamp()
+
+            data['occurrences'] = self._serialize_event_occurrences(event)
+            
+            logger.error(f'[delta] occurrences -> {(datetime.now().timestamp() - start_date)}')
+            
         
         return data

@@ -1,26 +1,32 @@
-from wtforms import StringField, BooleanField
-
 from indico.core.plugins import IndicoPlugin
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
+from flask_pluginengine.plugin import render_plugin_template
 
-
+from indico.modules.events.management.views import WPEventManagement
 
 from indico_jpsp_ab.blueprint import JpspAbPBlueprint
-
 
 
 class JpspNgPlugin(IndicoPlugin):
 
     configurable = False
-    
+
     def init(self):
         super(JpspNgPlugin, self).init()
         self.register_assets()
+        # self.register_hook()
 
     def get_blueprints(self):
         return JpspAbPBlueprint
 
     def register_assets(self):
-        self.inject_bundle('script.js')
-        self.inject_bundle('style.css')
+        self.inject_bundle('script.js', WPEventManagement)
+        self.inject_bundle('style.css', WPEventManagement)
+
+    def register_hook(self):
+        self.template_hook('attachment-sources', self._inject_check_pdf_button)
+
+    def _inject_check_pdf_button(self, linked_object=None, **kwargs):
+        return render_plugin_template('check_pdf_button.html', linked_object=linked_object,
+                                      service_name=self.settings.get('service_name'),
+                                      button_icon_url=self.settings.get('button_icon_url'))
