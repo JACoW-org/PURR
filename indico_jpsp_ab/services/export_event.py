@@ -163,9 +163,7 @@ class ABCExportEvent(ABC):
         # start_date = datetime.now().timestamp()
         
         field_values = list(map(self._serialize_field_value, contrib.field_values))
-        
-        # abstract = 
-        
+               
         return {
             '_type': 'Contribution',
             '_fossil': self._fossils_mapping['contribution'].get(self._detail_level),
