@@ -1,8 +1,5 @@
 
 
-
-
-
 from indico_jpsp_ab.forms import JpspSettingsForm
 
 from indico_jpsp_ab.models.settings import JpspSettingsModel
@@ -21,18 +18,11 @@ from indico.web.util import jsonify_data, jsonify_template
 from flask import g, request, session, make_response
 
 
-
-
-
-
-
-
-
 class RH_settings_page(RHManageEventBase):
     """ """
 
     def _process_GET(self):
-        
+
         self.user = g.current_api_user = session.user
         self.event = Event.get(request.view_args['event_id'])
 
@@ -49,7 +39,11 @@ class RH_settings_page(RHManageEventBase):
                     'utf-8')) if settings.custom_fields else []
 
                 form = JpspSettingsForm(pdf_page_width=settings.pdf_page_width,
-                                        pdf_page_height=settings.pdf_page_height)
+                                        pdf_page_height=settings.pdf_page_height,
+                                        ab_session_h1=settings.ab_session_h1,
+                                        ab_session_h2=settings.ab_session_h2,
+                                        ab_contribution_h1=settings.ab_contribution_h1,
+                                        ab_contribution_h2=settings.ab_contribution_h2)
 
                 return jsonify_template('jpsp_ab:settings.html', form=form,
                                         event=self.event, custom_fields=custom_fields)
@@ -67,13 +61,21 @@ class RH_settings_page(RHManageEventBase):
 
             if connected:
 
-                form = JpspSettingsForm(pdf_page_width=request.form['pdf_page_width'],
-                                        pdf_page_height=request.form['pdf_page_height'])
+                # print(request.form)
 
-                settings = JpspSettingsModel.query.filter_by(
-                    event_id=self.event.id).first()
+                form = JpspSettingsForm(pdf_page_width=request.form['pdf_page_width'],
+                                        pdf_page_height=request.form['pdf_page_height'],
+                                        ab_session_h1=request.form['ab_session_h1'],
+                                        ab_session_h2=request.form['ab_session_h2'],
+                                        ab_contribution_h1=request.form['ab_contribution_h1'],
+                                        ab_contribution_h2=request.form['ab_contribution_h2'])
+
+                # print(form.data)
 
                 if form.validate_on_submit():
+
+                    settings = JpspSettingsModel.query.filter_by(
+                        event_id=self.event.id).first()
 
                     settings.populate_from_dict(form.data)
                     settings.custom_fields = str(json_encode([
@@ -86,7 +88,7 @@ class RH_settings_page(RHManageEventBase):
                     db.session.commit()
                     db.session.flush()
 
-                    print(settings)
+                    # print(settings)
 
                     self.event.log(EventLogRealm.management, LogKind.positive, 'JPSP-NG',
                                    f'Settings saved', session.user)

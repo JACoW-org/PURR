@@ -20,13 +20,13 @@
 
 
 
-import { createApp as c } from 'vue'
-
-import RootComponent from './jpsp-ng.root.js'
-
-import SettingsBox from './components/jpsp-ng.settings.js'
-import DownloadBox from './components/jpsp-ng.download.js'
-import ReportBox from './components/jpsp-ng.report.js'
+// import { createApp as c } from 'vue'
+// 
+// import RootComponent from './jpsp-ng.root.js'
+// 
+// import SettingsBox from './components/jpsp-ng.settings.js'
+// import DownloadBox from './components/jpsp-ng.download.js'
+// import ReportBox from './components/jpsp-ng.report.js'
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             },
                             body: {
                                 method: task.method,
-                                params: params,
+                                params: params
                             },
                         })
                     );

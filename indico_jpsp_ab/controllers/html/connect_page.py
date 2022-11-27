@@ -35,6 +35,7 @@ class RH_connect_page(RHManageEventBase):
             if connected:
                 settings = JpspSettingsModel.query.filter_by(
                     event_id=self.event.id).first()
+                
                 form = JpspConnectForm(api_url=settings.api_url,
                                        api_key=settings.api_key)
             else:

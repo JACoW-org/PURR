@@ -19,11 +19,18 @@ class JpspDisconnectForm(IndicoForm):
 
 
 class JpspSettingsForm(IndicoForm):
-    pdf_page_width = FloatField(_('PDF PAGE WIDTH'), [DataRequired()])
-    pdf_page_height = FloatField(_('PDF PAGE HEIGHT'), [DataRequired()])
-    ab_session_h1 = FloatField(_('PDF SESSION H1'), [DataRequired()])
-    ab_session_h2 = FloatField(_('PDF SESSION H2'), [DataRequired()])
-    ab_contribution_h1 = FloatField(_('AB CONTRIBUTION H1'), [DataRequired()])
+    pdf_page_width = FloatField(_('PDF PAGE WIDTH'), [DataRequired()], 
+                                description=_('PDF PAGE WIDTH'))
+    pdf_page_height = FloatField(_('PDF PAGE HEIGHT'), [DataRequired()],
+                                 description=_('PDF PAGE HEIGHT'))
+    ab_session_h1 = StringField(_('AB SESSION H1'), [DataRequired()],
+                                description=_('AB SESSION H1 PATTERN'))
+    ab_session_h2 = StringField(_('AB SESSION H2'), [DataRequired()],
+                                description=_('AB SESSION H2 PATTERN'))
+    ab_contribution_h1 = StringField(_('AB CONTRIBUTION H1'), [DataRequired()],
+                                     description=_('AB CONTRIBUTION PATTERN'))
+    ab_contribution_h2 = StringField(_('AB CONTRIBUTION H2'), [DataRequired()],
+                                     description=_('AB CONTRIBUTION POSTER PATTERN'))
     
     
 # class SettingsForm(IndicoForm):

@@ -27,13 +27,13 @@ class JpspSettingsModel(db.Model):
     pdf_page_width = db.Column(
         db.Float,
         nullable=False,
-        default=0.0
+        default=0.1
     )
     
     pdf_page_height = db.Column(
         db.Float,
         nullable=False,
-        default=0.0
+        default=0.1
     )
     
     custom_fields = db.Column(
@@ -47,6 +47,30 @@ class JpspSettingsModel(db.Model):
         db.ForeignKey('users.users.id'),
         index=True,
         nullable=False
+    )
+    
+    ab_session_h1 = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    
+    ab_session_h2 = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    
+    ab_contribution_h1 = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    
+    ab_contribution_h2 = db.Column(
+        db.String,
+        nullable=False,
+        default=''
     )
     
     #: ID of the event
@@ -78,4 +102,7 @@ class JpspSettingsModel(db.Model):
     )
 
     def __repr__(self):
-        return u'<JpspSettingsModel({}, {}, {}, {})>'.format(self.id, self.api_url, self.api_key, self.custom_fields, self.event_id)
+        return u'<JpspSettingsModel({}, {}, {}, {}, {}, {}, {}, {}, {})>'.format(
+            self.id, self.api_url, self.api_key, self.custom_fields, 
+            self.ab_session_h1, self.ab_session_h2, self.ab_contribution_h1,
+            self.ab_contribution_h2, self.event_id)

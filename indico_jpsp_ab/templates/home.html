@@ -43,7 +43,7 @@
                     <button class="i-button info icon-settings" title="{% trans %}Settings{% endtrans %}"
                         data-href="{{ url_for('plugin_jpsp_ab.jpsp-settings', event) }}"
                         data-title="{% trans %}JPSP-NG - Settings{% endtrans %}"
-                        data-ajax-dialog></button>
+                        data-reload-after data-ajax-dialog></button>
 
                     <button class="i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
                         data-href="{{ url_for('plugin_jpsp_ab.jpsp-disconnect', event) }}"

@@ -31,10 +31,13 @@ def upgrade():
                               nullable=True, server_default='')
     ab_contribution_h1 = sa.Column('ab_contribution_h1', sa.String(),
                                    nullable=True, server_default='')
+    ab_contribution_h2 = sa.Column('ab_contribution_h2', sa.String(),
+                                   nullable=True, server_default='')
 
     op.add_column('jpsp_settings', ab_session_h1, schema=schema)
     op.add_column('jpsp_settings', ab_session_h2, schema=schema)
     op.add_column('jpsp_settings', ab_contribution_h1, schema=schema)
+    op.add_column('jpsp_settings', ab_contribution_h2, schema=schema)
 
   
     # ### end ###
@@ -43,6 +46,7 @@ def upgrade():
 def downgrade():
     # ### Del new columns ###
 
+    op.drop_column('jpsp_settings', 'ab_contribution_h2', schema=schema)
     op.drop_column('jpsp_settings', 'ab_contribution_h1', schema=schema)
     op.drop_column('jpsp_settings', 'ab_session_h2', schema=schema)
     op.drop_column('jpsp_settings', 'ab_session_h1', schema=schema)
