@@ -205,14 +205,53 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.remove("disabled");
                 ev.target.removeChild(loader);
 
-                document.body
-                    .appendChild(
-                        Object.assign(document.createElement("a"), {
-                            href: "data:application/octet-stream;base64," + body.params.b64,
-                            download: body.params.filename,
-                        })
-                    )
-                    .click();
+                const url = "data:application/octet-stream;base64," + body.params.b64;
+
+                // const blob = b64toBlob(body.params.b64, "application/octet-stream");
+                // const url = URL.createObjectURL(blob);
+
+                console.log('url', url)
+
+                Promise.resolve().then(() => {
+                    console.log('assign >>>')
+                    return Object.assign(document.createElement("a"), {
+                        href: url,
+                        download: body.params.filename,
+                        style: 'display:none'
+                    })
+                }).then(a => {
+                    console.log('append >>>')
+                    return document.body.appendChild(a)
+                }).then(a => {
+                    return new Promise(ok => {
+                        a.onclick = () => {
+
+                            setTimeout(() => {
+
+                                console.log('onclick >>>', );
+
+                                if (!document.hasFocus()) {
+                                    window.addEventListener('focus', () => {
+                                        return ok(a);
+                                    }, { once: true });
+                                } else {
+                                    return ok(a);
+                                }                                
+
+                            }, 1500)
+
+                        };
+                        console.log('click >>>')
+                        a.dispatchEvent(new MouseEvent('click'));
+                    });
+                }).then(a => {
+                    console.log('remove >>>')
+                    a.remove();
+                }).then(a => {
+                    window.URL.revokeObjectURL(url);
+                    console.log('end >>>')
+                })
+
             },
             err: (e) => console.error(e),
             task: {
@@ -483,6 +522,26 @@ function createLoader(label) {
 
 function SVGLoader(label) {
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="margin-right:.5em" width="19px" height="19px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><defs><clipPath id="ldio-nrdo6xh3vun-cp" x="0" y="0" width="100" height="100"><circle cx="50" cy="50" r="28"></circle></clipPath></defs><circle cx="50" cy="50" r="37" fill="#fac090" stroke="#ff7c81" stroke-width="6"></circle><g clip-path="url(#ldio-nrdo6xh3vun-cp)"><g><g transform="scale(0.5)"><g transform="translate(-50,-50)"><path fill="#ffffcb" d="M71.989,44.694V8.711c0-0.419-0.34-0.759-0.759-0.759H28.769c-0.419,0-0.759,0.34-0.759,0.759v35.983H6.069 c-0.914,0-1.405,1.075-0.807,1.766l43.931,45.22c0.425,0.491,1.188,0.491,1.613,0l43.931-45.22c0.599-0.691,0.108-1.766-0.807-1.766 H71.989z"></path></g></g><animateTransform attributeName="transform" type="translate" repeatCount="indefinite" dur="1s" keyTimes="0;1" values="50 -20;50 120"></animateTransform></g></g></svg>${label}`;
+}
+
+function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays, { type: contentType });
+    return blob;
 }
 
 function ULID() {
