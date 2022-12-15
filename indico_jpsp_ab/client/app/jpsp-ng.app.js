@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // const blob = b64toBlob(body.params.b64, "application/octet-stream");
                 // const url = URL.createObjectURL(blob);
 
-                console.log('url', url)
+                // console.log('url', url)
 
                 Promise.resolve().then(() => {
                     console.log('assign >>>')
@@ -259,37 +259,74 @@ document.addEventListener("DOMContentLoaded", () => {
                 params: () => fetchEventJson(),
             },
         });
+    });
 
-        // Promise.resolve()
-        //     .then(() => {
-        //         ev.target.classList.add('disabled');
-        //         ev.target.appendChild(loader)
-        //     })
-        //     .then(() => fetchEventJson())
-        //     // .then((evt) => createEventAb(evt))
-        //     .then((params) => {
-        //         ws.send(JSON.stringify({
-        //             head: {
-        //                 code: 'task:exec',
-        //                 uuid: ulid(),
-        //                 time: `${new Date().getTime()}`
-        //             },
-        //             body: {
-        //                 method: 'event_ab',
-        //                 params: params
-        //             },
-        //         }));
-        //     })
-        //     .catch((err) => console.error(err))
-        //     .finally(() => {
-        //         ev.target.classList.remove('disabled');
-        //         ev.target.removeChild(loader);
-        //     })
+    document.querySelector(".proceedings").addEventListener("click", (ev) => {
+        const loader = createLoader("Proceedings...");
 
-        // fetch(`http://${location.host}/api/conference/44/get`)
-        //     .then(res => res.json())
-        //     .then(json => console.log(json))
-        //     .catch(err => console.error(err))
+        ws.task({
+            pre: () => {
+                ev.target.classList.add("disabled");
+                ev.target.appendChild(loader);
+            },
+            progress: ({ head, body }) => {
+                ev.target.classList.remove("disabled");
+                ev.target.removeChild(loader);
+
+                const url = "data:application/octet-stream;base64," + body.params.b64;
+
+                // const blob = b64toBlob(body.params.b64, "application/octet-stream");
+                // const url = URL.createObjectURL(blob);
+
+                // console.log('url', url)
+
+                Promise.resolve().then(() => {
+                    console.log('assign >>>')
+                    return Object.assign(document.createElement("a"), {
+                        href: url,
+                        download: body.params.filename,
+                        style: 'display:none'
+                    })
+                }).then(a => {
+                    console.log('append >>>')
+                    return document.body.appendChild(a)
+                }).then(a => {
+                    return new Promise(ok => {
+                        a.onclick = () => {
+
+                            setTimeout(() => {
+
+                                console.log('onclick >>>', );
+
+                                if (!document.hasFocus()) {
+                                    window.addEventListener('focus', () => {
+                                        return ok(a);
+                                    }, { once: true });
+                                } else {
+                                    return ok(a);
+                                }                                
+
+                            }, 1500)
+
+                        };
+                        console.log('click >>>')
+                        a.dispatchEvent(new MouseEvent('click'));
+                    });
+                }).then(a => {
+                    console.log('remove >>>')
+                    a.remove();
+                }).then(a => {
+                    window.URL.revokeObjectURL(url);
+                    console.log('end >>>')
+                })
+
+            },
+            err: (e) => console.error(e),
+            task: {
+                method: "event_zip",
+                params: () => fetchEventJson(),
+            },
+        });
     });
 
     document.querySelector(".clear").addEventListener("click", (ev) => {
