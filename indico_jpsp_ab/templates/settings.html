@@ -1,0 +1,46 @@
+{% from '_sortable_list.html' import sortable_list %}
+{% from 'events/management/_settings.html' import render_event_settings %}
+{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows, form_fieldset %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
+
+{% block content %}
+
+    {{ form_header(form, id='jpsp-ng-settings-form') }}
+
+    {{ form_row(form.pdf_page_width) }}
+    {{ form_row(form.pdf_page_height) }}
+
+    {{ form_row(form.ab_session_h1) }}
+    {{ form_row(form.ab_session_h2) }}
+    {{ form_row(form.ab_contribution_h1) }}
+    {{ form_row(form.ab_contribution_h2) }}
+
+    <div class="form-group">
+        
+        <div class="form-label form-label-middle">
+            <label>CUSTOM FIELDS</label>
+        </div>
+        
+        <div class="form-field">
+            {% for custom_field in event.contribution_fields %}
+            <div>
+                <input id="custom_field_{{ custom_field.id }}" 
+                    name="custom_field_{{ custom_field.id }}"
+                    {{ 'checked' if custom_field.id in custom_fields }}
+                    type="checkbox" value="{{ custom_field.id }}">
+                
+                <label for="custom_field_{{ custom_field.id }}">
+                    {{ custom_field.title }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% call form_footer(form, skip_label=true) %}
+        <input class="i-button big highlight" type="submit" 
+            value="{% trans %}Save{% endtrans %}" 
+            data-disabled-until-change>
+    {% endcall %}
+
+{% endblock %}

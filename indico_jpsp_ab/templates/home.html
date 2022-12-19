@@ -1,0 +1,141 @@
+{% extends "events/management/base.html" %}
+{% from '_sortable_list.html' import sortable_list %}
+{% from 'events/management/_settings.html' import render_event_settings %}
+{% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
+{% block title %}
+    {% trans %}JPSP-NG{% endtrans %}
+{% endblock title %}
+{% block content %}
+
+    {{ template_hook('event-actions', event=event) }}
+
+    {% if connected %}
+        <script id="jpsp-ng-settings" type="application/json">{{ settings | tojson }}</script>
+    {% endif %} 
+
+    <div id="jpsp-ng-home"></div>
+    
+    <div class="jpsp-ng">
+
+        <div class="action-box fixed-width">
+            <div class="section">
+                <span class="icon icon-link"></span>
+                <div class="text">
+                    <div class="label">
+                        {% if connected %}
+                            {% trans %}Plugin connected{% endtrans %}
+                        {% else %}
+                            {% trans %}Plugin disconnected{% endtrans %}
+                        {% endif %} 
+                    </div>
+                    <div class="description">
+                        {% if connected %}
+                            {{ settings.api_url }}
+                        {% else %}
+                            {% trans %}Click "Connect" to configuer JPSP-NG Api Server..{% endtrans %}                      
+                        {% endif %} 
+                    </div>
+                </div>
+                <div class="toolbar">
+
+                    {% if connected %}
+
+                    <button class="i-button info icon-settings" title="{% trans %}Settings{% endtrans %}"
+                        data-href="{{ url_for('plugin_jpsp_ab.jpsp-settings', event) }}"
+                        data-title="{% trans %}JPSP-NG - Settings{% endtrans %}"
+                        data-reload-after data-ajax-dialog></button>
+
+                    <button class="i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
+                        data-href="{{ url_for('plugin_jpsp_ab.jpsp-disconnect', event) }}"
+                        data-title="{% trans %}JPSP-NG - Disconnect{% endtrans %}"
+                        data-reload-after data-ajax-dialog>
+                        {% trans %}Disconnect{% endtrans %}
+                    </button>
+
+                    {% else %}
+
+                    <button class="i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
+                        data-href="{{ url_for('plugin_jpsp_ab.jpsp-connect', event) }}"
+                        data-title="{% trans %}JPSP-NG - Connect{% endtrans %}"
+                        data-reload-after data-ajax-dialog>
+                        {% trans %}Connect{% endtrans %}
+                    </button>
+                    
+                    {% endif %}
+
+                </div>
+            </div>
+        </div> 
+
+        {% if connected %}        
+
+        <div class="action-box fixed-width" data-v-app>
+            <div class="section">
+                <span class="icon icon-package-download"></span>
+                <div class="text">
+                    <div class="label">Abstract Booklet ODT</div>
+                    <div class="description">You can attach files or links using the buttons on the right.</div>
+                </div>
+                <div class="toolbar">
+                    <a href="#"
+                        class="jpsp jpsp-btn download i-button icon-file-openoffice"
+                        data-title="Download Abstract Booklet"
+                        data-qtip-oldtitle="Download Abstract Booklet">
+                            Download
+                    </a>
+                </div>
+            </div>
+        </div>         
+
+        <div class="action-box fixed-width" data-v-app>
+            <div class="section">
+                <span class="icon icon-shrink"></span>
+                <div class="text">
+                    <div class="label">Proceedings</div>
+                    <div class="description">Download final Proceedings.</div>
+                </div>
+                <div class="toolbar">
+                    <a href="#"
+                        class="jpsp jpsp-btn proceedings i-button icon-file-zip"
+                        data-title="Download final Proceedings"
+                        data-qtip-oldtitle="Download final Proceedings">
+                            Download
+                    </a>
+                </div>
+            </div>
+        </div> 
+
+        <div class="action-box fixed-width fixed-height" data-v-app>
+            <div class="section">
+                <span class="icon icon-user-check"></span>
+                <div class="text">
+                    <div class="label">Check event pdf files</div>
+                    <div class="description">Check event pdf files.</div>
+                </div>
+                <div class="toolbar">
+                    <a href="#"
+                        class="jpsp jpsp-btn clear i-button icon-remove"
+                        data-title="Clear PDF Files"
+                        data-qtip-oldtitle="Clear PDF Files">
+                            Clear
+                    </a>
+                    <a href="#"
+                        class="jpsp jpsp-btn check i-button icon-file-check"
+                        data-title="Check PDF Files"
+                        data-qtip-oldtitle="Check PDF Files">
+                            Check
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-box files-box fixed-width fixed-height" style="display: none" data-v-app></div>
+
+        {% endif %}
+    </div>
+
+    {% raw %}
+        <div id="app"></div>
+    {% endraw %}
+
+{% endblock content %}

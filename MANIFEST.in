@@ -1,0 +1,6 @@
+graft indico_jpsp_ab/static
+graft indico_jpsp_ab/migrations
+graft indico_jpsp_ab/templates
+graft indico_jpsp_ab/translations
+
+global-exclude *.pyc __pycache__ .keep
