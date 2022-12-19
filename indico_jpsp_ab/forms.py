@@ -27,9 +27,9 @@ class JpspSettingsForm(IndicoForm):
                                 description=_('AB SESSION H1 PATTERN'))
     ab_session_h2 = StringField(_('AB SESSION H2'), [DataRequired()],
                                 description=_('AB SESSION H2 PATTERN'))
-    ab_contribution_h1 = StringField(_('AB CONTRIBUTION H1'), [DataRequired()],
+    ab_contribution_h1 = StringField(_('AB CONTRIBUTION STANDARD'), [DataRequired()],
                                      description=_('AB CONTRIBUTION PATTERN'))
-    ab_contribution_h2 = StringField(_('AB CONTRIBUTION H2'), [DataRequired()],
+    ab_contribution_h2 = StringField(_('AB CONTRIBUTION POSTER'), [DataRequired()],
                                      description=_('AB CONTRIBUTION POSTER PATTERN'))
     
     
