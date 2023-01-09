@@ -1,18 +1,11 @@
 from abc import ABC
 
-from sqlalchemy.orm import joinedload
-
-from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.editing.models.editable import Editable
-
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
-
-from indico.web.flask.util import url_for
-
 
 
 class ABCExportFile(ABC):
+    """ """
+              
     def _serialize_editable_revision(self, event, contribution, revision):
 
         editing_revision_files = EditingRevisionFile.query.with_parent(revision).all()
@@ -22,8 +15,7 @@ class ABCExportFile(ABC):
             "comment": revision.comment,
             "created_dt": revision.created_dt,
             "files": [
-                self._serialize_file(event, contribution,
-                                     revision, erf)
+                self._serialize_file(event, contribution, revision, erf)
                 for erf in editing_revision_files if erf.file_type.type == 1 and erf.file_type.publishable
             ]
         }
@@ -48,15 +40,16 @@ class ABCExportFile(ABC):
         
         # print(download_url, external_download_url)
 
-        # base_url = "http://127.0.0.1:8005"
         contribution_url = f"event/{event.id}/contributions/{contribution.id}"
         file_url = f"editing/paper/{revision.id}/{file.id}/{file.filename}"
 
         return {
             "id": file.id,
             "uuid": file.uuid,
+            "md5sum": file.md5,
             "filename": file.filename,
             "content_type": file.content_type,
+            
             "file_type": {
                 'type': file_type.type,
                 'name': file_type.name,
@@ -65,6 +58,7 @@ class ABCExportFile(ABC):
                 'publishable': file_type.publishable,
                 'filename_template': file_type.filename_template
             },
+            
             "event_id": event.id,
             "contribution_id": contribution.id,
             "revision_id": revision.id,

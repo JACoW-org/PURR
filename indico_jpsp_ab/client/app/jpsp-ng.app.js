@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             setTimeout(() => {
 
-                                console.log('onclick >>>', );
+                                console.log('onclick >>>',);
 
                                 if (!document.hasFocus()) {
                                     window.addEventListener('focus', () => {
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }, { once: true });
                                 } else {
                                     return ok(a);
-                                }                                
+                                }
 
                             }, 1500)
 
@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             setTimeout(() => {
 
-                                console.log('onclick >>>', );
+                                console.log('onclick >>>',);
 
                                 if (!document.hasFocus()) {
                                     window.addEventListener('focus', () => {
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     }, { once: true });
                                 } else {
                                     return ok(a);
-                                }                                
+                                }
 
                             }, 1500)
 
@@ -336,6 +336,112 @@ document.addEventListener("DOMContentLoaded", () => {
             .forEach((el) => el.parentNode.removeChild(el));
         files_box.style.display = 'none';
     });
+
+
+    document.querySelector(".keywords").addEventListener("click", (ev) => {
+
+        const loader = createLoader("Keywords...");
+
+        const keywords_box = jpsp_ng_element.querySelector(".keywords-box");
+        keywords_box
+            .querySelectorAll(".section.section-added")
+            .forEach((el) => el.parentNode.removeChild(el));
+
+        keywords_box.style.display = 'block';
+
+        const progress = Object.assign(document.createElement("section"), {
+            className: "section section-added",
+            innerHTML: `<div class="meter"><span class="progress"></span></div>`,
+            update: ({ index, total }) => {
+                const el = progress.querySelector(".meter .progress");
+
+                if (total === 0) {
+                    el.style.width = "100%";
+                } else {
+                    el.style.width = (index * 100) / total + "%";
+                }
+            },
+            increment: ({ total }) => {
+                progress.dataset.total = total;
+                progress.dataset.index = progress.dataset.index || 0;
+                progress.dataset.index++;
+                progress.querySelector(".meter .progress").style.width =
+                    (progress.dataset.index * 100) / total + "%";
+            },
+        });
+
+        ws.task({
+            pre: () => {
+                ev.target.classList.add("disabled");
+                ev.target.appendChild(loader);
+                keywords_box.appendChild(progress);
+
+                progress.update({
+                    index: 0,
+                    total: 0,
+                });
+            },
+            progress: ({ head, body }) => {
+                if (body.params.progress) {
+                    progress.increment({
+                        total: body.params.progress.total,
+                    });
+
+                    console.log(
+                        body.params.progress.index,
+                        body.params.progress.total,
+                        body.params.progress.file
+                    );
+                } else if (body.params.final) {
+
+                    const results = body.params.final.map(one => ({
+                        filename: one.file.filename,
+                        keywords: one.keywords
+                    }));
+
+                    results.sort((a, b) => {
+                        const A = a.filename.toUpperCase();
+                        const B = b.filename.toUpperCase();
+
+                        if (A < A) {
+                            return -1;
+                        }
+                        if (A > B) {
+                            return 1;
+                        }
+
+                        return 0;
+                    });
+
+                    const elements = results.map(res => Object.assign(
+                        document.createElement("li"), {
+                        innerHTML: `<b>${res.filename}</b>: ${JSON.stringify(res.keywords)}`
+                    }))
+
+                    const container = document.createElement("ul");
+
+                    elements.forEach(el => container.appendChild(el))
+
+                    keywords_box.appendChild(container);
+
+                }
+            },
+            post: () => {
+                ev.target.classList.remove("disabled");
+                ev.target.removeChild(loader);
+
+                keywords_box.removeChild(progress);
+                // keywords_box.style.display = 'none';
+            },
+            err: (e) => console.error(e),
+            task: {
+                method: "event_pdf",
+                params: () => fetchEventFilesJson(),
+            },
+        });
+
+    });
+
 
     document.querySelector(".check").addEventListener("click", (ev) => {
         const loader = createLoader("Checking...");
@@ -422,7 +528,9 @@ document.addEventListener("DOMContentLoaded", () => {
             post: () => {
                 ev.target.classList.remove("disabled");
                 ev.target.removeChild(loader);
+
                 files_box.removeChild(progress);
+                files_box.style.display = 'none';
             },
             err: (e) => console.error(e),
             task: {
@@ -430,6 +538,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 params: () => fetchEventFilesJson(),
             },
         });
+
+
+
+
+
 
         // Promise.resolve()
         //     .then(() => {

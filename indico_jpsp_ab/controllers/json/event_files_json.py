@@ -36,7 +36,7 @@ class RH_event_files_json(RHManageEventBase, ABCExportEventFiles):
                     event_id=self.event.id).first()
                 
                 return json_encode({
-                    'contributions': self._build_event_files_api_data(self.event),
+                    'event': self._build_event_files_api_data(self.event),
                     'cookies': get_cookies_util(request.cookies),
                     'settings': get_settings_util(settings)
                 })

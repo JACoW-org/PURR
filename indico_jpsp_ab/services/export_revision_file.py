@@ -6,13 +6,6 @@ from sqlalchemy.orm import joinedload
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.models.editable import Editable
 
-from indico.modules.events.editing.models.revision_files import EditingRevisionFile
-from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
-
-from indico.web.flask.util import url_for
-
-
-
 
 class ABCExportRevisionFile(ABCExportFile):
     """ """

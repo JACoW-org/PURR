@@ -9,6 +9,7 @@ from indico.modules.events.editing.models.revision_files import EditingRevisionF
 from indico.modules.events.editing.models.revisions import EditingRevision, InitialRevisionState
 
 from indico.web.flask.util import url_for
+from indico_jpsp_ab.services.export_utils import export_serialize_date, export_serialize_reference
 
 
 class ABCExportEventFiles(ABCExportFile):
@@ -24,8 +25,31 @@ class ABCExportEventFiles(ABCExportFile):
 
         elements = [self._serialize_contribution(
             event, contribution) for contribution in contributions]
+        
+        data: dict = self._build_event_api_data_base(event)
+        
+        data['contributions'] = [el for el in elements if el.get('revisions', None) is not None]
 
-        return [el for el in elements if el.get('revisions', None) is not None]
+        return data
+    
+    
+
+    def _build_event_api_data_base(self, event):
+        return {
+            '_type': 'Conference',
+            'id': str(event.id),
+            'title': event.title,
+            'description': event.description,
+            'start_dt': export_serialize_date(event.start_dt),
+            'timezone': event.timezone,
+            'end_dt': export_serialize_date(event.end_dt),
+            'room': event.get_room_name(full=False),
+            'location': event.venue_name,
+            'address': event.address,
+            'type': event.type_.legacy_name,
+            'references': list(map(export_serialize_reference, event.references))
+        }
+           
 
     def _serialize_contribution(self, event, contribution):
 
