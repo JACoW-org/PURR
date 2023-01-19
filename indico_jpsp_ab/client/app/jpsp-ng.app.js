@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        ws.task = ({ pre, post, progress, err, task }) => {
+        ws.task = ({ pre, post, result, progress, err, task }) => {
             const uuid = ulid();
             const time = new Date().getTime();
 
@@ -105,6 +105,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (post) {
                 store[uuid].post = post;
+            }
+
+            if (result) {
+                store[uuid].result = result;
             }
 
             if (progress) {
@@ -145,6 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             }
+            if (head.code === "task:result") {
+                if (head.uuid in store) {
+                    if ("result" in store[head.uuid]) {
+                        store[head.uuid].result.call(null, { head, body });
+                    }
+                }
+            }
 
             if (head.code === "task:end") {
                 if (head.uuid in store) {
@@ -154,9 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // if (body.method in handlers) {
-            //     handlers[body.method].call(null, { head, body });
-            // }
         }
 
         function log_data({ head, body }) {
@@ -166,6 +174,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 store[head.uuid].queued_time = head.time;
             } else if (["task:begin"].includes(head.code)) {
                 store[head.uuid].begin_time = head.time;
+            } else if (["task:result"].includes(head.code)) {
+                store[head.uuid].result_time = head.time;
             } else if (["task:end", "task:error"].includes(head.code)) {
                 store[head.uuid].end_time = head.time;
 
@@ -193,6 +203,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     })(jpsp_ng_settings);
 
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    /////////////// ABSTRACT BOOKLET //////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+
+
+
+
     document.querySelector(".download").addEventListener("click", (ev) => {
         const loader = createLoader("Downloading...");
 
@@ -201,57 +225,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.add("disabled");
                 ev.target.appendChild(loader);
             },
-            progress: ({ head, body }) => {
+            result: ({ head, body }) => {
                 ev.target.classList.remove("disabled");
                 ev.target.removeChild(loader);
-
-                const url = "data:application/octet-stream;base64," + body.params.b64;
-
-                // const blob = b64toBlob(body.params.b64, "application/octet-stream");
-                // const url = URL.createObjectURL(blob);
-
-                // console.log('url', url)
-
-                Promise.resolve().then(() => {
-                    console.log('assign >>>')
-                    return Object.assign(document.createElement("a"), {
-                        href: url,
-                        download: body.params.filename,
-                        style: 'display:none'
-                    })
-                }).then(a => {
-                    console.log('append >>>')
-                    return document.body.appendChild(a)
-                }).then(a => {
-                    return new Promise(ok => {
-                        a.onclick = () => {
-
-                            setTimeout(() => {
-
-                                console.log('onclick >>>',);
-
-                                if (!document.hasFocus()) {
-                                    window.addEventListener('focus', () => {
-                                        return ok(a);
-                                    }, { once: true });
-                                } else {
-                                    return ok(a);
-                                }
-
-                            }, 1500)
-
-                        };
-                        console.log('click >>>')
-                        a.dispatchEvent(new MouseEvent('click'));
-                    });
-                }).then(a => {
-                    console.log('remove >>>')
-                    a.remove();
-                }).then(a => {
-                    window.URL.revokeObjectURL(url);
-                    console.log('end >>>')
-                })
-
+                download(body);
             },
             err: (e) => console.error(e),
             task: {
@@ -261,6 +238,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    /////////////// FINAL PROCEEDINGS//////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+
+
     document.querySelector(".proceedings").addEventListener("click", (ev) => {
         const loader = createLoader("Proceedings...");
 
@@ -269,57 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.add("disabled");
                 ev.target.appendChild(loader);
             },
-            progress: ({ head, body }) => {
+            result: ({ head, body }) => {
                 ev.target.classList.remove("disabled");
                 ev.target.removeChild(loader);
-
-                const url = "data:application/octet-stream;base64," + body.params.b64;
-
-                // const blob = b64toBlob(body.params.b64, "application/octet-stream");
-                // const url = URL.createObjectURL(blob);
-
-                // console.log('url', url)
-
-                Promise.resolve().then(() => {
-                    console.log('assign >>>')
-                    return Object.assign(document.createElement("a"), {
-                        href: url,
-                        download: body.params.filename,
-                        style: 'display:none'
-                    })
-                }).then(a => {
-                    console.log('append >>>')
-                    return document.body.appendChild(a)
-                }).then(a => {
-                    return new Promise(ok => {
-                        a.onclick = () => {
-
-                            setTimeout(() => {
-
-                                console.log('onclick >>>',);
-
-                                if (!document.hasFocus()) {
-                                    window.addEventListener('focus', () => {
-                                        return ok(a);
-                                    }, { once: true });
-                                } else {
-                                    return ok(a);
-                                }
-
-                            }, 1500)
-
-                        };
-                        console.log('click >>>')
-                        a.dispatchEvent(new MouseEvent('click'));
-                    });
-                }).then(a => {
-                    console.log('remove >>>')
-                    a.remove();
-                }).then(a => {
-                    window.URL.revokeObjectURL(url);
-                    console.log('end >>>')
-                })
-
+                download(body);
             },
             err: (e) => console.error(e),
             task: {
@@ -329,13 +270,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    document.querySelector(".clear").addEventListener("click", (ev) => {
-        const files_box = jpsp_ng_element.querySelector(".files-box");
-        files_box
+
+
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    /////////////// KEYWORDS //////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    
+    
+    
+    document.querySelector(".clear-keywords").addEventListener("click", (ev) => {
+        const keywords_box = jpsp_ng_element.querySelector(".keywords-box");
+        keywords_box
             .querySelectorAll(".section.section-added")
             .forEach((el) => el.parentNode.removeChild(el));
-        files_box.style.display = 'none';
+        keywords_box.style.display = 'none';
     });
+
 
 
     document.querySelector(".keywords").addEventListener("click", (ev) => {
@@ -375,63 +330,39 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.add("disabled");
                 ev.target.appendChild(loader);
                 keywords_box.appendChild(progress);
-
-                progress.update({
-                    index: 0,
-                    total: 0,
-                });
+                progress.update({ index: 0, total: 0 });
             },
             progress: ({ head, body }) => {
-                if (body.params.progress) {
-                    progress.increment({
-                        total: body.params.progress.total,
-                    });
 
-                    console.log(
-                        body.params.progress.index,
-                        body.params.progress.total,
-                        body.params.progress.file
-                    );
-                } else if (body.params.final) {
+                progress.increment({ total: body.params.total });
 
-                    const results = body.params.final.map(one => ({
-                        filename: one.file.filename,
-                        keywords: one.keywords
-                    }));
+                console.log(body.params.index, body.params.total, body.params.file.filename);
 
-                    results.sort((a, b) => {
-                        const A = a.filename.toUpperCase();
-                        const B = b.filename.toUpperCase();
-
-                        if (A < A) {
-                            return -1;
-                        }
-                        if (A > B) {
-                            return 1;
-                        }
-
-                        return 0;
-                    });
-
-                    const elements = results.map(res => Object.assign(
-                        document.createElement("li"), {
-                        innerHTML: `<b>${res.filename}</b>: ${JSON.stringify(res.keywords)}`
-                    }))
-
-                    const container = document.createElement("ul");
-
-                    elements.forEach(el => container.appendChild(el))
-
-                    keywords_box.appendChild(container);
-
-                }
+                keywords_box.appendChild(
+                    Object.assign(document.createElement("section"), {
+                        className: "section section-added",
+                        innerHTML: `
+                                <div class="text">
+                                    <div class="jpsp-row">
+                                        <div class="jpsp-col jpsp-col">
+                                            <span class="icon icon-small icon-file-pdf"></span>
+                                            <span class="label">File:</span> 
+                                            ${body.params.file.filename}
+                                        </div>
+                                        <div class="jpsp-col jpsp-col-grow">
+                                            <span class="label">Keywords:</span>
+                                            ${JSON.stringify(body.params.keywords)}
+                                        </div>
+                                    <div>
+                                </div>`,
+                    })
+                );
             },
             post: () => {
                 ev.target.classList.remove("disabled");
                 ev.target.removeChild(loader);
 
                 keywords_box.removeChild(progress);
-                // keywords_box.style.display = 'none';
             },
             err: (e) => console.error(e),
             task: {
@@ -443,7 +374,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    document.querySelector(".check").addEventListener("click", (ev) => {
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    /////////////// CHECKS ////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+
+
+    document.querySelector(".clear-checks").addEventListener("click", (ev) => {
+        const files_box = jpsp_ng_element.querySelector(".files-box");
+        files_box
+            .querySelectorAll(".section.section-added")
+            .forEach((el) => el.parentNode.removeChild(el));
+        files_box.style.display = 'none';
+    });
+
+
+    document.querySelector(".checks").addEventListener("click", (ev) => {
         const loader = createLoader("Checking...");
 
         const files_box = jpsp_ng_element.querySelector(".files-box");
@@ -479,34 +429,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.add("disabled");
                 ev.target.appendChild(loader);
                 files_box.appendChild(progress);
-
-                progress.update({
-                    index: 0,
-                    total: 0,
-                });
+                progress.update({ index: 0, total: 0 });
             },
             progress: ({ head, body }) => {
-                if (body.params.progress) {
-                    progress.increment({
-                        total: body.params.progress.total,
-                    });
 
-                    console.log(
-                        body.params.progress.index,
-                        body.params.progress.total,
-                        body.params.progress.file.filename
-                    );
+                progress.increment({ total: body.params.total });
 
-                    files_box.appendChild(
-                        Object.assign(document.createElement("section"), {
-                            className: "section section-added",
-                            innerHTML: `
+                console.log(body.params.index, body.params.total, body.params.file.filename);
+
+                files_box.appendChild(
+                    Object.assign(document.createElement("section"), {
+                        className: "section section-added",
+                        innerHTML: `
                                 <div class="text">
                                     <div class="jpsp-row">
                                         <div class="jpsp-col jpsp-col-grow">
                                             <span class="icon icon-small icon-file-pdf"></span>
                                             <span class="label">File:</span> 
-                                            ${body.params.progress.file.filename}
+                                            ${body.params.file.filename}
                                         </div>
                                         <div class="jpsp-col jpsp-col-grow">
                                             <span class="label">Fonts:</span>
@@ -517,20 +457,17 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="icon icon-small icon-checkbox-checked"></span>
                                         </div>
                                         <div class="jpsp-col">
-                                            <a href="/${body.params.progress.file.contribution_url}/editing/paper">Go</a>
+                                            <a href="/${body.params.file.contribution_url}/editing/paper">Go</a>
                                         </div>
                                     <div>
                                 </div>`,
-                        })
-                    );
-                }
+                    })
+                );
             },
             post: () => {
                 ev.target.classList.remove("disabled");
                 ev.target.removeChild(loader);
-
                 files_box.removeChild(progress);
-                files_box.style.display = 'none';
             },
             err: (e) => console.error(e),
             task: {
@@ -540,40 +477,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-
-
-
-
-        // Promise.resolve()
-        //     .then(() => {
-        //         ev.target.classList.add('disabled');
-        //         ev.target.appendChild(loader)
-        //     })
-        //     .then(() => fetchEventFilesJson())
-        //     .then((params) => {
-        //         ws.send(JSON.stringify({
-        //             head: {
-        //                 code: 'task:exec',
-        //                 uuid: ulid(),
-        //                 time: `${new Date().getTime()}`
-        //             },
-        //             body: {
-        //                 method: 'check_pdf',
-        //                 params: params
-        //             },
-        //         }));
-        //
-        //         // params.contributions.forEach(contribution => {
-        //         //
-        //         // });
-        //     })
-        //     .catch((err) => console.error(err))
-        //     .finally(() => {
-        //         ev.target.classList.remove('disabled');
-        //         ev.target.removeChild(loader);
-        //     })
     });
 });
+
+
 
 async function fetchEventJson() {
     console.log("[INDICO-PLUGIN] >>> fetchEventJson");
@@ -597,6 +504,8 @@ async function fetchEventJson() {
     return await res.json();
 }
 
+
+
 async function fetchEventFilesJson() {
     console.log("[INDICO-PLUGIN] >>> fetchEventFilesJson");
 
@@ -619,6 +528,7 @@ async function fetchEventFilesJson() {
     return await res.json();
 }
 
+
 async function fetchEventFilesReport(params) {
     console.log("[JPSP-NG] >>> fetchEventFilesReport");
 
@@ -640,6 +550,8 @@ async function fetchEventFilesReport(params) {
     const res = await fetch(url, opts);
     return await res.json();
 }
+
+
 
 async function createEventAb(req) {
     console.log("[JPSP-NG] >>> createEventAb");
@@ -692,6 +604,19 @@ function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
 
     const blob = new Blob(byteArrays, { type: contentType });
     return blob;
+}
+
+function download(body) {
+
+    const url = "data:application/octet-stream;base64," + body.params.b64;
+
+    const a = document.body.appendChild(Object.assign(document.createElement("a"), {
+        href: url, download: body.params.filename, style: 'display:none'
+    }));
+
+    a.dispatchEvent(new MouseEvent('click'));
+    a.remove();
+    window.URL.revokeObjectURL(url);
 }
 
 function ULID() {
@@ -772,3 +697,4 @@ function ULID() {
         return encode(ulid);
     };
 }
+
