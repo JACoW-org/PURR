@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.add("disabled");
                 ev.target.appendChild(loader);
             },
-            post: ({ head, body }) => {
+            result: ({ head, body }) => {
                 ev.target.classList.remove("disabled");
                 loader.remove();
                 download(body);
