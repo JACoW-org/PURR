@@ -18,6 +18,10 @@
 // });
 
 
+import { of, Subject } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
+
+
 
 
 // import { createApp as c } from 'vue'
@@ -29,17 +33,17 @@
 // import ReportBox from './components/jpsp-ng.report.js'
 
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    // c(RootComponent)
-    // 
-    //     .component('SettingsBox', SettingsBox)
-    //     .component('DownloadBox', DownloadBox)
-    //     .component('ReportBox', ReportBox)
-    // 
-    //     .mount('#app')
-
-})
+// document.addEventListener("DOMContentLoaded", () => {
+// 
+//     // c(RootComponent)
+//     // 
+//     //     .component('SettingsBox', SettingsBox)
+//     //     .component('DownloadBox', DownloadBox)
+//     //     .component('ReportBox', ReportBox)
+//     // 
+//     //     .mount('#app')
+// 
+// })
 
 function get_settings() {
     try {
@@ -51,6 +55,14 @@ function get_settings() {
     }
 }
 
+
+
+
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const jpsp_ng_settings = get_settings();
@@ -61,47 +73,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!jpsp_ng_element) { return; }
 
+    document
+        .querySelectorAll(".jpsp")
+        .forEach((e) => (e.style.visibility = "visible"));
+
+
     const ulid = ULID();
+
+    const store = {};
+
+    const tasks = new Subject();
+
+
+
+
 
     const ws = (settings => {
 
         //console.log(settings);
-
-        const store = {};
-
-        // const handlers = {
-        //     // check_pdf: ({ head, body }) => { console.log({ head, body }) },
-        //     // event_ab: ({ head, body }) => console.log({ head, body })
-        // };        
 
         const api_url = new URL(settings.api_url);
         const api_pro = 'https:' === api_url.protocol ? 'wss:' : 'ws:';
 
         document.cookie = `X-API-KEY=${settings.api_key}` + "; path=/";
 
-        const ws = new WebSocket(`${api_pro}//${api_url.host}/socket/jpsp:feed`);
 
-        ws.addEventListener("open", (ev) => {
-            document
-                .querySelectorAll(".jpsp")
-                .forEach((e) => (e.style.visibility = "visible"));
 
-            ws.addEventListener("message", ({ data }) => {
-                const { head, body } = JSON.parse(data);
 
-                log_data({ head, body });
 
-                run_handler({ head, body });
-            });
-        });
+        const socket = (task_id) => {
 
-        ws.task = ({ pre, post, result, progress, err, task }) => {
+            return new Promise((ok, ko) => {
+
+                const ws = new WebSocket(`${api_pro}//${api_url.host}/socket/${task_id}`);
+
+                ws.addEventListener("open", (ev) => {
+
+                    ws.addEventListener("message", ({ data }) => {
+                        const { head, body } = JSON.parse(data);
+
+                        log_data({ head, body });
+
+                        run_handler({ head, body });
+                    });
+
+                    return ok(ws)
+
+                });
+
+            })
+
+        }
+
+        const task = ({ pre, params, post, result, progress, err, method }) => {
+
             const uuid = ulid();
-            const time = new Date().getTime();
 
-            store[uuid] = {
-                insert_time: time,
-            };
+            store[uuid] = { insert_time: new Date().getTime(), method, uuid };
+
+            if (pre) {
+                store[uuid].pre = pre;
+            }
+
+            if (params) {
+                store[uuid].params = params;
+            }
 
             if (post) {
                 store[uuid].post = post;
@@ -115,33 +151,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 store[uuid].progress = progress;
             }
 
-            Promise.resolve()
-                .then(() => pre())
+            if (err) {
+                store[uuid].err = err;
+            }
 
-                .then(() => task.params())
-                .then((params) => {
-                    ws.send(
-                        JSON.stringify({
-                            head: {
-                                code: "task:exec",
-                                uuid: uuid,
-                                time: time,
-                            },
-                            body: {
-                                method: task.method,
-                                params: params
-                            },
-                        })
-                    );
-                })
+            tasks.next(uuid);
 
-                .catch((e) => err(e));
-            // .finally(() => post())
         };
 
-        return ws;
+        return { socket, task };
 
-        function run_handler({ head, body }) {
+        function run_handler({ head, body, ws }) {
             if (head.code === "task:progress") {
                 if (head.uuid in store) {
                     if ("progress" in store[head.uuid]) {
@@ -162,9 +182,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     if ("post" in store[head.uuid]) {
                         store[head.uuid].post.call(null, { head, body });
                     }
+                    if ("ws" in store[head.uuid]) {
+                        store[head.uuid].ws.close();
+                    }
+                    delete store[head.uuid];
                 }
             }
-
         }
 
         function log_data({ head, body }) {
@@ -196,12 +219,54 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(
                     `[${head.uuid}]`,
                     "queued -> begin",
-                    store[head.uuid].begin_time - store[head.uuid].queued_time,
+                    store[head.uuid].end_time - store[head.uuid].queued_time,
                     "seconds"
                 );
             }
         }
     })(jpsp_ng_settings);
+
+
+
+
+
+
+    tasks.asObservable().pipe(
+        concatMap(task_id => {
+
+            if (!task_id) { return }
+
+            const { insert_time, pre, params, err, method } = store[task_id];
+
+            return of(
+                Promise.all([
+                    pre(),
+                    params(),
+                    ws.socket(task_id)
+                ]).then(results => {
+
+                    store[task_id].ws = results[2];
+
+                    store[task_id].ws.send(
+                        JSON.stringify({
+                            head: {
+                                code: "task:exec",
+                                uuid: task_id,
+                                time: insert_time,
+                            },
+                            body: {
+                                method: method,
+                                params: results[1]
+                            },
+                        })
+                    );
+
+                }).catch((e) => err(e))
+
+            );
+
+        })
+    ).subscribe()
 
 
 
@@ -225,16 +290,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 ev.target.classList.add("disabled");
                 ev.target.appendChild(loader);
             },
-            result: ({ head, body }) => {
+            post: ({ head, body }) => {
                 ev.target.classList.remove("disabled");
-                ev.target.removeChild(loader);
+                loader.remove();
                 download(body);
             },
             err: (e) => console.error(e),
-            task: {
-                method: "event_ab",
-                params: () => fetchEventJson(),
-            },
+            params: () => fetchEventJson(),
+            method: "event_ab",
         });
     });
 
@@ -259,14 +322,12 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             result: ({ head, body }) => {
                 ev.target.classList.remove("disabled");
-                ev.target.removeChild(loader);
+                loader.remove();
                 download(body);
             },
             err: (e) => console.error(e),
-            task: {
-                method: "event_zip",
-                params: () => fetchEventJson(),
-            },
+            params: () => fetchEventJson(),
+            method: "event_zip",
         });
     });
 
@@ -280,9 +341,9 @@ document.addEventListener("DOMContentLoaded", () => {
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
-    
-    
-    
+
+
+
     document.querySelector(".clear-keywords").addEventListener("click", (ev) => {
         const keywords_box = jpsp_ng_element.querySelector(".keywords-box");
         keywords_box
@@ -336,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 progress.increment({ total: body.params.total });
 
-                console.log(body.params.index, body.params.total, body.params.file.filename);
+                // console.log(body.params.index, body.params.total, body.params.file.filename);
 
                 keywords_box.appendChild(
                     Object.assign(document.createElement("section"), {
@@ -360,15 +421,12 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             post: () => {
                 ev.target.classList.remove("disabled");
-                ev.target.removeChild(loader);
-
+                loader.remove();
                 keywords_box.removeChild(progress);
             },
             err: (e) => console.error(e),
-            task: {
-                method: "event_pdf",
-                params: () => fetchEventFilesJson(),
-            },
+            params: () => fetchEventFilesJson(),
+            method: "event_pdf",
         });
 
     });
@@ -435,7 +493,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 progress.increment({ total: body.params.total });
 
-                console.log(body.params.index, body.params.total, body.params.file.filename);
+                // console.log(body.params.index, body.params.total, body.params.file.filename);
 
                 files_box.appendChild(
                     Object.assign(document.createElement("section"), {
@@ -466,14 +524,12 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             post: () => {
                 ev.target.classList.remove("disabled");
-                ev.target.removeChild(loader);
+                loader.remove();
                 files_box.removeChild(progress);
             },
             err: (e) => console.error(e),
-            task: {
-                method: "check_pdf",
-                params: () => fetchEventFilesJson(),
-            },
+            params: () => fetchEventFilesJson(),
+            method: "check_pdf",
         });
 
 
