@@ -671,8 +671,11 @@ function download(body) {
     }));
 
     a.dispatchEvent(new MouseEvent('click'));
-    a.remove();
-    window.URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    });
 }
 
 function ULID() {
