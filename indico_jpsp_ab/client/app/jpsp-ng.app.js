@@ -94,18 +94,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const api_url = new URL(settings.api_url);
         const api_pro = 'https:' === api_url.protocol ? 'wss:' : 'ws:';
+        const api_key = settings.api_key;
 
-        document.cookie = `X-API-KEY=${settings.api_key}` + "; path=/";
-
-
-
+        const base_url = `${api_pro}//${api_url.host}/socket/${api_key}`
 
 
         const socket = (task_id) => {
 
             return new Promise((ok, ko) => {
 
-                const ws = new WebSocket(`${api_pro}//${api_url.host}/socket/${task_id}`);
+                const ws = new WebSocket(`${base_url}/${task_id}`);
 
                 ws.addEventListener("open", (ev) => {
 
@@ -219,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(
                     `[${head.uuid}]`,
                     "queued -> begin",
-                    store[head.uuid].end_time - store[head.uuid].queued_time,
+                    store[head.uuid].begin_time - store[head.uuid].queued_time,
                     "seconds"
                 );
             }
