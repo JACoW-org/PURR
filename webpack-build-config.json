@@ -1,13 +1,13 @@
 {
   "build": {
-    "clientPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-ng-indico/indico_jpsp_ab/client",
-    "distPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-ng-indico/indico_jpsp_ab/static/dist",
-    "distURL": "/static/plugins/jpsp_ab/dist/",
+    "clientPath": "/home/fabio.meneghetti/Projects/elettra/src/purr/indico_purr/client",
+    "distPath": "/home/fabio.meneghetti/Projects/elettra/src/purr/indico_purr/static/dist",
+    "distURL": "/static/plugins/purr/dist/",
     "indicoSourcePath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/src",
-    "rootPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-ng-indico/indico_jpsp_ab",
-    "staticPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-ng-indico/indico_jpsp_ab/static",
-    "staticURL": "/static/plugins/jpsp_ab/",
-    "urlMapPath": "/home/fabio.meneghetti/Projects/elettra/opt/indico/dev/indico/plugins/jpsp/jpsp-ng-indico/url_map.json"
+    "rootPath": "/home/fabio.meneghetti/Projects/elettra/src/purr/indico_purr",
+    "staticPath": "/home/fabio.meneghetti/Projects/elettra/src/purr/indico_purr/static",
+    "staticURL": "/static/plugins/purr/",
+    "urlMapPath": "/home/fabio.meneghetti/Projects/elettra/src/purr/url_map.json"
   },
   "indico": {
     "build": {
@@ -22,6 +22,6 @@
     }
   },
   "isPlugin": true,
-  "plugin": "jpsp_ab",
+  "plugin": "purr",
   "themes": {}
 }

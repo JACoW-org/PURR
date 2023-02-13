@@ -7,15 +7,11 @@
 
 from setuptools import setup
 
-
-# setup()
-
-
 from setuptools import setup, find_packages
 
 setup(
-    name='indico_jpsp_ab',
-    description='Indico plugin for JPSP',
+    name='indico_purr',
+    description='Proceedings Utility Running Remotely ',
     version='1.0-dev',
     packages=find_packages(),
     zip_safe=False,
@@ -26,7 +22,7 @@ setup(
     ],
     entry_points={
         'indico.plugins': {
-            'jpsp_ab = indico_jpsp_ab:plugin'
+            'purr = indico_purr:plugin'
         }
     }
 )

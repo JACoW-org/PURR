@@ -44692,8 +44692,8 @@
         }
       ]
     },
-    "plugin_jpsp_ab.event-files-json": {
-      "endpoint": "plugin_jpsp_ab.event-files-json",
+    "plugin_purr.event-files-json": {
+      "endpoint": "plugin_purr.event-files-json",
       "rules": [
         {
           "args": [
@@ -44737,7 +44737,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -44752,8 +44752,8 @@
         }
       ]
     },
-    "plugin_jpsp_ab.event-json": {
-      "endpoint": "plugin_jpsp_ab.event-json",
+    "plugin_purr.event-json": {
+      "endpoint": "plugin_purr.event-json",
       "rules": [
         {
           "args": [
@@ -44797,7 +44797,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -44812,8 +44812,8 @@
         }
       ]
     },
-    "plugin_jpsp_ab.jpsp-connect": {
-      "endpoint": "plugin_jpsp_ab.jpsp-connect",
+    "plugin_purr.purr-connect": {
+      "endpoint": "plugin_purr.purr-connect",
       "rules": [
         {
           "args": [
@@ -44857,7 +44857,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -44865,15 +44865,15 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp-connect",
+              "data": "purr-connect",
               "isDynamic": false
             }
           ]
         }
       ]
     },
-    "plugin_jpsp_ab.jpsp-disconnect": {
-      "endpoint": "plugin_jpsp_ab.jpsp-disconnect",
+    "plugin_purr.purr-disconnect": {
+      "endpoint": "plugin_purr.purr-disconnect",
       "rules": [
         {
           "args": [
@@ -44917,7 +44917,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -44925,15 +44925,15 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp-disconnect",
+              "data": "purr-disconnect",
               "isDynamic": false
             }
           ]
         }
       ]
     },
-    "plugin_jpsp_ab.jpsp-home": {
-      "endpoint": "plugin_jpsp_ab.jpsp-home",
+    "plugin_purr.purr-home": {
+      "endpoint": "plugin_purr.purr-home",
       "rules": [
         {
           "args": [
@@ -44977,7 +44977,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -44985,15 +44985,15 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp-home",
+              "data": "purr-home",
               "isDynamic": false
             }
           ]
         }
       ]
     },
-    "plugin_jpsp_ab.jpsp-settings": {
-      "endpoint": "plugin_jpsp_ab.jpsp-settings",
+    "plugin_purr.purr-settings": {
+      "endpoint": "plugin_purr.purr-settings",
       "rules": [
         {
           "args": [
@@ -45037,7 +45037,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -45045,15 +45045,15 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp-settings",
+              "data": "purr-settings",
               "isDynamic": false
             }
           ]
         }
       ]
     },
-    "plugin_jpsp_ab.revision_check_pdf": {
-      "endpoint": "plugin_jpsp_ab.revision_check_pdf",
+    "plugin_purr.revision_check_pdf": {
+      "endpoint": "plugin_purr.revision_check_pdf",
       "rules": [
         {
           "args": [
@@ -45103,7 +45103,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -45158,8 +45158,8 @@
         }
       ]
     },
-    "plugin_jpsp_ab.static": {
-      "endpoint": "plugin_jpsp_ab.static",
+    "plugin_purr.static": {
+      "endpoint": "plugin_purr.static",
       "rules": [
         {
           "args": [
@@ -45195,7 +45195,7 @@
               "isDynamic": false
             },
             {
-              "data": "jpsp_ab",
+              "data": "purr",
               "isDynamic": false
             },
             {
@@ -60741,5 +60741,5 @@
       ]
     }
   },
-  "version": "6404466b76e9c5390de236116bfa2462"
+  "version": "a92eedb4e09f46b12f666546a4e25193"
 }
