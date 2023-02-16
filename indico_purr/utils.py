@@ -5,6 +5,7 @@ from typing import Any
 from pytz import timezone
 
 from indico.core.config import config
+from flask_pluginengine import current_plugin
 
 
 def default_timezone():
@@ -12,7 +13,7 @@ def default_timezone():
         if not config is None and not config.DEFAULT_TIMEZONE is None:
             return timezone(config.DEFAULT_TIMEZONE)
     except BaseException as e:
-        print(e)
+        current_plugin.logger.error(e)
     return timezone('UTC')
 
 

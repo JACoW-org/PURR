@@ -1,8 +1,9 @@
 from abc import ABC
 
-# from datetime import datetime
+from datetime import datetime
 from operator import attrgetter
 from sqlalchemy import Date, cast
+from flask_pluginengine import current_plugin
 
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
@@ -15,8 +16,6 @@ from indico_purr.utils import DEFAULT_TIMEZONE
 from indico_purr.wrappers import build_folders_api_data__wrapper, \
     build_material_legacy_api_data__wrapper, build_note_api_data__wrapper, \
     build_note_legacy_api_data__wrapper
-
-# from indico_purr.logger import logger
 
 
 
@@ -101,42 +100,42 @@ class ABCExportEvent(ABC):
     
 
     def _serialize_contribution(self, contrib):
-        
+               
         # start_date = datetime.now().timestamp()
         
         # folders = build_folders_api_data__wrapper(contrib)
         # 
-        # logger.error(f'[delta] folders -> {(datetime.now().timestamp() - start_date)}')
+        # # current_plugin.logger.error(f'[delta] folders -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         # 
         # material = build_material_legacy_api_data__wrapper(contrib)
         # 
-        # logger.error(f'[delta] material -> {(datetime.now().timestamp() - start_date)}')
-        # start_date = datetime.now().timestamp()
+        # # current_plugin.logger.error(f'[delta] material -> {(datetime.now().timestamp() - start_date)}')
+        start_date = datetime.now().timestamp()
         
         speakers = self._serialize_persons(contrib.speakers, person_type='ContributionParticipation')
         
-        # logger.info(f'[delta] speakers -> {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] speakers -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         primary_authors = self._serialize_persons(contrib.primary_authors, person_type='ContributionParticipation')
         
-        # logger.info(f'[delta] primary_authors -> {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] primary_authors -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         coauthors = self._serialize_persons(contrib.secondary_authors, person_type='ContributionParticipation')
         
-        # logger.info(f'[delta] coauthors -> {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] coauthors -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         references = list(map(export_serialize_reference, contrib.references))
         
-        # logger.info(f'[delta] references -> {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] references -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         sub_contributions = list(map(self._serialize_subcontribution, contrib.subcontributions))
         
-        # logger.info(f'[delta] sub_contributions -> {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] sub_contributions -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         field_values = list(map(self._serialize_field_value, contrib.field_values))
@@ -276,26 +275,26 @@ class ABCExportEvent(ABC):
         return [self._serialize_session_block(b, s) for b in session_.blocks]
 
     def _build_event_api_data(self, event, contributions=True, sessions=True, occurrences=True):
-        
+               
         # start_date = datetime.now().timestamp()
                 
         data = self._build_event_api_data_base(event)
         
-        # logger.error(f'[delta] event -> {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] event -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         material_data = build_material_legacy_api_data__wrapper(event)
         
-        #logger.error(f'[delta] material_data -> {(datetime.now().timestamp() - start_date)}')
-        #start_date = datetime.now().timestamp()
+        # current_plugin.logger.debug(f'[delta] material_data -> {(datetime.now().timestamp() - start_date)}')
+        # start_date = datetime.now().timestamp()
         
         if legacy_note_material := build_note_legacy_api_data__wrapper(event.note):
             if material_data is not None:
                 material_data.append(legacy_note_material)
             else:
-                print('Error: material_data is None')
+                current_plugin.logger.error('Error: material_data is None')
                 
-        # logger.error(f'[delta] material_legacy ->: {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] material_legacy ->: {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
                 
         data.update({
@@ -316,7 +315,7 @@ class ABCExportEvent(ABC):
             'organizer': event.organizer_info,
         })
         
-        # logger.error(f'[delta] update ->: {(datetime.now().timestamp() - start_date)}')
+        # current_plugin.logger.debug(f'[delta] update ->: {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
         
         if contributions:
@@ -327,7 +326,7 @@ class ABCExportEvent(ABC):
                 serialized_contrib = self._serialize_contribution(contribution)
                 data['contributions'].append(serialized_contrib)
 
-            # logger.error(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
+            # current_plugin.logger.debug(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
             
         if sessions:
             
@@ -339,7 +338,7 @@ class ABCExportEvent(ABC):
                 data['sessions'].extend(
                     self._build_session_api_data(session_))
                 
-            # logger.error(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
+            # current_plugin.logger.debug(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
             
         
         if occurrences:
@@ -348,7 +347,7 @@ class ABCExportEvent(ABC):
 
             data['occurrences'] = self._serialize_event_occurrences(event)
             
-            # logger.error(f'[delta] occurrences -> {(datetime.now().timestamp() - start_date)}')
+            # current_plugin.logger.debug(f'[delta] occurrences -> {(datetime.now().timestamp() - start_date)}')
             
         
         return data

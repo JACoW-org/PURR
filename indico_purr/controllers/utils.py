@@ -7,23 +7,18 @@ def get_cookies_util(c) -> dict | None:
 
 
 def get_contribution_fields(s) -> list:
-    try:
-        custom_fields = json_decode(s.custom_fields)
+    custom_fields = json_decode(s.custom_fields)
 
-        contribution_fields = [
-            dict(id=f.id, name=f.title)
-            for f in s.event.contribution_fields
-            if f.id in custom_fields
-        ]
-        
-        return contribution_fields
-    except:
-        return []
+    contribution_fields = [
+        dict(id=f.id, name=f.title)
+        for f in s.event.contribution_fields
+        if f.id in custom_fields
+    ]
+    
+    return contribution_fields
 
 
 def get_settings_util(s) -> dict | None:
-
-    # print(s)
     
     if s is None:
         return None   

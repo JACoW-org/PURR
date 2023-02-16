@@ -13,7 +13,7 @@ from indico_purr.controllers.json.revision_check_pdf_json import RH_revision_che
 PurrPluginBlueprint = IndicoPluginBlueprint(
     'purr',
     __name__,
-    url_prefix=f'/event/<int:event_id>/manage/purr'
+    url_prefix='/event/<int:event_id>/manage/purr'
 )
 
 
