@@ -1,3 +1,5 @@
 node_modules/
 __pycache__/
 indico_purr.egg-info/
+url_map.json
+indico_purr/static/dist
