@@ -1,5 +1,5 @@
 
-from indico_purr.services.export_file import ABCExportFile
+from indico_purr.services.export.export_file import ABCExportFile
 
 from sqlalchemy.orm import joinedload
 

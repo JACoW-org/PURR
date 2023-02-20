@@ -12,6 +12,42 @@ class PurrSettingsModel(db.Model):
         primary_key=True
     )
     
+    #: ID of the user
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=False
+    )
+    
+    #: ID of the event
+    event_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.events.id'),
+        index=True,
+        nullable=False
+    )
+    
+    #: The User associated with 
+    user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'purr_settings_user',
+            lazy='dynamic'
+        )
+    )
+    
+    #: The Event associated with
+    event = db.relationship(
+        'Event',
+        lazy=True,
+        backref=db.backref(
+            'purr_settings_event',
+            lazy='dynamic'
+        )
+    )
+    
     api_url = db.Column(
         db.String,
         nullable=False,
@@ -41,14 +77,6 @@ class PurrSettingsModel(db.Model):
         nullable=True
     )
     
-    #: ID of the user
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.users.id'),
-        index=True,
-        nullable=False
-    )
-    
     ab_session_h1 = db.Column(
         db.String,
         nullable=False,
@@ -71,34 +99,6 @@ class PurrSettingsModel(db.Model):
         db.String,
         nullable=False,
         default=''
-    )
-    
-    #: ID of the event
-    event_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.events.id'),
-        index=True,
-        nullable=False
-    )
-    
-    #: The user associated with the queue entry
-    user = db.relationship(
-        'User',
-        lazy=False,
-        backref=db.backref(
-            'outlook_queue',
-            lazy='dynamic'
-        )
-    )
-    
-    #: The Event this queue entry is associated with
-    event = db.relationship(
-        'Event',
-        lazy=True,
-        backref=db.backref(
-            'outlook_queue_entries',
-            lazy='dynamic'
-        )
     )
 
     def __repr__(self):

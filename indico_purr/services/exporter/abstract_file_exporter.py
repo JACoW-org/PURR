@@ -24,7 +24,7 @@ class ABCExportFile(ABC):
         
         # print(editing_revision_file)
         
-        file = editing_revision_file.file
+        rev_file = editing_revision_file.file
         file_type = editing_revision_file.file_type
 
         # content_type: "application/pdf"
@@ -40,15 +40,16 @@ class ABCExportFile(ABC):
         
         # print(download_url, external_download_url)
 
-        contribution_url = f"event/{event.id}/contributions/{contribution.id}"
-        file_url = f"editing/paper/{revision.id}/{file.id}/{file.filename}"
+        # DA TOGLIERE ???
+        # contribution_url = f"event/{event.id}/contributions/{contribution.id}"
+        # file_url = f"editing/paper/{revision.id}/{rev_file.id}/{rev_file.filename}"
 
         return {
-            "id": file.id,
-            "uuid": file.uuid,
-            "md5sum": file.md5,
-            "filename": file.filename,
-            "content_type": file.content_type,
+            "id": rev_file.id,
+            "uuid": rev_file.uuid,
+            "md5sum": rev_file.md5,
+            "filename": rev_file.filename,
+            "content_type": rev_file.content_type,
             
             "file_type": {
                 'type': file_type.type,
@@ -63,8 +64,8 @@ class ABCExportFile(ABC):
             "contribution_id": contribution.id,
             "revision_id": revision.id,
             
-            "contribution_url": contribution_url,
-            "file_url": file_url,
+            # "contribution_url": contribution_url,
+            # "file_url": file_url,
             
             "download_url": download_url,
             "external_download_url": external_download_url,
