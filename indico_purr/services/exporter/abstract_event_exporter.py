@@ -52,10 +52,10 @@ class ABCExportEvent(ABCExportFile):
     #         'SubContribParticipation': 'contributionParticipationMetadata'
     #     }
     # }
-    
+
     def find_contributions_list(self, event, files):
         query = Contribution.query.with_parent(event)
-        
+
         current_plugin.logger.info('files ' + str(files))
 
         if files == True:
@@ -94,18 +94,18 @@ class ABCExportEvent(ABCExportFile):
             'room_name': event.room_name,
             'url': event.external_url,
             'creation_dt': export_serialize_date(event.created_dt),
-            'creator': self._serialize_person(event.creator, person_type='Avatar'),
+            'creator': self._serialize_person(event.creator),
             # 'hasAnyProtection': event.effective_protection_mode != ProtectionMode.public,
             # 'room_map_url': event.room.map_url if event.room else None,
             # 'folders': build_folders_api_data__wrapper(event),
-            'chairs': self._serialize_persons(event.person_links, person_type='ConferenceChair'),
+            'chairs': self._serialize_persons(event.person_links),
             # 'material': material_data,
             'keywords': event.keywords,
             'organizer': event.organizer_info,
             'references': list(map(export_serialize_reference, event.references))
         }
 
-    def _serialize_person(self, person, person_type):
+    def _serialize_person(self, person):
         if person:
             return {
                 # '_type': person_type,
@@ -117,8 +117,8 @@ class ABCExportEvent(ABCExportFile):
                 'email': person.email
             }
 
-    def _serialize_persons(self, persons, person_type):
-        return [self._serialize_person(person, person_type) for person in persons]
+    def _serialize_persons(self, persons):
+        return [self._serialize_person(person) for person in persons]
 
     def _serialize_field_value(self, field):
         return {
@@ -140,25 +140,22 @@ class ABCExportEvent(ABCExportFile):
         # # current_plugin.logger.error(f'[delta] material -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
 
-        speakers = self._serialize_persons(
-            contrib.speakers, person_type='ContributionParticipation')
+        speakers = self._serialize_persons(contrib.speakers)
 
         # current_plugin.logger.debug(f'[delta] speakers -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
 
-        primary_authors = self._serialize_persons(
-            contrib.primary_authors, person_type='ContributionParticipation')
+        primary_authors = self._serialize_persons(contrib.primary_authors)
 
         # current_plugin.logger.debug(f'[delta] primary_authors -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
 
-        coauthors = self._serialize_persons(
-            contrib.secondary_authors, person_type='ContributionParticipation')
+        coauthors = self._serialize_persons(contrib.secondary_authors)
 
         # current_plugin.logger.debug(f'[delta] coauthors -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
 
-        references = list(map(export_serialize_reference, contrib.references))
+        # references = list(map(export_serialize_reference, contrib.references))
 
         # current_plugin.logger.debug(f'[delta] references -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
@@ -173,13 +170,13 @@ class ABCExportEvent(ABCExportFile):
             map(self._serialize_field_value, contrib.field_values))
 
         editable = self._serialize_editable(event, contrib)
-        
+
         session_code = ''
         if contrib.session_block.code:
             session_code = contrib.session_block.code
         else:
             session_code = contrib.session_block.session.code
-        
+
         track = []
         if contrib.track:
             if contrib.track.track_group:
@@ -206,14 +203,15 @@ class ABCExportEvent(ABCExportFile):
             'speakers': speakers,
             'primary_authors': primary_authors,
             'coauthors': coauthors,
-            'keywords': contrib.keywords,
+            # 'keywords': contrib.keywords,
             'track': track,
-            'references': references,
-            'board_number': contrib.board_number,
+            # 'references': references,
+            # 'board_number': contrib.board_number,
             'code': contrib.code,
             'session_code': session_code,
             'sub_contributions': sub_contributions,
-            "revisions": editable.get('revisions', []) if editable else []
+            "revisions": editable.get('revisions', []) if editable else [],
+            "editor": editable.get('editor', None) if editable else None
         }
 
     def _serialize_editable(self, event, contrib):
@@ -232,7 +230,8 @@ class ABCExportEvent(ABCExportFile):
             return {
                 "id": editable.id,
                 "type": editable.type,
-                "revisions": revisions
+                "revisions": revisions,
+                "editor": self._serialize_person(editable.editor)
             }
 
         return None
@@ -255,7 +254,7 @@ class ABCExportEvent(ABCExportFile):
         ]
 
         revisions = [el for el in elements if len(el.get('files', [])) > 0]
-        
+
         return revisions
 
     def _serialize_subcontribution(self, subcontrib):
@@ -268,7 +267,7 @@ class ABCExportEvent(ABCExportFile):
             'friendly_id': subcontrib.friendly_id,
             'title': subcontrib.title,
             'duration': subcontrib.duration.seconds // 60,
-            'speakers': self._serialize_persons(subcontrib.speakers, person_type='SubContribParticipation'),
+            'speakers': self._serialize_persons(subcontrib.speakers),
             'references': list(map(export_serialize_reference, subcontrib.references)),
             'code': subcontrib.code,
         }
@@ -289,7 +288,7 @@ class ABCExportEvent(ABCExportFile):
             'email': convener.person.email,
         }
 
-    def _serialize_session_block(self, event, block, serialized_session, event_contributions = []):
+    def _serialize_session_block(self, event, block, serialized_session, event_contributions=[]):
 
         # contributions = block.contributions
         # contributions = (Contribution.query
@@ -297,10 +296,10 @@ class ABCExportEvent(ABCExportFile):
         #                  .options(joinedload('editables'))
         #                  .order_by(Contribution.friendly_id)
         #                  .all())
-        
+
         def _contribution_filter(contribution):
             return block.id == contribution.session_block_id
-        
+
         contributions = filter(_contribution_filter, event_contributions)
 
         # contributions_codes = [ c.code for c in contributions ]
@@ -379,5 +378,3 @@ class ABCExportEvent(ABCExportFile):
             'address': session_.address,
             'num_slots': len(session_.blocks),
         }
-
-       
