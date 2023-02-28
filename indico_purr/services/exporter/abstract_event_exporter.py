@@ -56,10 +56,9 @@ class ABCExportEvent(ABCExportFile):
     def find_contributions_list(self, event, files):
         query = Contribution.query.with_parent(event)
 
-        current_plugin.logger.info('files ' + str(files))
+        # current_plugin.logger.info('files ' + str(files))
 
         if files == True:
-            current_plugin.logger.info('filessssss')
             query.options(joinedload('editables'))
 
         event_contributions = query.order_by(Contribution.friendly_id).all()
@@ -105,17 +104,24 @@ class ABCExportEvent(ABCExportFile):
             'references': list(map(export_serialize_reference, event.references))
         }
 
+    def _serialize_person_affiliation(self, person):          
+        return {
+            'name': person.affiliation
+        } if person else None
+
     def _serialize_person(self, person):
-        if person:
-            return {
-                # '_type': person_type,
-                # '_fossil': self._fossils_mapping['person'].get(person_type, None),
-                'first_name': person.first_name,
-                'last_name': person.last_name,
-                'id': str(person.id),
-                'affiliation': person.affiliation,
-                'email': person.email
-            }
+        return {
+            # '_type': person_type,
+            # '_fossil': self._fossils_mapping['person'].get(person_type, None),
+            'first_name': person.first_name,
+            'last_name': person.last_name,
+            'id': str(person.id),
+            'affiliation': person.affiliation,
+            'email': person.email
+        } if person else None
+
+    def _serialize_institutes(self, persons):
+        return [self._serialize_person_affiliation(person) for person in persons]
 
     def _serialize_persons(self, persons):
         return [self._serialize_person(person) for person in persons]
@@ -139,6 +145,8 @@ class ABCExportEvent(ABCExportFile):
         #
         # # current_plugin.logger.error(f'[delta] material -> {(datetime.now().timestamp() - start_date)}')
         # start_date = datetime.now().timestamp()
+
+        institutes = self._serialize_institutes(contrib.primary_authors)
 
         speakers = self._serialize_persons(contrib.speakers)
 
@@ -177,18 +185,12 @@ class ABCExportEvent(ABCExportFile):
         else:
             session_code = contrib.session_block.session.code
 
-        track = []
-        if contrib.track:
-            if contrib.track.track_group:
-                track.append(contrib.track.track_group.title)
-            track.append(contrib.track.title)
-
         return {
             # '_type': 'Contribution',
             # '_fossil': self._fossils_mapping['contribution'].get(self._detail_level),
             'id': (contrib.legacy_mapping.legacy_contribution_id
                    if contrib.legacy_mapping else str(contrib.friendly_id)),
-            'db_id': contrib.id,
+            # 'db_id': contrib.id,
             'friendly_id': contrib.friendly_id,
             'field_values': field_values,
             'title': contrib.title,
@@ -204,7 +206,8 @@ class ABCExportEvent(ABCExportFile):
             'primary_authors': primary_authors,
             'coauthors': coauthors,
             # 'keywords': contrib.keywords,
-            'track': track,
+            'track': self._serialize_track_data(contrib),
+            'institutes': institutes,
             # 'references': references,
             # 'board_number': contrib.board_number,
             'code': contrib.code,
@@ -213,6 +216,26 @@ class ABCExportEvent(ABCExportFile):
             "revisions": editable.get('revisions', []) if editable else [],
             "editor": editable.get('editor', None) if editable else None
         }
+
+    def _serialize_track_data(self, contrib):
+        track: dict | None = None
+
+        if contrib.track:
+            track = dict(
+                code=contrib.track.code,
+                title=contrib.track.title,
+                description=contrib.track.description,
+            )
+
+            if contrib.track.track_group:
+                track.update(dict(
+                    group=dict(
+                        title=contrib.track.track_group.title,
+                        description=contrib.track.track_group.description,
+                    )
+                ))
+
+        return track
 
     def _serialize_editable(self, event, contrib):
 
@@ -228,7 +251,7 @@ class ABCExportEvent(ABCExportFile):
             revisions = self._get_latest_revision(event, contrib, editable)
 
             return {
-                "id": editable.id,
+                "id": str(editable.id),
                 "type": editable.type,
                 "revisions": revisions,
                 "editor": self._serialize_person(editable.editor)
@@ -263,7 +286,7 @@ class ABCExportEvent(ABCExportFile):
             # '_fossil': 'subContributionMetadata',
             'id': (subcontrib.legacy_mapping.legacy_subcontribution_id
                    if subcontrib.legacy_mapping else str(subcontrib.friendly_id)),
-            'db_id': subcontrib.id,
+            # 'db_id': subcontrib.id,
             'friendly_id': subcontrib.friendly_id,
             'title': subcontrib.title,
             'duration': subcontrib.duration.seconds // 60,
@@ -277,7 +300,7 @@ class ABCExportEvent(ABCExportFile):
             # '_type': 'SlotChair',
             # '_fossil': 'conferenceParticipation',
             'id': convener.person_id,
-            'db_id': convener.id,
+            # 'db_id': convener.id,
             'title': convener.title,
             'last_name': convener.last_name,
             'first_name': convener.first_name,
@@ -310,7 +333,7 @@ class ABCExportEvent(ABCExportFile):
         block_data = {
             # '_type': 'SessionSlot',
             # '_fossil': self._fossils_mapping['block'].get(self._detail_level),
-            'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
+            # 'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
             # 'conference': self._build_session_event_api_data(block.event),
             'start_dt': export_serialize_date(block.timetable_entry.start_dt) if block.timetable_entry else None,
             'end_dt': export_serialize_date(block.timetable_entry.end_dt) if block.timetable_entry else None,
@@ -358,7 +381,7 @@ class ABCExportEvent(ABCExportFile):
             # '_fossil': 'sessionMinimal',
             'id': (session_.legacy_mapping.legacy_session_id
                    if session_.legacy_mapping else str(session_.friendly_id)),
-            'db_id': session_.id,
+            # 'db_id': session_.id,
             'friendly_id': session_.friendly_id,
             'code': session_.code,
             # 'folders': build_folders_api_data__wrapper(session_),
