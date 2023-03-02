@@ -13,7 +13,7 @@ def get_contribution_fields(s) -> list:
     contribution_fields = []
 
     try:
-        if s is not None:
+        if s is not None and s.custom_fields is not None:
             custom_fields = json_decode(s.custom_fields)
 
             contribution_fields = [
