@@ -1,4 +1,6 @@
 from indico_purr.utils import json_decode
+from flask_pluginengine import current_plugin
+
 
 def get_cookies_util(c) -> dict | None:
     return {
@@ -7,22 +9,28 @@ def get_cookies_util(c) -> dict | None:
 
 
 def get_contribution_fields(s) -> list:
-    custom_fields = json_decode(s.custom_fields)
 
-    contribution_fields = [
-        dict(id=f.id, name=f.title)
-        for f in s.event.contribution_fields
-        if f.id in custom_fields
-    ]
-    
+    contribution_fields = []
+
+    try:
+        if s is not None:
+            custom_fields = json_decode(s.custom_fields)
+
+            contribution_fields = [
+                dict(id=f.id, name=f.title)
+                for f in s.event.contribution_fields
+                if f.id in custom_fields
+            ]
+    except Exception as e:
+        current_plugin.logger.error(e)
+
     return contribution_fields
 
 
 def get_settings_util(s) -> dict | None:
-    
+
     if s is None:
-        return None   
-    
+        return None
 
     return dict(
         api_key=s.api_key,
