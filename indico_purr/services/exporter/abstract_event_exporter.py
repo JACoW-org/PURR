@@ -60,8 +60,8 @@ class ABCExportEvent(ABCExportFile):
 
         if files == True:
             query.options(joinedload('editables'))
-
-        event_contributions = query.order_by(Contribution.friendly_id).all()
+            
+        event_contributions = query.filter_by(is_deleted=False).order_by(Contribution.friendly_id).all()
         return event_contributions
 
     def find_event_day_bounds(self, obj, day):
@@ -104,7 +104,7 @@ class ABCExportEvent(ABCExportFile):
             'references': list(map(export_serialize_reference, event.references))
         }
 
-    def _serialize_person_affiliation(self, person):          
+    def _serialize_person_affiliation(self, person):
         return {
             'name': person.affiliation
         } if person else None
@@ -213,7 +213,8 @@ class ABCExportEvent(ABCExportFile):
             'code': contrib.code,
             'session_code': session_code,
             'sub_contributions': sub_contributions,
-            "revisions": editable.get('revisions', []) if editable else [],
+            "all_revisions": editable.get('all_revisions', []) if editable else [],
+            "latest_revision": editable.get('latest_revision', None) if editable else None,
             "editor": editable.get('editor', None) if editable else None
         }
 
@@ -225,6 +226,7 @@ class ABCExportEvent(ABCExportFile):
                 code=contrib.track.code,
                 title=contrib.track.title,
                 description=contrib.track.description,
+                position=contrib.track.position,
             )
 
             if contrib.track.track_group:
@@ -232,6 +234,7 @@ class ABCExportEvent(ABCExportFile):
                     group=dict(
                         title=contrib.track.track_group.title,
                         description=contrib.track.track_group.description,
+                        position=contrib.track.track_group.position,
                     )
                 ))
 
@@ -246,14 +249,16 @@ class ABCExportEvent(ABCExportFile):
 
         if editable is not None:
 
-            # revisions = self._get_all_revisions(event, contrib, editable)
+            all_revisions = self._get_all_revisions(event, contrib, editable)
 
-            revisions = self._get_latest_revision(event, contrib, editable)
+            latest_revision = self._get_latest_revision(
+                event, contrib, editable)
 
             return {
                 "id": str(editable.id),
                 "type": editable.type,
-                "revisions": revisions,
+                "all_revisions": all_revisions,
+                "latest_revision": latest_revision,
                 "editor": self._serialize_person(editable.editor)
             }
 
@@ -263,20 +268,18 @@ class ABCExportEvent(ABCExportFile):
         latest_revision = editable.revisions[-1]
 
         serialized_revision = self._serialize_editable_revision(
-            event, contrib, latest_revision)
+            event, contrib, latest_revision, True)
 
-        revisions = [serialized_revision]
-
-        return revisions
+        return serialized_revision
 
     def _get_all_revisions(self, event, contrib, editable):
-        elements = [
+        revisions = [
             self._serialize_editable_revision(
-                event, contrib, revision)
+                event, contrib, revision, False)
             for revision in editable.revisions
         ]
 
-        revisions = [el for el in elements if len(el.get('files', [])) > 0]
+        # revisions = [el for el in revisions if len(el.get('files', [])) > 0]
 
         return revisions
 
