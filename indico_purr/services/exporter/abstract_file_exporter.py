@@ -55,7 +55,7 @@ class ABCExportFile(ABC):
         # contribution_url = f"event/{event.id}/contributions/{contribution.id}"
         # file_url = f"editing/paper/{revision.id}/{rev_file.id}/{rev_file.filename}"
         
-        print(rev_file.filename)
+        # print(rev_file.filename)
 
         return {
             "id": rev_file.id,
