@@ -39,6 +39,24 @@ class FinalProceedingsExporter(ABCExportEvent):
         # 
         #     # current_plugin.logger.debug(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
 
+
+
+        attachments = self.find_attachments_list(event=event)
+        
+        data['attachments'] = []
+        
+        for attachment in attachments:
+            data['attachments'].append(dict(
+                md5sum=attachment.file.md5,
+                filename=attachment.file.filename,
+                content_type=attachment.file.content_type,
+                size=attachment.file.size,
+            
+                title=attachment.title,
+                description=attachment.description,
+                external_download_url=attachment.absolute_download_url,
+            ))
+
         contributions = self.find_contributions_list(event=event, files=True)
 
         data['contributions'] = []

@@ -13,6 +13,9 @@ from indico.web.flask.util import url_for
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
+
 
 from indico_purr.services.exporter.abstract_file_exporter import ABCExportFile
 from indico_purr.services.exporter.common_exporter_utils import export_serialize_date, export_serialize_reference
@@ -52,6 +55,20 @@ class ABCExportEvent(ABCExportFile):
     #         'SubContribParticipation': 'contributionParticipationMetadata'
     #     }
     # }
+    
+    def find_attachments_list(self, event):
+        # query = Attachment.query.with_parent(event)
+
+        # current_plugin.logger.info('files ' + str(files))
+        
+        event_folders = AttachmentFolder.query.filter_by(event=event, is_deleted=False).all()
+        
+        folder_ids = [f.id for f in event_folders if f.title == 'final_proceedings']
+        
+        event_attachments = Attachment.query.filter(Attachment.folder_id.in_(folder_ids)).all()
+            
+        # event_attachments = query.filter_by(is_deleted=False).order_by(Attachment.title).all()
+        return event_attachments
 
     def find_contributions_list(self, event, files):
         query = Contribution.query.with_parent(event)
@@ -75,7 +92,7 @@ class ABCExportEvent(ABCExportFile):
                    ).end_dt if entries else None
         return first, last
 
-    def _build_event_api_data_base(self, event):
+    def _build_event_api_data_base(self, event):       
         return {
             # '_type': 'Conference',
             'id': str(event.id),
