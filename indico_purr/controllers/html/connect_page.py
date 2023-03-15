@@ -13,15 +13,13 @@ from indico.modules.events.management.controllers.base import RHManageEventBase
 
 from indico.web.util import jsonify_data, jsonify_template
 
-from flask import g, request, session, make_response
+from flask import request, session, make_response
 
 
 class RH_connect_page(RHManageEventBase):
     """ """
 
     def _process_GET(self):
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(request.view_args['event_id'])
 
         if self.event.can_manage(session.user):
 
@@ -43,8 +41,6 @@ class RH_connect_page(RHManageEventBase):
         return make_response('', 403)
 
     def _process_POST(self):
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(request.view_args['event_id'])
 
         if self.event.can_manage(session.user):
 
@@ -56,7 +52,7 @@ class RH_connect_page(RHManageEventBase):
                 settings = PurrSettingsModel()
                 settings.populate_from_dict(form.data)
 
-                settings.user_id = self.user.id
+                settings.user_id = session.user.id
                 settings.event_id = self.event.id
 
                 db.session.add(settings)

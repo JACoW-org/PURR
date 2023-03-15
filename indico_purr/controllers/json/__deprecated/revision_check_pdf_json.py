@@ -5,11 +5,10 @@ from indico_purr.controllers.utils import get_cookies_util, get_settings_util
 from indico_purr.models.settings import PurrSettingsModel
 from indico_purr.utils import json_encode
 
-from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 
 
-from flask import g, request, session, make_response
+from flask import request, session, make_response
 
 
 class RH_revision_check_pdf_json(RHManageEventBase, ABCExportRevisionFile):
@@ -20,9 +19,6 @@ class RH_revision_check_pdf_json(RHManageEventBase, ABCExportRevisionFile):
         contrib_id = request.view_args['contrib_id']
         file_type = request.view_args['type']
         revision_id = request.view_args['revision_id']
-
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(request.view_args['event_id'])
 
         if self.event.can_manage(session.user):
 

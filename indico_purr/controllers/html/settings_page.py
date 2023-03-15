@@ -23,9 +23,6 @@ class RH_settings_page(RHManageEventBase):
 
     def _process_GET(self):
 
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(request.view_args['event_id'])
-
         if self.event.can_manage(session.user):
 
             connected = PurrSettingsModel.query.filter_by(
@@ -51,8 +48,6 @@ class RH_settings_page(RHManageEventBase):
         return make_response('', 403)
 
     def _process_POST(self):
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(request.view_args['event_id'])
 
         if self.event.can_manage(session.user):
 
@@ -61,16 +56,12 @@ class RH_settings_page(RHManageEventBase):
 
             if connected:
 
-                # print(request.form)
-
                 form = PurrSettingsForm(pdf_page_width=request.form['pdf_page_width'],
                                         pdf_page_height=request.form['pdf_page_height'],
                                         ab_session_h1=request.form['ab_session_h1'],
                                         ab_session_h2=request.form['ab_session_h2'],
                                         ab_contribution_h1=request.form['ab_contribution_h1'],
                                         ab_contribution_h2=request.form['ab_contribution_h2'])
-
-                # print(form.data)
 
                 if form.validate_on_submit():
 
@@ -87,8 +78,6 @@ class RH_settings_page(RHManageEventBase):
                     db.session.add(settings)
                     db.session.commit()
                     db.session.flush()
-
-                    # print(settings)
 
                     self.event.log(EventLogRealm.management, LogKind.positive, 
                                    'PURR', 'Settings saved', session.user)

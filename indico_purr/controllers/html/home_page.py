@@ -15,9 +15,6 @@ class RH_home_page(RHManageEventBase):
 
     def _process(self):
 
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(request.view_args['event_id'])
-
         if self.event.can_manage(session.user):
 
             connected = PurrSettingsModel.query.filter_by(

@@ -45,10 +45,3 @@ def get_settings_util(s) -> dict | None:
         ab_contribution_h2=s.ab_contribution_h2
     ) if s else None
 
-
-# pdf_page_width
-# pdf_page_height
-# ab_session_h1
-# ab_session_h2
-# ab_contribution_h1
-# ab_contribution_p

@@ -6,7 +6,6 @@ from indico_purr.services.abstract_booklet_exporter import AbstractBookletExport
 
 from indico_purr.utils import json_encode
 
-from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 
 from flask_pluginengine import current_plugin
@@ -18,11 +17,6 @@ class RH_abstract_booklet_json(RHManageEventBase, AbstractBookletExporter):
     """ """
 
     def _process(self):
-
-        event_id = request.view_args.get('event_id')
-
-        self.user = g.current_api_user = session.user
-        self.event = Event.get(event_id)
 
         if self.event.can_manage(session.user):
             
