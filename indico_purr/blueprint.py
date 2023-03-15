@@ -1,13 +1,13 @@
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_purr.controllers.html.home_page import RH_home_page
-from indico_purr.controllers.html.connect_page import RH_connect_page
-from indico_purr.controllers.html.disconnect_page import RH_disconnect_page
-from indico_purr.controllers.html.settings_page import RH_settings_page
+from indico_purr.controllers.html.home_page import RHPurrHomePage
+from indico_purr.controllers.html.connect_page import RHPurrConnectPage
+from indico_purr.controllers.html.disconnect_page import RHPurrDisconnectPage
+from indico_purr.controllers.html.settings_page import RHPurrSettingsPage
 # from indico_purr.controllers.json.revision_check_pdf_json import RH_revision_check_pdf_json
 
-from indico_purr.controllers.json.abstract_booklet import RH_abstract_booklet_json
-from indico_purr.controllers.json.final_proceedings import RH_final_proceedings_json
+from indico_purr.controllers.json.abstract_booklet import RHPurrAbstractBookletJson
+from indico_purr.controllers.json.final_proceedings import RHPurrFinalProceedingsJson
 # from indico_purr.controllers.json.event_files_json import RH_event_files_json
 
 
@@ -20,31 +20,31 @@ PurrPluginBlueprint = IndicoPluginBlueprint(
 
 PurrPluginBlueprint.add_url_rule('/purr-home',
                                  'purr-home',
-                                 view_func=RH_home_page)
+                                 view_func=RHPurrHomePage)
 
 PurrPluginBlueprint.add_url_rule('/purr-connect',
                                  'purr-connect',
-                                 view_func=RH_connect_page,
+                                 view_func=RHPurrConnectPage,
                                  methods=('GET', 'POST'))
 
 PurrPluginBlueprint.add_url_rule('/purr-disconnect',
                                  'purr-disconnect',
-                                 view_func=RH_disconnect_page,
+                                 view_func=RHPurrDisconnectPage,
                                  methods=('GET', 'POST'))
 
 PurrPluginBlueprint.add_url_rule('/purr-settings',
                                  'purr-settings',
-                                 view_func=RH_settings_page,
+                                 view_func=RHPurrSettingsPage,
                                  methods=('GET', 'POST'))
 
 
 PurrPluginBlueprint.add_url_rule('/event-abstract-booklet',
                                  'event-abstract-booklet',
-                                 view_func=RH_abstract_booklet_json)
+                                 view_func=RHPurrAbstractBookletJson)
 
 PurrPluginBlueprint.add_url_rule('/event-final-proceedings',
                                  'event-final-proceedings',
-                                 view_func=RH_final_proceedings_json)
+                                 view_func=RHPurrFinalProceedingsJson)
 
 # PurrPluginBlueprint.add_url_rule('/event-files-json',
 #                                  'event-files-json',

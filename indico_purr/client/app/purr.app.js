@@ -167,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(body?.params);
       },
       result: ({head, body}) => {
+        console.log(body?.params);
         ev.target.classList.remove('disabled');
         loader.remove();
       },
@@ -352,6 +353,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // console.log(body.params.index, body.params.total, body.params.file.filename);
 
+        const filename = body.params.file.filename;
+        const event_id = body.params.file.event_id;
+        const contribution_id = body.params.file.contribution_id;
+
+        // f"event/{event.id}/contributions/{contribution.id}"
+        const contribution_url = `event/${event_id}/contributions/${contribution_id}`;
+        const edit_url = `/${contribution_url}/editing/paper`;
+
         files_box.appendChild(
           Object.assign(document.createElement('section'), {
             className: 'section section-added',
@@ -361,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
                       <div class="purr-col purr-col-grow">
                           <span class="icon icon-small icon-file-pdf"></span>
                           <span class="label">File:</span> 
-                          ${body.params.file.filename}
+                          ${filename}
                       </div>
                       <div class="purr-col purr-col-grow">
                           <span class="label">Fonts:</span>
@@ -372,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                           <span class="icon icon-small icon-checkbox-checked"></span>
                       </div>
                       <div class="purr-col">
-                          <a href="/${body.params.file.contribution_url}/editing/paper">Go</a>
+                          <a href="${edit_url}">Go</a>
                       </div>
                   <div>
               </div>`,

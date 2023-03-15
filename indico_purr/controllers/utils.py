@@ -1,4 +1,5 @@
 from indico_purr.utils import DEFAULT_TIMEZONE, json_decode
+
 from flask_pluginengine import current_plugin
 
 
@@ -44,4 +45,3 @@ def get_settings_util(s) -> dict | None:
         ab_contribution_h1=s.ab_contribution_h1,
         ab_contribution_h2=s.ab_contribution_h2
     ) if s else None
-

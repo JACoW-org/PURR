@@ -1,28 +1,16 @@
 
-
-
-
-
 from indico_purr.forms import PurrSettingsForm
-
 from indico_purr.models.settings import PurrSettingsModel
 
-
 from indico.core.db import db
-
 from indico.modules.logs import EventLogRealm, LogKind
-
-from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
-
 from indico.web.util import jsonify_data, jsonify_template
 
 from flask import session, make_response
 
 
-
-
-class RH_disconnect_page(RHManageEventBase):
+class RHPurrDisconnectPage(RHManageEventBase):
     """ """
 
     def _process_GET(self):
@@ -55,7 +43,7 @@ class RH_disconnect_page(RHManageEventBase):
                 db.session.commit()
                 db.session.flush()
 
-                self.event.log(EventLogRealm.management, LogKind.positive, 
+                self.event.log(EventLogRealm.management, LogKind.positive,
                                'PURR', 'Settings removed', session.user)
 
             return jsonify_data(flash=True)

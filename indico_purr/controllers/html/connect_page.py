@@ -1,22 +1,16 @@
 
 from indico_purr.forms import PurrConnectForm
-
 from indico_purr.models.settings import PurrSettingsModel
 
-
 from indico.core.db import db
-
 from indico.modules.logs import EventLogRealm, LogKind
-
-from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
-
 from indico.web.util import jsonify_data, jsonify_template
 
 from flask import request, session, make_response
 
 
-class RH_connect_page(RHManageEventBase):
+class RHPurrConnectPage(RHManageEventBase):
     """ """
 
     def _process_GET(self):

@@ -49,14 +49,6 @@ class ABCExportFile(ABC):
         download_url = editing_revision_file.download_url
         external_download_url = editing_revision_file.external_download_url
 
-        # print(download_url, external_download_url)
-
-        # DA TOGLIERE ???
-        # contribution_url = f"event/{event.id}/contributions/{contribution.id}"
-        # file_url = f"editing/paper/{revision.id}/{rev_file.id}/{rev_file.filename}"
-        
-        # print(rev_file.filename)
-
         return {
             "id": rev_file.id,
             "uuid": rev_file.uuid,
@@ -77,12 +69,6 @@ class ABCExportFile(ABC):
             "contribution_id": contribution.id,
             "revision_id": revision.id,
 
-            # "contribution_url": contribution_url,
-            # "file_url": file_url,
-
             "download_url": download_url,
-            "external_download_url": external_download_url,
-
-            # "download_url": url_for('.download_archive', event, type="paper", uuid=file.uuid), # archive_type=archive_type,
-            # "external_download_url": url_for('attachments.download', filename=file.filename, _external=True)
+            "external_download_url": external_download_url
         }

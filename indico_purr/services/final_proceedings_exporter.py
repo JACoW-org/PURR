@@ -3,7 +3,7 @@ from flask_pluginengine import current_plugin
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 
 
-class FinalProceedingsExporter(ABCExportEvent):
+class PurrFinalProceedingsExporter(ABCExportEvent):
     """ """
 
     def _build_event_api_data(self, event):
@@ -38,8 +38,6 @@ class FinalProceedingsExporter(ABCExportEvent):
         #         data['contributions'].append(serialized_contrib)
         # 
         #     # current_plugin.logger.debug(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
-
-
 
         attachments = self.find_attachments_list(event=event)
         

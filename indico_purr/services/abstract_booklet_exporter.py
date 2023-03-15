@@ -3,7 +3,7 @@ from flask_pluginengine import current_plugin
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 
 
-class AbstractBookletExporter(ABCExportEvent):
+class PurrAbstractBookletExporter(ABCExportEvent):
     """ """
 
     def _build_event_api_data(self, event):

@@ -1,24 +1,17 @@
 
-
 from indico_purr.forms import PurrSettingsForm
-
 from indico_purr.models.settings import PurrSettingsModel
-
 from indico_purr.utils import json_decode, json_encode
 
 from indico.core.db import db
-
 from indico.modules.logs import EventLogRealm, LogKind
-
-from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
-
 from indico.web.util import jsonify_data, jsonify_template
 
-from flask import g, request, session, make_response
+from flask import request, session, make_response
 
 
-class RH_settings_page(RHManageEventBase):
+class RHPurrSettingsPage(RHManageEventBase):
     """ """
 
     def _process_GET(self):
@@ -79,7 +72,7 @@ class RH_settings_page(RHManageEventBase):
                     db.session.commit()
                     db.session.flush()
 
-                    self.event.log(EventLogRealm.management, LogKind.positive, 
+                    self.event.log(EventLogRealm.management, LogKind.positive,
                                    'PURR', 'Settings saved', session.user)
 
                     return jsonify_data(flash=True)
