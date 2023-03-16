@@ -185,18 +185,84 @@ document.addEventListener('DOMContentLoaded', () => {
   ///////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////
 
+  document.querySelector('.clear-proceedings').addEventListener('click', ev => {
+    const proceedings_box = purr_element.querySelector('.proceedings-box');
+    proceedings_box
+      .querySelectorAll('.section.section-added')
+      .forEach(el => el.parentNode.removeChild(el));
+      proceedings_box.style.display = 'none';
+  });
+
   document.querySelector('.proceedings').addEventListener('click', ev => {
     const loader = createLoader('Proceedings...');
+
+    const proceedings_box = purr_element.querySelector('.proceedings-box');
+    proceedings_box
+      .querySelectorAll('.section.section-added')
+      .forEach(el => el.parentNode.removeChild(el));
+
+    proceedings_box.style.display = 'block';
+
+    const progress = Object.assign(document.createElement('section'), {
+      className: 'section section-added',
+      innerHTML: `<div class="meter"><span class="progress"></span></div>`,
+      update: ({index, total}) => {
+        const el = progress.querySelector('.meter .progress');
+
+        if (total === 0) {
+          el.style.width = '100%';
+        } else {
+          el.style.width = (index * 100) / total + '%';
+        }
+      },
+      increment: ({total}) => {
+        progress.dataset.total = total;
+        progress.dataset.index = progress.dataset.index || 0;
+        progress.dataset.index++;
+        progress.querySelector('.meter .progress').style.width =
+          (progress.dataset.index * 100) / total + '%';
+      },
+    });
 
     ws.task({
       pre: () => {
         ev.target.classList.add('disabled');
         ev.target.appendChild(loader);
+        proceedings_box.appendChild(progress);
+        progress.update({index: 0, total: 0});
+      },
+      progress: ({head, body}) => {
+        console.log('progress:', body.params.phase)
+        progress.increment({total: 14});
+
+        proceedings_box.appendChild(
+          Object.assign(document.createElement('section'), {
+            className: 'section section-added',
+            innerHTML: `
+              <div class="text">
+                  <div class="purr-row">
+                      <div class="purr-col purr-col">
+                          <span class="icon icon-small icon-file-pdf"></span>
+                          <span class="label">Phase:</span> 
+                      </div>
+                      <div class="purr-col purr-col-grow">
+                          ${body.params.phase}
+                      </div>
+                  <div>
+              </div>`,
+          })
+        );
+
       },
       result: ({head, body}) => {
         ev.target.classList.remove('disabled');
         loader.remove();
         download(body);
+      },
+      post: () => {
+        ev.target.classList.remove('disabled');
+        loader.remove();
+        proceedings_box.removeChild(progress);
       },
       err: e => console.error(e),
       params: () => fetchFinalProceedingsJson(true),

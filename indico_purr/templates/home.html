@@ -3,187 +3,176 @@
 {% from 'events/management/_settings.html' import render_event_settings %}
 {% from 'events/contributions/management/_draft_mode_warning.html' import render_draft_mode_warning %}
 {% block title %}
-    {% trans %}PURR{% endtrans %}
+{% trans %}PURR{% endtrans %}
 {% endblock title %}
 {% block content %}
 
-    {{ template_hook('event-actions', event=event) }}
+{{ template_hook('event-actions', event=event) }}
 
-    {% if connected %}
-        <script id="purr-settings" type="application/json">{{ settings | tojson }}</script>
-    {% endif %} 
+{% if connected %}
+<script id="purr-settings" type="application/json">{{ settings | tojson }}</script>
+{% endif %}
 
-    <div id="purr-home"></div>
-    
-    <div class="purr">
+<div id="purr-home"></div>
 
-        <div class="purr-plugin-settings-box action-box fixed-width">
-            <div class="section">
-                <span class="icon icon-link"></span>
-                <div class="text">
-                    <div class="label">
-                        {% if connected %}
-                            {% trans %}Plugin connected{% endtrans %}
-                        {% else %}
-                            {% trans %}Plugin disconnected{% endtrans %}
-                        {% endif %} 
-                    </div>
-                    <div class="description">
-                        {% if connected %}
-                            {{ settings.api_url }}
-                        {% else %}
-                            {% trans %}Click "Connect" to configuer PURR Api Server..{% endtrans %}                      
-                        {% endif %} 
-                    </div>
-                </div>
-                <div class="toolbar">
+<div class="purr">
 
+    <div class="purr-plugin-settings-box action-box fixed-width">
+        <div class="section">
+            <span class="icon icon-link"></span>
+            <div class="text">
+                <div class="label">
                     {% if connected %}
-
-                    <button class="i-button info icon-settings" title="{% trans %}Settings{% endtrans %}"
-                        data-href="{{ url_for('plugin_purr.purr-settings', event) }}"
-                        data-title="{% trans %}PURR - Settings{% endtrans %}"
-                        data-reload-after data-ajax-dialog></button>
-
-                    <button class="i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
-                        data-href="{{ url_for('plugin_purr.purr-disconnect', event) }}"
-                        data-title="{% trans %}PURR - Disconnect{% endtrans %}"
-                        data-reload-after data-ajax-dialog>
-                        {% trans %}Disconnect{% endtrans %}
-                    </button>
-
+                    {% trans %}Plugin connected{% endtrans %}
                     {% else %}
-
-                    <button class="i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
-                        data-href="{{ url_for('plugin_purr.purr-connect', event) }}"
-                        data-title="{% trans %}PURR - Connect{% endtrans %}"
-                        data-reload-after data-ajax-dialog>
-                        {% trans %}Connect{% endtrans %}
-                    </button>
-                    
+                    {% trans %}Plugin disconnected{% endtrans %}
                     {% endif %}
-
+                </div>
+                <div class="description">
+                    {% if connected %}
+                    {{ settings.api_url }}
+                    {% else %}
+                    {% trans %}Click "Connect" to configuer PURR Api Server..{% endtrans %}
+                    {% endif %}
                 </div>
             </div>
-        </div> 
+            <div class="toolbar">
 
-        {% if connected %}        
+                {% if connected %}
 
-        <div class="purr-abstract-booklet-box action-box fixed-width" data-v-app>
-            <div class="section">
-                <span class="icon icon-package-download"></span>
-                <div class="text">
-                    <div class="label">Abstract Booklet Document</div>
-                    <div class="description">Generate Abstract Booklet Document.</div>
-                </div>
-                <div class="toolbar">
-                    <a href="#"
-                        class="purr purr-btn download i-button icon-file-openoffice"
-                        data-title="Download Abstract Booklet"
-                        data-qtip-oldtitle="Download Abstract Booklet">
-                        Document
-                    </a>
-                </div>
-            </div>
-        </div>             
+                <button class="i-button info icon-settings" title="{% trans %}Settings{% endtrans %}"
+                    data-href="{{ url_for('plugin_purr.purr-settings', event) }}"
+                    data-title="{% trans %}PURR - Settings{% endtrans %}" data-reload-after data-ajax-dialog></button>
 
-        <div class="purr-contribution-reference-box action-box fixed-width" data-v-app>
-            <div class="section">
-                <span class="icon icon-package-download"></span>
-                <div class="text">
-                    <div class="label">Get Contribution Reference</div>
-                    <div class="description">Get Contribution Reference.</div>
-                </div>
-                <div class="toolbar">
-                    <a href="#"
-                        class="purr purr-btn reference i-button icon-file-openoffice"
-                        data-title="Get Contribution Reference"
-                        data-qtip-oldtitle="Get Contribution Reference">
-                        Reference
-                    </a>
-                </div>
-            </div>
-        </div>      
+                <button class="i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
+                    data-href="{{ url_for('plugin_purr.purr-disconnect', event) }}"
+                    data-title="{% trans %}PURR - Disconnect{% endtrans %}" data-reload-after data-ajax-dialog>
+                    {% trans %}Disconnect{% endtrans %}
+                </button>
 
-        <div class="purr-final-proceedings-box action-box fixed-width" data-v-app>
-            <div class="section">
-                <span class="icon icon-shrink"></span>
-                <div class="text">
-                    <div class="label">Final Proceedings</div>
-                    <div class="description">
-                        <a target="_blank" href="javascript:void(0)">Download ZIP (disabled)</a>
-                        -
-                        <a target="_blank" href="{{ settings.api_url }}/FEL2022/">Preview (dev preview)</a>
-                    </div>
-                </div>
-                <div class="toolbar">
-                    <a href="#"
-                        class="purr purr-btn proceedings i-button icon-file-zip"
-                        data-title="Download final Proceedings"
-                        data-qtip-oldtitle="Download final Proceedings">
-                        Proceedings
-                    </a>
-                </div>
-            </div>
-        </div> 
+                {% else %}
 
-        <div class="purr-papers-keywords-box action-box fixed-width fixed-height" data-v-app>
-            <div class="section">
-                <span class="icon icon-user-check"></span>
-                <div class="text">
-                    <div class="label">Extract event pdf keywords</div>
-                    <div class="description">Extract event pdf Keywords.</div>
-                </div>
-                <div class="toolbar">
-                    <a href="#"
-                        class="purr purr-btn clear-keywords i-button icon-remove"
-                        data-title="Clear Reports"
-                        data-qtip-oldtitle="Clear Reports">
-                            Clear
-                    </a>
-                    <a href="#"
-                        class="purr purr-btn keywords i-button icon-file-check"
-                        data-title="Keywords"
-                        data-qtip-oldtitle="Keywords">
-                        Keywords
-                    </a>
-                </div>
+                <button class="i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
+                    data-href="{{ url_for('plugin_purr.purr-connect', event) }}"
+                    data-title="{% trans %}PURR - Connect{% endtrans %}" data-reload-after data-ajax-dialog>
+                    {% trans %}Connect{% endtrans %}
+                </button>
+
+                {% endif %}
+
             </div>
         </div>
-
-        <div class="action-box keywords-box fixed-width fixed-height" style="display: none" data-v-app></div>
-
-        <div class="purr-papers-check-box action-box fixed-width fixed-height" data-v-app>
-            <div class="section">
-                <span class="icon icon-user-check"></span>
-                <div class="text">
-                    <div class="label">Check event pdf files</div>
-                    <div class="description">Check event pdf files.</div>
-                </div>
-                <div class="toolbar">
-                    <a href="#"
-                        class="purr purr-btn clear-checks i-button icon-remove"
-                        data-title="Clear Reports"
-                        data-qtip-oldtitle="Clear Reports">
-                            Clear
-                    </a>
-                    <a href="#"
-                        class="purr purr-btn checks i-button icon-file-check"
-                        data-title="Check PDF Files"
-                        data-qtip-oldtitle="Check PDF Files">
-                            Check
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="action-box files-box fixed-width fixed-height" style="display: none" data-v-app></div>
-
-        {% endif %}
     </div>
 
-    {% raw %}
-        <div id="app"></div>
-    {% endraw %}
+    {% if connected %}
+
+    <div class="purr-abstract-booklet-box action-box fixed-width" data-v-app>
+        <div class="section">
+            <span class="icon icon-package-download"></span>
+            <div class="text">
+                <div class="label">Abstract Booklet Document</div>
+                <div class="description">Generate Abstract Booklet Document.</div>
+            </div>
+            <div class="toolbar">
+                <a href="#" class="purr purr-btn download i-button icon-file-openoffice"
+                    data-title="Download Abstract Booklet" data-qtip-oldtitle="Download Abstract Booklet">
+                    Document
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="purr-contribution-reference-box action-box fixed-width" data-v-app>
+        <div class="section">
+            <span class="icon icon-package-download"></span>
+            <div class="text">
+                <div class="label">Get Contribution Reference</div>
+                <div class="description">Get Contribution Reference.</div>
+            </div>
+            <div class="toolbar">
+                <a href="#" class="purr purr-btn reference i-button icon-file-openoffice"
+                    data-title="Get Contribution Reference" data-qtip-oldtitle="Get Contribution Reference">
+                    Reference
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="purr-final-proceedings-box action-box fixed-width" data-v-app>
+        <div class="section">
+            <span class="icon icon-shrink"></span>
+            <div class="text">
+                <div class="label">Final Proceedings</div>
+                <div class="description">
+                    <a target="_blank" href="javascript:void(0)">Download ZIP (disabled)</a>
+                    -
+                    <a target="_blank" href="{{ settings.api_url }}/FEL2022/">Preview (dev preview)</a>
+                </div>
+            </div>
+            <div class="toolbar">
+                <a href="#" class="purr purr-btn clear-proceedings i-button icon-remove" data-title="Clear Proceedings"
+                    data-qtip-oldtitle="Clear Proceedings">
+                    Clear
+                </a>
+                <a href="#" class="purr purr-btn proceedings i-button icon-file-zip"
+                    data-title="Download final Proceedings" data-qtip-oldtitle="Download final Proceedings">
+                    Proceedings
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box proceedings-box fixed-width fixed-height" style="display: none" data-v-app></div>
+
+    <div class="purr-papers-keywords-box action-box fixed-width fixed-height" data-v-app>
+        <div class="section">
+            <span class="icon icon-user-check"></span>
+            <div class="text">
+                <div class="label">Extract event pdf keywords</div>
+                <div class="description">Extract event pdf Keywords.</div>
+            </div>
+            <div class="toolbar">
+                <a href="#" class="purr purr-btn clear-keywords i-button icon-remove" data-title="Clear Keywords"
+                    data-qtip-oldtitle="Clear Keywords">
+                    Clear
+                </a>
+                <a href="#" class="purr purr-btn keywords i-button icon-file-check" data-title="Keywords"
+                    data-qtip-oldtitle="Keywords">
+                    Keywords
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box keywords-box fixed-width fixed-height" style="display: none" data-v-app></div>
+
+    <div class="purr-papers-check-box action-box fixed-width fixed-height" data-v-app>
+        <div class="section">
+            <span class="icon icon-user-check"></span>
+            <div class="text">
+                <div class="label">Check event pdf files</div>
+                <div class="description">Check event pdf files.</div>
+            </div>
+            <div class="toolbar">
+                <a href="#" class="purr purr-btn clear-checks i-button icon-remove" data-title="Clear Reports"
+                    data-qtip-oldtitle="Clear Reports">
+                    Clear
+                </a>
+                <a href="#" class="purr purr-btn checks i-button icon-file-check" data-title="Check PDF Files"
+                    data-qtip-oldtitle="Check PDF Files">
+                    Check
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box files-box fixed-width fixed-height" style="display: none" data-v-app></div>
+
+    {% endif %}
+</div>
+
+{% raw %}
+<div id="app"></div>
+{% endraw %}
 
 {% endblock content %}

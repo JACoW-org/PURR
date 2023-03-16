@@ -65,7 +65,10 @@ class ABCExportEvent(ABCExportFile):
         
         folder_ids = [f.id for f in event_folders if f.title == 'final_proceedings']
         
-        event_attachments = Attachment.query.filter(Attachment.folder_id.in_(folder_ids)).all()
+        event_attachments = Attachment.query.filter(
+            Attachment.is_deleted==False,
+            Attachment.folder_id.in_(folder_ids)
+        ).all()
             
         # event_attachments = query.filter_by(is_deleted=False).order_by(Attachment.title).all()
         return event_attachments
