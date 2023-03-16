@@ -241,12 +241,13 @@ document.addEventListener('DOMContentLoaded', () => {
             innerHTML: `
               <div class="text">
                   <div class="purr-row">
-                      <div class="purr-col purr-col">
-                          <span class="icon icon-small icon-file-pdf"></span>
-                          <span class="label">Phase:</span> 
+                      <div class="purr-col purr-col-grow">
+                          <span class="icon icon-small icon-eye"></span>
+                          <span class="label">Phase:</span>
+                          ${body.params.phase}
                       </div>
                       <div class="purr-col purr-col-grow">
-                          ${body.params.phase}
+                          ${body.params.text}
                       </div>
                   <div>
               </div>`,
