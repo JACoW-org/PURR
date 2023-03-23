@@ -1,5 +1,3 @@
-from flask_pluginengine import current_plugin
-
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 
 
@@ -77,7 +75,6 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
             ]
 
             data['sessions'].extend(serialized_sessions)
-
 
         # current_plugin.logger.debug(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
 

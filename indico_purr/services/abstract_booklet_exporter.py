@@ -1,5 +1,3 @@
-from flask_pluginengine import current_plugin
-
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 
 

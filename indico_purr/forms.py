@@ -1,9 +1,7 @@
-from wtforms import BooleanField, EmailField, FloatField, SelectField, SelectMultipleField, StringField, TextAreaField
-from wtforms.fields import IntegerField, URLField
-from wtforms.validators import URL, DataRequired, Email, InputRequired
+from wtforms import BooleanField, FloatField, StringField, URLField
+from wtforms.validators import URL, DataRequired
 
 from indico.util.i18n import _
-from indico.util.string import validate_email
 from indico.web.forms.base import IndicoForm
 
 

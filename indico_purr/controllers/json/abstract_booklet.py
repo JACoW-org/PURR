@@ -1,6 +1,5 @@
 
 from flask import make_response, request, session
-from flask_pluginengine import current_plugin
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 

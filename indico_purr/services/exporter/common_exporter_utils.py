@@ -1,18 +1,16 @@
+from pytz import timezone
 
-
-from indico_purr.utils import DEFAULT_TIMEZONE
+from indico.core.config import config
 
 
 def export_serialize_date(date):
     if date:
-        date = date.astimezone(DEFAULT_TIMEZONE)
+        date = date.astimezone(timezone(config.DEFAULT_TIMEZONE))
         return {
             'date': str(date.date()),
             'time': str(date.time()),
             'tz': str(date.tzinfo)
         }
-
-
 
 
 def export_serialize_reference(reference):

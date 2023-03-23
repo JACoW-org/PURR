@@ -1,11 +1,10 @@
-from abc import ABC
-from datetime import datetime
 from operator import attrgetter
 
-from flask_pluginengine import current_plugin
+from pytz import timezone
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
 
+from indico.core.config import config
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -16,7 +15,6 @@ from indico.web.flask.util import url_for
 
 from indico_purr.services.exporter.abstract_file_exporter import ABCExportFile
 from indico_purr.services.exporter.common_exporter_utils import export_serialize_date, export_serialize_reference
-from indico_purr.utils import DEFAULT_TIMEZONE
 
 
 # from indico_purr.wrappers import build_folders_api_data__wrapper, \
@@ -63,7 +61,7 @@ class ABCExportEvent(ABCExportFile):
         folder_ids = [f.id for f in event_folders if f.title == 'final_proceedings']
 
         event_attachments = Attachment.query.filter(
-            Attachment.is_deleted==False,
+            ~Attachment.is_deleted,
             Attachment.folder_id.in_(folder_ids)
         ).all()
 
@@ -75,7 +73,7 @@ class ABCExportEvent(ABCExportFile):
 
         # current_plugin.logger.info('files ' + str(files))
 
-        if files == True:
+        if files:
             query.options(joinedload('editables'))
 
         event_contributions = query.filter_by(is_deleted=False).order_by(Contribution.friendly_id).all()
@@ -86,10 +84,8 @@ class ABCExportEvent(ABCExportFile):
             return None, None
         entries = obj.timetable_entries.filter(TimetableEntry.parent_id.is_(None),
                                                cast(TimetableEntry.start_dt.astimezone(obj.tzinfo), Date) == day).all()
-        first = min(entries, key=attrgetter('start_dt')
-                    ).start_dt if entries else None
-        last = max(entries, key=attrgetter('end_dt')
-                   ).end_dt if entries else None
+        first = min(entries, key=attrgetter('start_dt')).start_dt if entries else None
+        last = max(entries, key=attrgetter('end_dt')).end_dt if entries else None
         return first, last
 
     def _build_event_api_data_base(self, event):
@@ -385,10 +381,11 @@ class ABCExportEvent(ABCExportFile):
                 yield {'start_dt': first_start, 'end_dt': last_end}
 
     def _serialize_event_occurrences(self, event):
+        tz = timezone(config.DEFAULT_TIMEZONE)
         return [
             {
-                'start_dt': period['start_dt'].astimezone(DEFAULT_TIMEZONE),
-                'end_dt': period['end_dt'].astimezone(DEFAULT_TIMEZONE),
+                'start_dt': period['start_dt'].astimezone(tz),
+                'end_dt': period['end_dt'].astimezone(tz),
                 # '_type': 'Period',
                 # '_fossil': 'period'
             }
