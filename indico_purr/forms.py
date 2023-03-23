@@ -1,8 +1,9 @@
 from wtforms import BooleanField, FloatField, StringField, URLField
 from wtforms.validators import URL, DataRequired
 
-from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+
+from indico_purr import _
 
 
 class PurrConnectForm(IndicoForm):

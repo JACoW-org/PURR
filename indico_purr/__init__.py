@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
-from indico.util.i18n import _
+from indico.util.i18n import make_bound_gettext
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -11,6 +11,7 @@ from indico_purr.blueprint import PurrPluginBlueprint
 from indico_purr.plugin import PurrPlugin
 
 
+_ = make_bound_gettext('purr')
 blueprint = PurrPluginBlueprint
 plugin = PurrPlugin
 
