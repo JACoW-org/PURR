@@ -35,7 +35,7 @@ class PurrPlugin(IndicoPlugin):
 
     def purr_sidemenu_items(self, sender, event, **kwargs):
         if event.can_manage(session.user):
-            yield SideMenuItem('purr', _('PURR'), url_for_plugin('purr.purr-home', event),
+            yield SideMenuItem('purr', _('PURR'), url_for_plugin('purr.purr_home', event),
                                0, section='workflows', icon='pdf')
 
     def get_blueprints(self):

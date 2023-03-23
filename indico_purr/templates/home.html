@@ -36,13 +36,13 @@
                 <div class="toolbar">
                     {% if connected %}
                         <button class="i-button info icon-settings" title="{% trans %}Settings{% endtrans %}"
-                            data-href="{{ url_for('plugin_purr.purr-settings', event) }}"
+                            data-href="{{ url_for_plugin('purr.purr_settings', event) }}"
                             data-title="{% trans %}PURR - Settings{% endtrans %}"
                             data-reload-after
                             data-ajax-dialog></button>
 
                         <button class="i-button danger icon-cross" title="{% trans %}Disconnect{% endtrans %}"
-                            data-href="{{ url_for('plugin_purr.purr-disconnect', event) }}"
+                            data-href="{{ url_for_plugin('purr.purr_disconnect', event) }}"
                             data-title="{% trans %}PURR - Disconnect{% endtrans %}"
                             data-method="POST"
                             data-confirm="{% trans %}Are you sure you want to disconnect PURR and clear its settings?{% endtrans %}"
@@ -51,7 +51,7 @@
                         </button>
                     {% else %}
                         <button class="i-button highlight icon-lan" title="{% trans %}Connect{% endtrans %}"
-                            data-href="{{ url_for('plugin_purr.purr-connect', event) }}"
+                            data-href="{{ url_for_plugin('purr.purr_connect', event) }}"
                             data-title="{% trans %}PURR - Connect{% endtrans %}" data-reload-after data-ajax-dialog>
                             {% trans %}Connect{% endtrans %}
                         </button>

@@ -12,20 +12,16 @@ from indico_purr.controllers.json.final_proceedings import RHPurrFinalProceeding
 # from indico_purr.controllers.json.event_files_json import RH_event_files_json
 
 
-blueprint = IndicoPluginBlueprint(
-    'purr',
-    __name__,
-    url_prefix='/event/<int:event_id>/manage/purr'
-)
+blueprint = IndicoPluginBlueprint('purr', __name__, url_prefix='/event/<int:event_id>/manage/purr')
 
 
-blueprint.add_url_rule('/', 'purr-home', RHPurrHomePage)
-blueprint.add_url_rule('/connect', 'purr-connect', RHPurrConnectPage, methods=('GET', 'POST'))
-blueprint.add_url_rule('/disconnect', 'purr-disconnect', RHPurrDisconnectPage, methods=('POST',))
-blueprint.add_url_rule('/settings', 'purr-settings', RHPurrSettingsPage, methods=('GET', 'POST'))
+blueprint.add_url_rule('/', 'purr_home', RHPurrHomePage)
+blueprint.add_url_rule('/connect', 'purr_connect', RHPurrConnectPage, methods=('GET', 'POST'))
+blueprint.add_url_rule('/disconnect', 'purr_disconnect', RHPurrDisconnectPage, methods=('POST',))
+blueprint.add_url_rule('/settings', 'purr_settings', RHPurrSettingsPage, methods=('GET', 'POST'))
 
-blueprint.add_url_rule('/event-abstract-booklet', 'event-abstract-booklet', RHPurrAbstractBookletJson)
-blueprint.add_url_rule('/event-final-proceedings', 'event-final-proceedings', RHPurrFinalProceedingsJson)
+blueprint.add_url_rule('/event-abstract-booklet', 'event_abstract_booklet', RHPurrAbstractBookletJson)
+blueprint.add_url_rule('/event-final-proceedings', 'event_final_proceedings', RHPurrFinalProceedingsJson)
 
 # blueprint.add_url_rule('/event-files-json',
 #                        'event-files-json',
