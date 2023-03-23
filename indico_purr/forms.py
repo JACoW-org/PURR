@@ -8,26 +8,20 @@ from indico_purr import _
 
 class PurrConnectForm(IndicoForm):
     api_url = URLField(_('API URL'), [DataRequired(), URL()])
-    api_key = StringField(_('API KEY'), [DataRequired()])
+    api_key = StringField(_('API Key'), [DataRequired()])
 
 
 class PurrDisconnectForm(IndicoForm):
-    connected = BooleanField(_('CONNECTED'), [DataRequired()])
+    connected = BooleanField(_('Connected'), [DataRequired()])
 
 
 class PurrSettingsForm(IndicoForm):
-    pdf_page_width = FloatField(_('PDF PAGE WIDTH'), [DataRequired()],
-                                description=_('PDF PAGE WIDTH'))
-    pdf_page_height = FloatField(_('PDF PAGE HEIGHT'), [DataRequired()],
-                                 description=_('PDF PAGE HEIGHT'))
-    ab_session_h1 = StringField(_('AB SESSION H1'), [DataRequired()],
-                                description=_('AB SESSION H1 PATTERN'))
-    ab_session_h2 = StringField(_('AB SESSION H2'), [DataRequired()],
-                                description=_('AB SESSION H2 PATTERN'))
-    ab_contribution_h1 = StringField(_('AB CONTRIBUTION STANDARD'), [DataRequired()],
-                                     description=_('AB CONTRIBUTION PATTERN'))
-    ab_contribution_h2 = StringField(_('AB CONTRIBUTION POSTER'), [DataRequired()],
-                                     description=_('AB CONTRIBUTION POSTER PATTERN'))
+    pdf_page_width = FloatField(_('PDF page width'), [DataRequired()])
+    pdf_page_height = FloatField(_('PDF page height'), [DataRequired()])
+    ab_session_h1 = StringField(_('AB session H1 pattern'), [DataRequired()])
+    ab_session_h2 = StringField(_('AB session H2 pattern'), [DataRequired()])
+    ab_contribution_h1 = StringField(_('AB contribution standard pattern'), [DataRequired()])
+    ab_contribution_h2 = StringField(_('AB contribution poster pattern'), [DataRequired()])
 
 
 # class SettingsForm(IndicoForm):
