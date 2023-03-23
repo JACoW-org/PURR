@@ -31,7 +31,7 @@ blueprint.add_url_rule('/purr-connect',
 blueprint.add_url_rule('/purr-disconnect',
                        'purr-disconnect',
                        view_func=RHPurrDisconnectPage,
-                       methods=('GET', 'POST'))
+                       methods=('POST',))
 
 blueprint.add_url_rule('/purr-settings',
                        'purr-settings',

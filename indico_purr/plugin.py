@@ -11,8 +11,21 @@ from indico_purr.blueprint import blueprint
 
 
 class PurrPlugin(IndicoPlugin):
+    """PURR"""
 
     configurable = False
+    default_event_settings = {
+        'connected': False,
+        'api_url': '',
+        'api_key': '',
+        'pdf_page_width': 0.1,
+        'pdf_page_height': 0.1,
+        'custom_fields': [],
+        'ab_session_h1': '',
+        'ab_session_h2': '',
+        'ab_contribution_h1': '',
+        'ab_contribution_h2': '',
+    }
 
     def init(self):
         super(PurrPlugin, self).init()

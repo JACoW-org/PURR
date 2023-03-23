@@ -1,64 +1,21 @@
+from flask import session
 
-from flask import make_response, request, session
-
-from indico.core.db import db
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.logs import EventLogRealm, LogKind
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form
 
+from indico_purr import _
 from indico_purr.forms import PurrConnectForm
-from indico_purr.models.settings import PurrSettingsModel
+from indico_purr.utils import get_purr_settings, set_purr_settings
 
 
 class RHPurrConnectPage(RHManageEventBase):
-    """ """
-
-    def _process_GET(self):
-
-        if self.event.can_manage(session.user):
-
-            connected = PurrSettingsModel.query.filter_by(
-                event_id=self.event.id).has_rows()
-
-            if connected:
-                settings = PurrSettingsModel.query.filter_by(
-                    event_id=self.event.id).first()
-
-                form = PurrConnectForm(api_url=settings.api_url,
-                                       api_key=settings.api_key)
-            else:
-                form = PurrConnectForm()
-
-            return jsonify_template('purr:connect.html',
-                                    event=self.event, form=form)
-
-        return make_response('', 403)
-
-    def _process_POST(self):
-
-        if self.event.can_manage(session.user):
-
-            form = PurrConnectForm(api_url=request.form['api_url'],
-                                   api_key=request.form['api_key'])
-
-            if form.validate_on_submit():
-
-                settings = PurrSettingsModel()
-                settings.populate_from_dict(form.data)
-
-                settings.user_id = session.user.id
-                settings.event_id = self.event.id
-
-                db.session.add(settings)
-                db.session.commit()
-                db.session.flush()
-
-                self.event.log(EventLogRealm.management, LogKind.positive,
-                               'PURR', 'Settings saved', session.user)
-
-                return jsonify_data(flash=True)
-
-            return jsonify_template('purr:connect.html',
-                                    event=self.event, form=form)
-
-        return make_response('', 403)
+    def _process(self):
+        settings = get_purr_settings(self.event)
+        form = PurrConnectForm(obj=FormDefaults(**settings))
+        if form.validate_on_submit():
+            set_purr_settings(self.event, **form.data, connected=True)
+            self.event.log(EventLogRealm.management, LogKind.positive, 'PURR', 'Connected', session.user)
+            return jsonify_data()
+        return jsonify_form(form, submit=_('Connect'))

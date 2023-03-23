@@ -2,12 +2,13 @@ from wtforms import BooleanField, FloatField, StringField, URLField
 from wtforms.validators import URL, DataRequired
 
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField
 
 from indico_purr import _
 
 
 class PurrConnectForm(IndicoForm):
-    api_url = URLField(_('API URL'), [DataRequired(), URL()])
+    api_url = URLField(_('API URL'), [DataRequired(), URL(require_tld=False)])
     api_key = StringField(_('API Key'), [DataRequired()])
 
 
@@ -22,6 +23,11 @@ class PurrSettingsForm(IndicoForm):
     ab_session_h2 = StringField(_('AB session H2 pattern'), [DataRequired()])
     ab_contribution_h1 = StringField(_('AB contribution standard pattern'), [DataRequired()])
     ab_contribution_h2 = StringField(_('AB contribution poster pattern'), [DataRequired()])
+    custom_fields = IndicoSelectMultipleCheckboxField(_('Custom fields'), coerce=int)
+
+    def __init__(self, *args, event, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.custom_fields.choices = [(f.id, f.title) for f in event.contribution_fields]
 
 
 # class SettingsForm(IndicoForm):
