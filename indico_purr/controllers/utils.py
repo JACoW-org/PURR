@@ -3,7 +3,7 @@ from indico_purr.utils import DEFAULT_TIMEZONE, json_decode
 from flask_pluginengine import current_plugin
 
 
-def get_cookies_util(c) -> dict | None:
+def get_cookies_util(c):
     return {
         'indico_session_http': c.get('indico_session_http')
     } if c else None
@@ -28,7 +28,7 @@ def get_contribution_fields(s) -> list:
     return contribution_fields
 
 
-def get_settings_util(s) -> dict | None:
+def get_settings_util(s):
 
     if s is None:
         return None

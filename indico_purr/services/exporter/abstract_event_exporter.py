@@ -239,7 +239,7 @@ class ABCExportEvent(ABCExportFile):
         }
 
     def _serialize_track_data(self, contrib):
-        track: dict | None = None
+        track = None
 
         if contrib.track:
             track = dict(
