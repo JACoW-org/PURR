@@ -3,7 +3,7 @@ from flask_pluginengine import render_plugin_template
 from indico.core.plugins import IndicoPlugin
 from indico.modules.events.management.views import WPEventManagement
 
-from indico_purr.blueprint import PurrPluginBlueprint
+from indico_purr.blueprint import blueprint
 
 
 class PurrPlugin(IndicoPlugin):
@@ -16,7 +16,7 @@ class PurrPlugin(IndicoPlugin):
         # self.register_hook()
 
     def get_blueprints(self):
-        return PurrPluginBlueprint
+        return blueprint
 
     def register_assets(self):
         self.inject_bundle('script.js', WPEventManagement)
