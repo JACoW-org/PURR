@@ -1,8 +1,12 @@
+from flask import session
 from flask_pluginengine import render_plugin_template
 
-from indico.core.plugins import IndicoPlugin
+from indico.core import signals
+from indico.core.plugins import IndicoPlugin, url_for_plugin
 from indico.modules.events.management.views import WPEventManagement
+from indico.web.menu import SideMenuItem
 
+from indico_purr import _
 from indico_purr.blueprint import blueprint
 
 
@@ -14,6 +18,12 @@ class PurrPlugin(IndicoPlugin):
         super(PurrPlugin, self).init()
         self.register_assets()
         # self.register_hook()
+        self.connect(signals.menu.items, self.purr_sidemenu_items, sender='event-management-sidemenu')
+
+    def purr_sidemenu_items(self, sender, event, **kwargs):
+        if event.can_manage(session.user):
+            yield SideMenuItem('purr', _('PURR'), url_for_plugin('purr.purr-home', event),
+                               0, section='workflows', icon='pdf')
 
     def get_blueprints(self):
         return blueprint
