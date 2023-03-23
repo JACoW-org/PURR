@@ -1,14 +1,13 @@
 
+from flask import make_response, request, session
+from flask_pluginengine import current_plugin
+
+from indico.modules.events.management.controllers.base import RHManageEventBase
+
 from indico_purr.controllers.utils import get_cookies_util, get_settings_util
 from indico_purr.models.settings import PurrSettingsModel
 from indico_purr.services.abstract_booklet_exporter import PurrAbstractBookletExporter
 from indico_purr.utils import json_encode
-
-from indico.modules.events.management.controllers.base import RHManageEventBase
-
-from flask_pluginengine import current_plugin
-
-from flask import request, session, make_response
 
 
 class RHPurrAbstractBookletJson(RHManageEventBase, PurrAbstractBookletExporter):

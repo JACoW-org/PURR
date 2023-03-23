@@ -1,14 +1,14 @@
 
+from flask import make_response, request, session
+
+from indico.core.db import db
+from indico.modules.events.management.controllers.base import RHManageEventBase
+from indico.modules.logs import EventLogRealm, LogKind
+from indico.web.util import jsonify_data, jsonify_template
+
 from indico_purr.forms import PurrSettingsForm
 from indico_purr.models.settings import PurrSettingsModel
 from indico_purr.utils import json_decode, json_encode
-
-from indico.core.db import db
-from indico.modules.logs import EventLogRealm, LogKind
-from indico.modules.events.management.controllers.base import RHManageEventBase
-from indico.web.util import jsonify_data, jsonify_template
-
-from flask import request, session, make_response
 
 
 class RHPurrSettingsPage(RHManageEventBase):

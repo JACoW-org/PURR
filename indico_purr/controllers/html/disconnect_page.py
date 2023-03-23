@@ -1,13 +1,13 @@
 
-from indico_purr.forms import PurrSettingsForm
-from indico_purr.models.settings import PurrSettingsModel
+from flask import make_response, session
 
 from indico.core.db import db
-from indico.modules.logs import EventLogRealm, LogKind
 from indico.modules.events.management.controllers.base import RHManageEventBase
+from indico.modules.logs import EventLogRealm, LogKind
 from indico.web.util import jsonify_data, jsonify_template
 
-from flask import session, make_response
+from indico_purr.forms import PurrSettingsForm
+from indico_purr.models.settings import PurrSettingsModel
 
 
 class RHPurrDisconnectPage(RHManageEventBase):

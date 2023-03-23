@@ -1,11 +1,10 @@
-import orjson
-
 from typing import Any
 
+import orjson
+from flask_pluginengine import current_plugin
 from pytz import timezone
 
 from indico.core.config import config
-from flask_pluginengine import current_plugin
 
 
 def default_timezone():

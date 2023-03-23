@@ -1,26 +1,23 @@
 from abc import ABC
-
 from datetime import datetime
 from operator import attrgetter
+
+from flask_pluginengine import current_plugin
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
 
-from flask_pluginengine import current_plugin
-
+from indico.modules.attachments.models.attachments import Attachment
+from indico.modules.attachments.models.folders import AttachmentFolder
+from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.editing.models.editable import Editable
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
 
-from indico.modules.events.editing.models.editable import Editable
-from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.attachments.models.attachments import Attachment
-from indico.modules.attachments.models.folders import AttachmentFolder
-
-
 from indico_purr.services.exporter.abstract_file_exporter import ABCExportFile
 from indico_purr.services.exporter.common_exporter_utils import export_serialize_date, export_serialize_reference
-
 from indico_purr.utils import DEFAULT_TIMEZONE
+
 
 # from indico_purr.wrappers import build_folders_api_data__wrapper, \
 #     build_material_legacy_api_data__wrapper, build_note_api_data__wrapper, \

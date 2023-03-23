@@ -1,6 +1,6 @@
-from indico_purr.utils import DEFAULT_TIMEZONE, json_decode
-
 from flask_pluginengine import current_plugin
+
+from indico_purr.utils import DEFAULT_TIMEZONE, json_decode
 
 
 def get_cookies_util(c):

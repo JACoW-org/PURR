@@ -1,7 +1,6 @@
-from indico.core.plugins import IndicoPlugin
-from indico.util.i18n import _
-from flask_pluginengine.plugin import render_plugin_template
+from flask_pluginengine import render_plugin_template
 
+from indico.core.plugins import IndicoPlugin
 from indico.modules.events.management.views import WPEventManagement
 
 from indico_purr.blueprint import PurrPluginBlueprint

@@ -1,12 +1,12 @@
 
 
-from indico_purr.controllers.utils import get_settings_util
-from indico_purr.models.settings import PurrSettingsModel
+from flask import make_response, session
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.views import WPEventManagement
 
-from flask import session, make_response
+from indico_purr.controllers.utils import get_settings_util
+from indico_purr.models.settings import PurrSettingsModel
 
 
 class RHPurrHomePage(RHManageEventBase):
