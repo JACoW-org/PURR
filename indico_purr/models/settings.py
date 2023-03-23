@@ -11,7 +11,7 @@ class PurrSettingsModel(db.Model):
         db.Integer,
         primary_key=True
     )
-    
+
     #: ID of the user
     user_id = db.Column(
         db.Integer,
@@ -19,7 +19,7 @@ class PurrSettingsModel(db.Model):
         index=True,
         nullable=False
     )
-    
+
     #: ID of the event
     event_id = db.Column(
         db.Integer,
@@ -27,8 +27,8 @@ class PurrSettingsModel(db.Model):
         index=True,
         nullable=False
     )
-    
-    #: The User associated with 
+
+    #: The User associated with
     user = db.relationship(
         'User',
         lazy=False,
@@ -37,7 +37,7 @@ class PurrSettingsModel(db.Model):
             lazy='dynamic'
         )
     )
-    
+
     #: The Event associated with
     event = db.relationship(
         'Event',
@@ -47,54 +47,54 @@ class PurrSettingsModel(db.Model):
             lazy='dynamic'
         )
     )
-    
+
     api_url = db.Column(
         db.String,
         nullable=False,
         default=''
     )
-    
+
     api_key = db.Column(
         db.String,
         nullable=False,
         default=''
     )
-    
+
     pdf_page_width = db.Column(
         db.Float,
         nullable=False,
         default=0.1
     )
-    
+
     pdf_page_height = db.Column(
         db.Float,
         nullable=False,
         default=0.1
     )
-    
+
     custom_fields = db.Column(
         db.String,
         nullable=True
     )
-    
+
     ab_session_h1 = db.Column(
         db.String,
         nullable=False,
         default=''
     )
-    
+
     ab_session_h2 = db.Column(
         db.String,
         nullable=False,
         default=''
     )
-    
+
     ab_contribution_h1 = db.Column(
         db.String,
         nullable=False,
         default=''
     )
-    
+
     ab_contribution_h2 = db.Column(
         db.String,
         nullable=False,
@@ -103,6 +103,6 @@ class PurrSettingsModel(db.Model):
 
     def __repr__(self):
         return u'<PurrSettingsModel({}, {}, {}, {}, {}, {}, {}, {}, {})>'.format(
-            self.id, self.api_url, self.api_key, self.custom_fields, 
+            self.id, self.api_url, self.api_key, self.custom_fields,
             self.ab_session_h1, self.ab_session_h2, self.ab_contribution_h1,
             self.ab_contribution_h2, self.event_id)

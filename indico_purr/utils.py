@@ -17,12 +17,12 @@ def default_timezone():
     return timezone('UTC')
 
 
-def json_decode(data: bytes) -> Any:   
+def json_decode(data: bytes) -> Any:
     return orjson.loads(data)
 
-def json_encode(data: Any) -> bytes:    
-    return orjson.dumps(data)
 
+def json_encode(data: Any) -> bytes:
+    return orjson.dumps(data)
 
 
 DEFAULT_TIMEZONE = default_timezone()

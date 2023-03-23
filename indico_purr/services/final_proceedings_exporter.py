@@ -30,26 +30,26 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
         # start_date = datetime.now().timestamp()
 
         # if contributions:
-        # 
+        #
         #     data['contributions'] = []
-        # 
+        #
         #     for contribution in event.contributions:
         #         serialized_contrib = self._serialize_contribution(event, contribution)
         #         data['contributions'].append(serialized_contrib)
-        # 
+        #
         #     # current_plugin.logger.debug(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
 
         attachments = self.find_attachments_list(event=event)
-        
+
         data['attachments'] = []
-        
+
         for attachment in attachments:
             data['attachments'].append(dict(
                 md5sum=attachment.file.md5,
                 filename=attachment.file.filename,
                 content_type=attachment.file.content_type,
                 size=attachment.file.size,
-            
+
                 title=attachment.title,
                 description=attachment.description,
                 external_download_url=attachment.absolute_download_url,
@@ -77,16 +77,16 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
             ]
 
             data['sessions'].extend(serialized_sessions)
-        
-        
+
+
         # current_plugin.logger.debug(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
 
         # if occurrences:
-        # 
+        #
         #     # start_date = datetime.now().timestamp()
-        # 
+        #
         #     data['occurrences'] = self._serialize_event_occurrences(event)
-        # 
+        #
         #     # current_plugin.logger.debug(f'[delta] occurrences -> {(datetime.now().timestamp() - start_date)}')
 
         return data

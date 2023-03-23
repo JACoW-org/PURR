@@ -55,21 +55,21 @@ class ABCExportEvent(ABCExportFile):
     #         'SubContribParticipation': 'contributionParticipationMetadata'
     #     }
     # }
-    
+
     def find_attachments_list(self, event):
         # query = Attachment.query.with_parent(event)
 
         # current_plugin.logger.info('files ' + str(files))
-        
+
         event_folders = AttachmentFolder.query.filter_by(event=event, is_deleted=False).all()
-        
+
         folder_ids = [f.id for f in event_folders if f.title == 'final_proceedings']
-        
+
         event_attachments = Attachment.query.filter(
             Attachment.is_deleted==False,
             Attachment.folder_id.in_(folder_ids)
         ).all()
-            
+
         # event_attachments = query.filter_by(is_deleted=False).order_by(Attachment.title).all()
         return event_attachments
 
@@ -80,7 +80,7 @@ class ABCExportEvent(ABCExportFile):
 
         if files == True:
             query.options(joinedload('editables'))
-            
+
         event_contributions = query.filter_by(is_deleted=False).order_by(Contribution.friendly_id).all()
         return event_contributions
 
@@ -95,7 +95,7 @@ class ABCExportEvent(ABCExportFile):
                    ).end_dt if entries else None
         return first, last
 
-    def _build_event_api_data_base(self, event):       
+    def _build_event_api_data_base(self, event):
         return {
             # '_type': 'Conference',
             'id': str(event.id),
