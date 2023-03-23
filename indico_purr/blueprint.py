@@ -19,33 +19,13 @@ blueprint = IndicoPluginBlueprint(
 )
 
 
-blueprint.add_url_rule('/purr-home',
-                       'purr-home',
-                       view_func=RHPurrHomePage)
+blueprint.add_url_rule('/', 'purr-home', RHPurrHomePage)
+blueprint.add_url_rule('/connect', 'purr-connect', RHPurrConnectPage, methods=('GET', 'POST'))
+blueprint.add_url_rule('/disconnect', 'purr-disconnect', RHPurrDisconnectPage, methods=('POST',))
+blueprint.add_url_rule('/settings', 'purr-settings', RHPurrSettingsPage, methods=('GET', 'POST'))
 
-blueprint.add_url_rule('/purr-connect',
-                       'purr-connect',
-                       view_func=RHPurrConnectPage,
-                       methods=('GET', 'POST'))
-
-blueprint.add_url_rule('/purr-disconnect',
-                       'purr-disconnect',
-                       view_func=RHPurrDisconnectPage,
-                       methods=('POST',))
-
-blueprint.add_url_rule('/purr-settings',
-                       'purr-settings',
-                       view_func=RHPurrSettingsPage,
-                       methods=('GET', 'POST'))
-
-
-blueprint.add_url_rule('/event-abstract-booklet',
-                       'event-abstract-booklet',
-                       view_func=RHPurrAbstractBookletJson)
-
-blueprint.add_url_rule('/event-final-proceedings',
-                       'event-final-proceedings',
-                       view_func=RHPurrFinalProceedingsJson)
+blueprint.add_url_rule('/event-abstract-booklet', 'event-abstract-booklet', RHPurrAbstractBookletJson)
+blueprint.add_url_rule('/event-final-proceedings', 'event-final-proceedings', RHPurrFinalProceedingsJson)
 
 # blueprint.add_url_rule('/event-files-json',
 #                        'event-files-json',
