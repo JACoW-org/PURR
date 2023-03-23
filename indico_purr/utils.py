@@ -1,15 +1,3 @@
-import json
-from typing import Any
-
-
-def json_decode(data: bytes) -> Any:
-    return json.loads(data)
-
-
-def json_encode(data: Any) -> bytes:
-    return json.dumps(data)
-
-
 def get_purr_settings(event) -> dict:
     from indico_purr.plugin import PurrPlugin
     return PurrPlugin.event_settings.get_all(event)
