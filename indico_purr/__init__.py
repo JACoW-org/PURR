@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from flask import session
 
 from indico.core import signals

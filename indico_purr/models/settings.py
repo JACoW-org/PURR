@@ -102,7 +102,7 @@ class PurrSettingsModel(db.Model):
     )
 
     def __repr__(self):
-        return u'<PurrSettingsModel({}, {}, {}, {}, {}, {}, {}, {}, {})>'.format(
+        return '<PurrSettingsModel({}, {}, {}, {}, {}, {}, {}, {}, {})>'.format(
             self.id, self.api_url, self.api_key, self.custom_fields,
             self.ab_session_h1, self.ab_session_h2, self.ab_contribution_h1,
             self.ab_contribution_h2, self.event_id)
