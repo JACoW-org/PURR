@@ -51,7 +51,7 @@ class ABCExportFile(ABC):
 
         return {
             "id": rev_file.id,
-            "uuid": rev_file.uuid,
+            "uuid": str(rev_file.uuid),
             "md5sum": rev_file.md5,
             "filename": rev_file.filename,
             "content_type": rev_file.content_type,
