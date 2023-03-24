@@ -1,5 +1,4 @@
 from flask import session
-from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.plugins import IndicoPlugin, url_for_plugin
@@ -21,16 +20,15 @@ class PurrPlugin(IndicoPlugin):
         'pdf_page_width': 0.1,
         'pdf_page_height': 0.1,
         'custom_fields': [],
-        'ab_session_h1': '',
-        'ab_session_h2': '',
-        'ab_contribution_h1': '',
-        'ab_contribution_h2': '',
+        'ab_session_h1': '{code} - {title}',
+        'ab_session_h2': '{start} / {end}',
+        'ab_contribution_h1': '| {code} | / | {start} |',
+        'ab_contribution_h2': '| {code} | / | {start} |',
     }
 
     def init(self):
         super(PurrPlugin, self).init()
         self.register_assets()
-        # self.register_hook()
         self.connect(signals.menu.items, self.purr_sidemenu_items, sender='event-management-sidemenu')
 
     def purr_sidemenu_items(self, sender, event, **kwargs):
@@ -45,10 +43,3 @@ class PurrPlugin(IndicoPlugin):
         self.inject_bundle('script.js', WPEventManagement)
         self.inject_bundle('style.css', WPEventManagement)
 
-    def register_hook(self):
-        self.template_hook('attachment-sources', self._inject_check_pdf_button)
-
-    def _inject_check_pdf_button(self, linked_object=None, **kwargs):
-        return render_plugin_template('check_pdf_button.html', linked_object=linked_object,
-                                      service_name=self.settings.get('service_name'),
-                                      button_icon_url=self.settings.get('button_icon_url'))
