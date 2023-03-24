@@ -1,36 +1,33 @@
-from wtforms.validators import URL, DataRequired, Email, InputRequired
-
-from wtforms import BooleanField, EmailField, FloatField, SelectField, SelectMultipleField, StringField, TextAreaField
-from wtforms.fields import IntegerField, URLField
-
-from indico.util.i18n import _
-from indico.util.string import validate_email
+from wtforms import BooleanField, FloatField, StringField, URLField
+from wtforms.validators import URL, DataRequired
 
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField
+
+from indico_purr import _
 
 
 class PurrConnectForm(IndicoForm):
-    api_url = URLField(_('API URL'), [DataRequired(), URL()])
-    api_key = StringField(_('API KEY'), [DataRequired()])
+    api_url = URLField(_('API URL'), [DataRequired(), URL(require_tld=False)])
+    api_key = StringField(_('API Key'), [DataRequired()])
 
 
 class PurrDisconnectForm(IndicoForm):
-    connected = BooleanField(_('CONNECTED'), [DataRequired()])
+    connected = BooleanField(_('Connected'), [DataRequired()])
 
 
 class PurrSettingsForm(IndicoForm):
-    pdf_page_width = FloatField(_('PDF PAGE WIDTH'), [DataRequired()],
-                                description=_('PDF PAGE WIDTH'))
-    pdf_page_height = FloatField(_('PDF PAGE HEIGHT'), [DataRequired()],
-                                 description=_('PDF PAGE HEIGHT'))
-    ab_session_h1 = StringField(_('AB SESSION H1'), [DataRequired()],
-                                description=_('AB SESSION H1 PATTERN'))
-    ab_session_h2 = StringField(_('AB SESSION H2'), [DataRequired()],
-                                description=_('AB SESSION H2 PATTERN'))
-    ab_contribution_h1 = StringField(_('AB CONTRIBUTION STANDARD'), [DataRequired()],
-                                     description=_('AB CONTRIBUTION PATTERN'))
-    ab_contribution_h2 = StringField(_('AB CONTRIBUTION POSTER'), [DataRequired()],
-                                     description=_('AB CONTRIBUTION POSTER PATTERN'))
+    pdf_page_width = FloatField(_('PDF page width'), [DataRequired()])
+    pdf_page_height = FloatField(_('PDF page height'), [DataRequired()])
+    ab_session_h1 = StringField(_('AB session H1 pattern'), [DataRequired()])
+    ab_session_h2 = StringField(_('AB session H2 pattern'), [DataRequired()])
+    ab_contribution_h1 = StringField(_('AB contribution standard pattern'), [DataRequired()])
+    ab_contribution_h2 = StringField(_('AB contribution poster pattern'), [DataRequired()])
+    custom_fields = IndicoSelectMultipleCheckboxField(_('Custom fields'), coerce=int)
+
+    def __init__(self, *args, event, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.custom_fields.choices = [(f.id, f.title) for f in event.contribution_fields]
 
 
 # class SettingsForm(IndicoForm):

@@ -1,28 +1,16 @@
-import orjson
-
-from typing import Any
-
-from pytz import timezone
-
-from indico.core.config import config
-from flask_pluginengine import current_plugin
+def get_purr_settings(event) -> dict:
+    from indico_purr.plugin import PurrPlugin
+    return PurrPlugin.event_settings.get_all(event)
 
 
-def default_timezone():
-    try:
-        if not config is None and not config.DEFAULT_TIMEZONE is None:
-            return timezone(config.DEFAULT_TIMEZONE)
-    except BaseException as e:
-        current_plugin.logger.error(e)
-    return timezone('UTC')
+def set_purr_settings(event, **settings):
+    from indico_purr.plugin import PurrPlugin
+    PurrPlugin.event_settings.set_multi(event, settings)
 
 
-def json_decode(data: bytes) -> Any:   
-    return orjson.loads(data)
-
-def json_encode(data: Any) -> bytes:    
-    return orjson.dumps(data)
-
-
-
-DEFAULT_TIMEZONE = default_timezone()
+def clear_purr_settings(event):
+    from indico_purr.plugin import PurrPlugin
+    # XXX: if you ever add settings not related to being connected to the event,
+    # you may want to just clear api url, key and connected flag instead of
+    # deleting all the settings
+    PurrPlugin.event_settings.delete_all(event)
