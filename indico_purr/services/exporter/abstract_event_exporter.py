@@ -193,10 +193,11 @@ class ABCExportEvent(ABCExportFile):
         editable = self._serialize_editable(event, contrib)
 
         session_code = ''
-        if contrib.session_block.code:
-            session_code = contrib.session_block.code
-        else:
-            session_code = contrib.session_block.session.code
+        if contrib.session_block:
+            if contrib.session_block.code:
+                session_code = contrib.session_block.code
+            else:
+                session_code = contrib.session_block.session.code
 
         return {
             # '_type': 'Contribution',

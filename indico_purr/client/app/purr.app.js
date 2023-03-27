@@ -1,11 +1,13 @@
 import {of, Subject} from 'rxjs';
 import {concatMap} from 'rxjs/operators';
 
-import {get_settings, get_ulid, log_data, run_handler, createLoader, download} from './purr.lib';
+import {getSettings, ulid, log_data, run_handler, createLoader, download} from './purr.lib';
 import {fetchAbstractBookletJson, fetchFinalProceedingsJson} from './purr.rest'
 
+import './purr.spa'
+
 document.addEventListener('DOMContentLoaded', () => {
-  const purr_settings = get_settings();
+  const purr_settings = getSettings();
 
   if (!purr_settings) {
     return;
@@ -16,8 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!purr_element) {
     return;
   }
-
-  const ulid = get_ulid();
 
   const store = {};
 
