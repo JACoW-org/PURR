@@ -1,5 +1,5 @@
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
-
+from flask_pluginengine import current_plugin
 
 class PurrAbstractBookletExporter(ABCExportEvent):
     """ """
@@ -48,8 +48,12 @@ class PurrAbstractBookletExporter(ABCExportEvent):
         #     # current_plugin.logger.debug(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
 
         contributions = self.find_contributions_list(
-            event, session_code=None, files=False
+            event, session_block_id=None, files=False
         )
+
+        # contributions_len = len(contributions)
+
+        # current_plugin.logger.info(f"contributions: {contributions_len}")
 
         # start_date = datetime.now().timestamp()
 
@@ -63,6 +67,10 @@ class PurrAbstractBookletExporter(ABCExportEvent):
             ]
 
             data["sessions"].extend(serialized_sessions)
+
+        # sessions_len = len(data["sessions"])
+
+        # current_plugin.logger.info(f"sessions: {sessions_len}")
 
         # current_plugin.logger.debug(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
 

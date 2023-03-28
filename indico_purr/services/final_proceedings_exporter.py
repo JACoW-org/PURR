@@ -56,7 +56,7 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
             )
 
         contributions = self.find_contributions_list(
-            event=event, session_code=None, files=True
+            event=event, session_block_id=None, files=True
         )
 
         data["contributions"] = []
