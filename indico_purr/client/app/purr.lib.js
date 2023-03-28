@@ -43,7 +43,7 @@ export function fetchJson(url) {
 
 export function runPhase(head, body, actions, socket) {
 
-  console.log(head, body);
+  // console.log(head, body);
 
   if (head.code === 'task:end') {
     return socket.complete();

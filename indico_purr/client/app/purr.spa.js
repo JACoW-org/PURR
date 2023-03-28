@@ -24,4 +24,5 @@ document.addEventListener("DOMContentLoaded", () => {
         </PurrHome>,
         document.getElementById("purr-spa")
     )
+    
 });

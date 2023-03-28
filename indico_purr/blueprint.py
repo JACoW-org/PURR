@@ -1,32 +1,98 @@
 from indico.core.plugins import IndicoPluginBlueprint
 
-from indico_purr.controllers.html.connect_page import RHPurrConnectPage
-from indico_purr.controllers.html.disconnect_page import RHPurrDisconnectPage
+blueprint = IndicoPluginBlueprint(
+    "purr", __name__, url_prefix="/event/<int:event_id>/manage/purr"
+)
+
 from indico_purr.controllers.html.home_page import RHPurrHomePage
+
+blueprint.add_url_rule("/", "purr_home", RHPurrHomePage)
+
+from indico_purr.controllers.html.connect_page import RHPurrConnectPage
+
+blueprint.add_url_rule(
+    "/connect", "purr_connect", RHPurrConnectPage, methods=("GET", "POST")
+)
+
+from indico_purr.controllers.html.disconnect_page import RHPurrDisconnectPage
+
+blueprint.add_url_rule(
+    "/disconnect", "purr_disconnect", RHPurrDisconnectPage, methods=("POST",)
+)
+
 from indico_purr.controllers.html.settings_page import RHPurrSettingsPage
+
+blueprint.add_url_rule(
+    "/settings", "purr_settings", RHPurrSettingsPage, methods=("GET", "POST")
+)
+
 from indico_purr.controllers.json.abstract_booklet import RHPurrAbstractBookletJson
+
+blueprint.add_url_rule(
+    "/event-abstract-booklet", "event_abstract_booklet", RHPurrAbstractBookletJson
+)
+
 from indico_purr.controllers.json.final_proceedings import RHPurrFinalProceedingsJson
 
+blueprint.add_url_rule(
+    "/event-final-proceedings", "event_final_proceedings", RHPurrFinalProceedingsJson
+)
 
-# from indico_purr.controllers.json.revision_check_pdf_json import RH_revision_check_pdf_json
-# from indico_purr.controllers.json.event_files_json import RH_event_files_json
+from indico_purr.controllers.json.common.event_data import (
+    RHPurrSettingsAndEventDataJson,
+)
+
+blueprint.add_url_rule(
+    "/settings-and-event-data", "event_data", RHPurrSettingsAndEventDataJson
+)
+
+from indico_purr.controllers.json.abstract_booklet.contributions_data import (
+    RHPurrContributionsDataJson,
+)
+
+blueprint.add_url_rule(
+    "/abstract-booklet-contributions-data/<int:session_block_id>",
+    "abstract_booklet_contributions_data",
+    RHPurrContributionsDataJson,
+)
+
+from indico_purr.controllers.json.abstract_booklet.sessions_data import (
+    RHPurrSessionsDataJson,
+)
+
+blueprint.add_url_rule(
+    "/abstract-booklet-sessions-data",
+    "abstract_booklet_sessions_data",
+    RHPurrSessionsDataJson,
+)
 
 
-blueprint = IndicoPluginBlueprint('purr', __name__, url_prefix='/event/<int:event_id>/manage/purr')
+from indico_purr.controllers.json.final_proceedings.contributions_data import (
+    RHPurrContributionsDataJson,
+)
 
+blueprint.add_url_rule(
+    "/final-proceedings-contributions-data/<int:session_block_id>",
+    "final_proceedings_contributions_data",
+    RHPurrContributionsDataJson,
+)
 
-blueprint.add_url_rule('/', 'purr_home', RHPurrHomePage)
-blueprint.add_url_rule('/connect', 'purr_connect', RHPurrConnectPage, methods=('GET', 'POST'))
-blueprint.add_url_rule('/disconnect', 'purr_disconnect', RHPurrDisconnectPage, methods=('POST',))
-blueprint.add_url_rule('/settings', 'purr_settings', RHPurrSettingsPage, methods=('GET', 'POST'))
+from indico_purr.controllers.json.final_proceedings.sessions_data import (
+    RHPurrSessionsDataJson,
+)
 
-blueprint.add_url_rule('/event-abstract-booklet', 'event_abstract_booklet', RHPurrAbstractBookletJson)
-blueprint.add_url_rule('/event-final-proceedings', 'event_final_proceedings', RHPurrFinalProceedingsJson)
+blueprint.add_url_rule(
+    "/final-proceedings-sessions-data",
+    "final_proceedings_sessions_data",
+    RHPurrSessionsDataJson,
+)
 
-# blueprint.add_url_rule('/event-files-json',
-#                        'event-files-json',
-#                        view_func=RH_event_files_json)
-#
-# blueprint.add_url_rule('/contributions/<int:contrib_id>/editing/<any(paper,slides,poster):type>/<int:revision_id>/check-pdf',
-#                        'revision_check_pdf',
-#                        view_func=RH_revision_check_pdf_json)
+from indico_purr.controllers.json.final_proceedings.attachments_data import (
+    RHPurrAttachmentsDataJson,
+)
+
+blueprint.add_url_rule(
+    "/final-proceedings-attachments-data",
+    "final_proceedings_attachments_data",
+    RHPurrAttachmentsDataJson,
+)

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Card, Icon } from 'semantic-ui-react'
+import { of, forkJoin, throwError } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
 
 import { getSettings, download, openSocket, fetchJson, runPhase } from './purr.lib';
 
@@ -16,6 +18,7 @@ export const PurrAbstractBooklet = () => {
             const [task_id, socket] = openSocket(settings);
 
             const actions = {
+                'task:progress': (head, body) => console.log(head, body),
                 'task:result': (head, body) => download(body),
             };
 
@@ -28,25 +31,55 @@ export const PurrAbstractBooklet = () => {
                 }
             });
 
-            fetchJson('event-abstract-booklet')
-                .subscribe(({ error, result }) => error
-                    ? socket.complete()
-                    : socket.next({
-                        head: {
-                            code: `task:exec`,
-                            uuid: task_id
-                        },
-                        body: {
-                            method: `event_ab`,
-                            params: result,
-                        },
+            const context = { params: {} };
+
+            of(null)
+                .pipe(
+
+                    concatMap(() => forkJoin({
+                        event: fetchJson('settings-and-event-data')
+                    })),
+
+                    concatMap(({ event }) => {
+
+                        if (event.error) {
+                            return throwError(() => new Error('error'))
+                        }
+
+                        context.params = {
+                            ...context.params,
+                            event: event.result.event,
+                            cookies: event.result.cookies,
+                            settings: event.result.settings
+                        }
+
+                        socket.next({
+                            head: {
+                                code: `task:exec`,
+                                uuid: task_id
+                            },
+                            body: {
+                                method: `event_ab`,
+                                params: context.params
+                            }
+                        })
+
+                        return of(null)
+
                     })
-                );
+
+                )
+                .subscribe()
+
         }
 
-        return () => console.log('destroy');
+        return () => { };
 
     }, [settings, loading]);
+
+
+
+
 
 
     return (

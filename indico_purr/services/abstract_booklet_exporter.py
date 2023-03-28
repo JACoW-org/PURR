@@ -4,8 +4,18 @@ from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 class PurrAbstractBookletExporter(ABCExportEvent):
     """ """
 
-    def _build_event_api_data(self, event):
+    def _export_event_contributions_data(self, event, session_block_id):
+        contributions = self.find_contributions_list(
+            event=event, session_block_id=session_block_id, files=False
+        )
 
+        contributions_data = [
+            self._serialize_contribution(event, c) for c in contributions
+        ]
+
+        return contributions_data
+
+    def _build_event_api_data(self, event):
         # start_date = datetime.now().timestamp()
 
         data = self._build_event_api_data_base(event)
@@ -37,22 +47,22 @@ class PurrAbstractBookletExporter(ABCExportEvent):
         #
         #     # current_plugin.logger.debug(f'[delta] contributions -> {(datetime.now().timestamp() - start_date)}')
 
-        contributions = self.find_contributions_list(event, files=False)
+        contributions = self.find_contributions_list(
+            event, session_code=None, files=False
+        )
 
         # start_date = datetime.now().timestamp()
 
-        data['sessions'] = []
+        data["sessions"] = []
 
         for session in event.sessions:
-
             serialized = self._serialize_session(session)
             serialized_sessions = [
-                self._serialize_session_block(
-                    event, block, serialized, contributions)
+                self._serialize_session_block(event, block, serialized, contributions)
                 for block in session.blocks
             ]
 
-            data['sessions'].extend(serialized_sessions)
+            data["sessions"].extend(serialized_sessions)
 
         # current_plugin.logger.debug(f'[delta] sessions -> {(datetime.now().timestamp() - start_date)}')
 
