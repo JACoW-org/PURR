@@ -11,15 +11,29 @@ class ABCExportFile(ABC):
             self._serialize_file(event, contribution, revision, erf)
             for erf in EditingRevisionFile.query.with_parent(revision)
             # .filter(EditingFileType.publishable, EditingFileType.id != self.file_type.id).all()
-            if erf.file_type.name == 'PDF' and erf.file_type.type in [1, 2, 3]
+            if erf.file_type.name == "PDF" and erf.file_type.type in [1, 2, 3]
             # erf.file_type.type in [1, 2] and erf.file_type.publishable
         ]
 
-    def _serialize_editable_revision(self, event, contribution, revision, include_files):
+    def _get_tags(self, revision):
+        return [
+            {
+                "title": tag.title,
+                "code": tag.code,
+                "color": tag.color,
+                "system": tag.system,
+            }
+            for tag in revision.tags
+        ]
 
-        revision_files = self._get_files(
-            event, contribution, revision) \
-            if include_files else []
+    def _serialize_editable_revision(
+        self, event, contribution, revision, include_files
+    ):
+        revision_files = (
+            self._get_files(event, contribution, revision) if include_files else []
+        )
+
+        revision_tags = self._get_tags(revision)
 
         return {
             "id": revision.id,
@@ -28,11 +42,11 @@ class ABCExportFile(ABC):
             "reviewed_dt": revision.reviewed_dt,
             "initial_state": revision.initial_state,
             "final_state": revision.final_state,
-            "files": revision_files
+            "files": revision_files,
+            "tags": revision_tags,
         }
 
     def _serialize_file(self, event, contribution, revision, editing_revision_file):
-
         # print(editing_revision_file)
 
         rev_file = editing_revision_file.file
@@ -55,20 +69,17 @@ class ABCExportFile(ABC):
             "md5sum": rev_file.md5,
             "filename": rev_file.filename,
             "content_type": rev_file.content_type,
-
             "file_type": {
-                'type': file_type.type,
-                'name': file_type.name,
-                'extensions': file_type.extensions,
-                'required': file_type.required,
-                'publishable': file_type.publishable,
-                'filename_template': file_type.filename_template
+                "type": file_type.type,
+                "name": file_type.name,
+                "extensions": file_type.extensions,
+                "required": file_type.required,
+                "publishable": file_type.publishable,
+                "filename_template": file_type.filename_template,
             },
-
             "event_id": event.id,
             "contribution_id": contribution.id,
             "revision_id": revision.id,
-
             "download_url": download_url,
-            "external_download_url": external_download_url
+            "external_download_url": external_download_url,
         }

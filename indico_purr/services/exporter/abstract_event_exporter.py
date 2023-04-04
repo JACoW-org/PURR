@@ -154,7 +154,7 @@ class ABCExportEvent(ABCExportFile):
 
         field_values = [self._serialize_field_value(f) for f in contrib.field_values]
 
-        editable = self._serialize_editable(event, contrib)
+        editables = self._serialize_editables(event, contrib)
 
         session_code = ""
         if contrib.session_block:
@@ -194,11 +194,7 @@ class ABCExportEvent(ABCExportFile):
             "code": contrib.code,
             "session_code": session_code,
             "sub_contributions": sub_contributions,
-            "all_revisions": editable.get("all_revisions", []) if editable else [],
-            "latest_revision": editable.get("latest_revision", None)
-            if editable
-            else None,
-            "editor": editable.get("editor", None) if editable else None,
+            "editables": editables,
         }
 
     def _serialize_track_data(self, contrib):
@@ -225,23 +221,29 @@ class ABCExportEvent(ABCExportFile):
 
         return track
 
-    def _serialize_editable(self, event, contrib):
-        editable = Editable.query.with_parent(contrib).filter_by(type=1).first()
+    def _serialize_editables(self, event, contrib):
 
-        if editable is not None:
-            all_revisions = self._get_all_revisions(event, contrib, editable)
+        editables = (
+            Editable.query.with_parent(contrib)
+            .filter(Editable.type.in_([1, 2, 3]))
+            .all()
+        )
 
-            latest_revision = self._get_latest_revision(event, contrib, editable)
-
-            return {
-                "id": str(editable.id),
-                "type": editable.type,
-                "all_revisions": all_revisions,
-                "latest_revision": latest_revision,
-                "editor": self._serialize_person(editable.editor),
-            }
-
-        return None
+        return (
+            [
+                {
+                    "id": str(editable.id),
+                    "type": editable.type,
+                    "all_revisions": self._get_all_revisions(event, contrib, editable),
+                    "latest_revision": self._get_latest_revision(
+                        event, contrib, editable
+                    ),
+                }
+                for editable in editables
+            ]
+            if len(editables) > 0
+            else []
+        )
 
     def _get_latest_revision(self, event, contrib, editable):
         latest_revision = editable.revisions[-1]
@@ -254,7 +256,7 @@ class ABCExportEvent(ABCExportFile):
 
     def _get_all_revisions(self, event, contrib, editable):
         revisions = [
-            self._serialize_editable_revision(event, contrib, revision, False)
+            self._serialize_editable_revision(event, contrib, revision, True)
             for revision in editable.revisions
         ]
 

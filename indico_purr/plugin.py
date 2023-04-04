@@ -23,7 +23,7 @@ class PurrPlugin(IndicoPlugin):
         'ab_session_h1': '{code} - {title}',
         'ab_session_h2': '{start} / {end}',
         'ab_contribution_h1': '| {code} | / | {start} |',
-        'ab_contribution_h2': '| {code} | / | {start} |',
+        'ab_contribution_h2': '| {code} | / | {start} |'
     }
 
     def init(self):

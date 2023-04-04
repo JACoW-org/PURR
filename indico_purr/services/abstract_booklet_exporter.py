@@ -1,5 +1,4 @@
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
-from flask_pluginengine import current_plugin
 
 class PurrAbstractBookletExporter(ABCExportEvent):
     """ """

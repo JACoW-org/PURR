@@ -51,7 +51,7 @@ from indico_purr.controllers.json.abstract_booklet.contributions_data import (
 )
 
 blueprint.add_url_rule(
-    "/abstract-booklet-contributions-data/<int:session_block_id>",
+    "/abstract-booklet-contributions-data/<session_block_id>",
     "abstract_booklet_contributions_data",
     RHPurrContributionsDataJson,
 )
@@ -72,7 +72,7 @@ from indico_purr.controllers.json.final_proceedings.contributions_data import (
 )
 
 blueprint.add_url_rule(
-    "/final-proceedings-contributions-data/<int:session_block_id>",
+    "/final-proceedings-contributions-data/<session_block_id>",
     "final_proceedings_contributions_data",
     RHPurrContributionsDataJson,
 )
