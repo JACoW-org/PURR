@@ -27,6 +27,24 @@ export function openSocket(settings) {
   return [task_id, socket];
 }
 
+export function putJson(url, body) {
+  return fromFetch(url, {
+    method: 'POST', credentials: 'include', headers: {
+      "Content-Type": "application/json",
+    }, body: JSON.stringify(body)
+  }).pipe(
+    switchMap(response => {
+      return (response.ok)
+        ? from(response.json()).pipe(map(result => ({ error: false, result })))
+        : of({ error: true, message: `Error ${response.status}` })
+    }),
+    catchError(err => {
+      console.error(err);
+      return of({ error: true, message: err.message })
+    })
+  );
+}
+
 export function fetchJson(url) {
   return fromFetch(url).pipe(
     switchMap(response => {
