@@ -1,13 +1,13 @@
-import { of, from } from 'rxjs';
-import { webSocket } from 'rxjs/webSocket';
-import { switchMap, catchError, map } from 'rxjs/operators';
-import { fromFetch } from 'rxjs/fetch';
+import {of, from} from 'rxjs';
+import {webSocket} from 'rxjs/webSocket';
+import {switchMap, catchError, map} from 'rxjs/operators';
+import {fromFetch} from 'rxjs/fetch';
 
 export function getSettings() {
   try {
     return JSON.parse(document.querySelector('#purr-settings').textContent);
   } catch (e) {
-    console.error(err)
+    console.error(err);
     return undefined;
   }
 }
@@ -15,7 +15,7 @@ export function getSettings() {
 export function openSocket(settings) {
   const task_id = ulid();
 
-  const { api_url, api_key } = settings;
+  const {api_url, api_key} = settings;
 
   const ws_url = new URL(api_url);
   const ws_pro = 'https:' === ws_url.protocol ? 'wss:' : 'ws:';
@@ -48,19 +48,38 @@ export function putJson(url, body) {
 export function fetchJson(url) {
   return fromFetch(url).pipe(
     switchMap(response => {
-      return (response.ok)
-        ? from(response.json()).pipe(map(result => ({ error: false, result })))
-        : of({ error: true, message: `Error ${response.status}` })
+      return response.ok
+        ? from(response.json()).pipe(map(result => ({error: false, result})))
+        : of({error: true, message: `Error ${response.status}`});
     }),
     catchError(err => {
       console.error(err);
-      return of({ error: true, message: err.message })
+      return of({error: true, message: err.message});
+    })
+  );
+}
+
+// TODO rename
+export function httpPost(url, body) {
+  const request = new Request(url, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+  return fromFetch(request).pipe(
+    switchMap(response => {
+      return response.ok
+        ? from(response.json()).pipe(map(result => ({error: false, result})))
+        : of({error: true, message: `Error ${response.status}`});
+    }),
+    catchError(err => {
+      console.error(err);
+      return of({error: true, message: err.message});
     })
   );
 }
 
 export function runPhase(head, body, actions, socket) {
-
   // console.log(head, body);
 
   if (head.code === 'task:end') {
@@ -74,7 +93,6 @@ export function runPhase(head, body, actions, socket) {
   if (head.code in actions) {
     return actions[head.code](head, body);
   }
-
 }
 
 export function createLoader(label) {
@@ -107,8 +125,7 @@ export function download(body) {
   });
 }
 
-
-export function log_data({ head, body, store }) {
+export function log_data({head, body, store}) {
   if (head) store[head.uuid] = store[head.uuid] || {};
 
   if (['task:queued'].includes(head.code)) {
@@ -143,18 +160,18 @@ export function log_data({ head, body, store }) {
   }
 }
 
-export function run_handler({ head, body, store }) {
+export function run_handler({head, body, store}) {
   if (head.code === 'task:progress') {
     if (head.uuid in store) {
       if ('progress' in store[head.uuid]) {
-        store[head.uuid].progress.call(null, { head, body });
+        store[head.uuid].progress.call(null, {head, body});
       }
     }
   }
   if (head.code === 'task:result') {
     if (head.uuid in store) {
       if ('result' in store[head.uuid]) {
-        store[head.uuid].result.call(null, { head, body });
+        store[head.uuid].result.call(null, {head, body});
       }
     }
   }
@@ -162,7 +179,7 @@ export function run_handler({ head, body, store }) {
   if (head.code === 'task:end') {
     if (head.uuid in store) {
       if ('post' in store[head.uuid]) {
-        store[head.uuid].post.call(null, { head, body });
+        store[head.uuid].post.call(null, {head, body});
       }
       if ('ws' in store[head.uuid]) {
         store[head.uuid].ws.close();
@@ -172,7 +189,7 @@ export function run_handler({ head, body, store }) {
   }
 }
 
-export const ulid = get_ulid()
+export const ulid = get_ulid();
 
 function get_ulid() {
   const BASE32 = [
@@ -232,7 +249,7 @@ function get_ulid() {
     return dest.join('');
   }
 
-  return function () {
+  return function() {
     let now = Date.now();
     if (now === last) {
       /* 80-bit overflow is so incredibly unlikely that it's not
