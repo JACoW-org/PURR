@@ -1,14 +1,14 @@
 import React from 'react';
 import {useState} from 'react';
-import {Button, Modal, Tab} from 'semantic-ui-react';
+import {Button, Icon, Modal, Tab} from 'semantic-ui-react';
 import {pick} from 'lodash';
 
 import {AbstractBookletSettings} from './purr.settings.abstract-booklet';
 import {FinalProceedingsSettings} from './purr.settings.final-proceedings';
 import {PDFCheckSettings} from './purr.settings.pdf-check';
 
-export function SettingsDialog({settings, open, setOpen, onSubmit}) {
-// TODO refactor as const array
+export function SettingsDialog({settings, open, setOpen, onSubmit, loading}) {
+  // TODO refactor as const array
   const defaultABSettings = pick(settings, [
     'ab_contribution_h1',
     'ab_contribution_h2',
@@ -82,7 +82,14 @@ export function SettingsDialog({settings, open, setOpen, onSubmit}) {
     <Modal open={open} onClose={onDialogClose}>
       <Modal.Header>Settings</Modal.Header>
       <Modal.Content>
-        <Tab menu={{fluid: true, vertical: true, tabular: true}} panes={panes} />
+        {loading ? (
+          <div>
+            <Icon loading name="spinner" />
+            Processing...
+          </div>
+        ) : (
+          <Tab menu={{fluid: true, vertical: true, tabular: true}} panes={panes} />
+        )}
       </Modal.Content>
       <Modal.Actions>
         <Button content="Cancel" onClick={onDialogClose} secondary />
