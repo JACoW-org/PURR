@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {catchError, concatMap, finalize, of, tap, throwError} from 'rxjs';
 import {Button, Card, Icon} from 'semantic-ui-react';
 
-import {getSettings, download, openSocket, fetchJson, runPhase, httpPost} from './purr.lib';
+import {getSettings, download, openSocket, fetchJson, runPhase, httpPost, putJson} from './purr.lib';
 import {SettingsDialog} from './settings/purr.settings.dialog';
 
 export const PurrSettingsCard = () => {
@@ -30,7 +30,7 @@ export const PurrSettingsCard = () => {
       };
 
       of(null).pipe(
-        concatMap(() => httpPost('settings-data', body)),
+        concatMap(() => putJson('settings-data', body)),
         concatMap((event) => {
           // TODO handle error properly
           if (event.error) {
