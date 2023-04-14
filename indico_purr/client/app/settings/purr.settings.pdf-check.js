@@ -1,10 +1,8 @@
 import React from 'react';
 import {Form, Input, Tab} from 'semantic-ui-react';
 
-export function PDFCheckSettings({pdfCheckSettings, setPDFCheckSettings}) {
-  const onFieldChange = (e, field) => {
-    setPDFCheckSettings({...pdfCheckSettings, [field.name]: field.value});
-  };
+export function PDFCheckSettings({pdfCheckSettings, updatePDFCheckSetting}) {
+  const onFieldChange = (e, field) => updatePDFCheckSetting(field.name, field.value);
 
   return (
     <Tab.Pane>

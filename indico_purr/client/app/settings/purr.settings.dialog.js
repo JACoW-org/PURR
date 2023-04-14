@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {useState} from 'react';
 import {Button, Icon, Modal, Tab} from 'semantic-ui-react';
 import {pick} from 'lodash';
@@ -36,6 +36,10 @@ export function SettingsDialog({settings, open, setOpen, onSubmit, loading}) {
   const [pdfCheckSettings, setPDFCheckSettings] = useState(() => defaultPDFCheckSettings);
   const [finalProcSettings, setFinalProcSettings] = useState(() => defaultFinalProcSettings);
 
+  const updateABSetting = (key, value) => setABSettings({...abSettings, [key]: value});
+  const updatePDFCheckSetting = (key, value) => setPDFCheckSettings({...pdfCheckSettings, [key]: value});
+  const updateFinalProcSetting = (key, value) => setFinalProcSettings({...finalProcSettings, [key]: value});
+
   const onFormSubmit = () => {
     onSubmit({
       ...abSettings,
@@ -48,7 +52,7 @@ export function SettingsDialog({settings, open, setOpen, onSubmit, loading}) {
     {
       menuItem: 'Abstract Booklet',
       render: () => (
-        <AbstractBookletSettings abSettings={abSettings} setABSettings={setABSettings} />
+        <AbstractBookletSettings abSettings={abSettings} updateABSetting={updateABSetting} />
       ),
     },
     {
@@ -56,7 +60,7 @@ export function SettingsDialog({settings, open, setOpen, onSubmit, loading}) {
       render: () => (
         <PDFCheckSettings
           pdfCheckSettings={pdfCheckSettings}
-          setPDFCheckSettings={setPDFCheckSettings}
+          updatePDFCheckSetting={updatePDFCheckSetting}
         />
       ),
     },
@@ -65,7 +69,7 @@ export function SettingsDialog({settings, open, setOpen, onSubmit, loading}) {
       render: () => (
         <FinalProceedingsSettings
           finalProcSettings={finalProcSettings}
-          setFinalProcSettings={setFinalProcSettings}
+          updateFinalProcSetting={updateFinalProcSetting}
         />
       ),
     },

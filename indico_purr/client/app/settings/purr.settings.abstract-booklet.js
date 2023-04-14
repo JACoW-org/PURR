@@ -1,17 +1,15 @@
 import React from 'react';
-import {flow, includes, map, reduce, without} from 'lodash';
-import {Form, Input, Tab} from 'semantic-ui-react';
+import {flow, includes, map, reduce, tap, without} from 'lodash';
+import {Checkbox, Form, Input, Tab} from 'semantic-ui-react';
 
-export function AbstractBookletSettings({abSettings, setABSettings}) {
-  const onFieldChange = (e, field) => {
-    setABSettings({...abSettings, [field.name]: field.value});
-  };
+export function AbstractBookletSettings({abSettings, updateABSetting}) {
+  const onFieldChange = (e, field) => updateABSetting(field.name, field.value);
 
   const onCustomFieldChange = (e, field) => {
-    const custom_fields = field.value
-      ? [...abSettings.custom_fields, field.name]
-      : without(...abSettings.custom_fields, field.name);
-    setABSettings({...abSettings, custom_fields});
+    const custom_fields = field.checked
+      ? [...abSettings.custom_fields, +field.name]
+      : without(...abSettings.custom_fields, +field.name);
+    updateABSetting('custom_fields', custom_fields);
   };
 
   return (
@@ -55,34 +53,38 @@ export function AbstractBookletSettings({abSettings, setABSettings}) {
         </Form.Field>
         <Form.Group grouped>
           <label>Custom Fields</label>
-          <CustomFields abSettings={abSettings} onCustomFieldChange={onCustomFieldChange} />
+          <CustomFields
+            custom_fields={abSettings.custom_fields}
+            contribution_fields={abSettings.contribution_fields}
+            onCustomFieldChange={onCustomFieldChange}
+          />
         </Form.Group>
       </Form>
     </Tab.Pane>
   );
 }
 
-function CustomFields({abSettings, onCustomFieldChange}) {
+function CustomFields({custom_fields, contribution_fields, onCustomFieldChange}) {
   return (
     flow(
-      // step 1, checked is true if settings.custom_fields includes the id of the considered contribution field
+      // step 1, checked is true if custom_fields includes the id of the considered contribution field
       fields =>
         map(fields, field => {
-          return {...field, checked: includes(abSettings.custom_fields, field.id)};
+          return {...field, checked: includes(custom_fields, field.id)};
         }),
       // step 2, map contribution fields to an array of semantic-ui checkboxes
       fields =>
         map(fields, field => (
-          <Form.Checkbox
-            name={field.id}
-            label={field.title}
-            value={field.checked}
-            control="input"
-            onChange={onCustomFieldChange}
-          />
-        )),
-      // step 3, concat all checkboxes to create JSX code to be rendered
-      jsxElements => reduce(jsxElements, (result, checkbox) => result.concat(checkbox))
-    )(abSettings.contribution_fields) || <span> No custom field available</span>
+          <Form.Field key={`custom_form_field_${field.id}`}>
+            <Checkbox
+              key={`custom_field_${field.id}`}
+              name={`${field.id}`}
+              label={field.title}
+              checked={field.checked}
+              onChange={onCustomFieldChange}
+            />
+          </Form.Field>
+        ))
+    )(contribution_fields) || <span> No custom field available</span>
   );
 }

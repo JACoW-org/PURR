@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Accordion, Form, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
 
-export function FinalProceedingsSettings({finalProcSettings, setFinalProcSettings}) {
+export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSetting}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onClick = useCallback(
@@ -12,9 +12,7 @@ export function FinalProceedingsSettings({finalProcSettings, setFinalProcSetting
     [activeIndex]
   );
 
-  const onFieldChange = (e, field) => {
-    setFinalProcSettings({...finalProcSettings, [field.name]: field.value});
-  };
+  const onFieldChange = (e, field) => updateFinalProcSetting(field.name, field.value);
 
   return (
     <Tab.Pane>
