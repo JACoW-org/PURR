@@ -34,6 +34,18 @@ class PurrPlugin(IndicoPlugin):
         'event_isbn': '978-3-95450-220-2',
         'event_issn': '2673-5474',
         'event_doi': '10.18429/JACoW-FEL2022',
+        'isbn': '',
+        'issn': '',
+        'booktitle_short': '',
+        'booktitle_long': '',
+        'series': '',
+        'series_number': '',
+        'location': '',
+        'hostInfo': '',
+        'editorialBoard': '',
+        'doi_base_url': '',
+        'doi_user': '',
+        'doi_password': ''
     }
 
     def init(self):
