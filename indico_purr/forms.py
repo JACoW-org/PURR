@@ -25,6 +25,18 @@ class PurrSettingsForm(IndicoForm):
     ab_contribution_h2 = StringField(_('AB contribution poster pattern'), [DataRequired()])
     custom_fields = IndicoSelectMultipleCheckboxField(_('Custom fields'), coerce=int)
 
+    event_title = StringField(_('Event title'), [DataRequired()])
+    event_name = StringField(_('Event name'), [DataRequired()])
+    event_hosted = StringField(_('Event hosted'), [DataRequired()])
+    event_location = StringField(_('Event location'), [DataRequired()])
+    event_editorial = StringField(_('Event Editorial Board'), [DataRequired()])
+    event_context = StringField(_('Event context'), [DataRequired()])
+    event_date = StringField(_('Event date'), [DataRequired()])
+    event_isbn = StringField(_('Event ISBM'), [DataRequired()])
+    event_issn = StringField(_('Event ISSN'), [DataRequired()])
+    event_doi = StringField(_('Event DOI'), [DataRequired()])
+
+
     def __init__(self, *args, event, **kwargs):
         super().__init__(*args, **kwargs)
         self.custom_fields.choices = [(f.id, f.title) for f in event.contribution_fields]

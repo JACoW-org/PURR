@@ -26,6 +26,12 @@ blueprint.add_url_rule(
     "/settings", "purr_settings", RHPurrSettingsPage, methods=("GET", "POST")
 )
 
+from indico_purr.controllers.json.common.settings_data import RHPurrSettingsDataJson
+
+blueprint.add_url_rule(
+    "/settings-data", "purr_settings_data", RHPurrSettingsDataJson, methods=("GET", "POST")
+)
+
 from indico_purr.controllers.json.abstract_booklet import RHPurrAbstractBookletJson
 
 blueprint.add_url_rule(
