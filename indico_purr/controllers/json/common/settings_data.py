@@ -32,7 +32,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
 
             if form.validate():
                 set_purr_settings(self.event, **form.data)
-                
+
                 self.event.log(
                     EventLogRealm.management,
                     LogKind.change,
@@ -40,8 +40,22 @@ class RHPurrSettingsDataJson(RHManageEventBase):
                     "Updated",
                     session.user,
                 )
-                
-                settings = get_purr_settings(self.event)
+
+                return jsonify(
+                    {
+                        "method": request.method,
+                        "settings": get_purr_settings(self.event),
+                    }
+                )
+
+            return jsonify(
+                {
+                    "method": request.method,
+                    "valid": form.validate(),
+                    "errors": form.error_list,
+                    "settings": get_purr_settings(self.event),
+                }
+            )
 
         return jsonify(
             {
