@@ -1,6 +1,9 @@
-import React, {Component} from 'react';
-import {Form, Input, Modal, Tab, Button} from 'semantic-ui-react';
-import {flow, includes, map, reduce, without} from 'lodash';
+import React, {Component, useState} from 'react';
+import {Form, Modal, Tab, Button} from 'semantic-ui-react';
+import {without} from 'lodash';
+import {FinalProceedingsSettings} from './settings/purr.settings.final-proceedings';
+import {AbstractBookletSettings} from './settings/purr.settings.abstract-booklet';
+import {PDFCheckSettings} from './settings/purr.settings.pdf-check';
 
 // TODO use Grid components to align form fields
 export class SettingsDialog extends Component {
@@ -25,185 +28,38 @@ export class SettingsDialog extends Component {
   };
 
   onCustomFieldChange = (event, field) => {
-    this.setState({custom_fields: field.value ? [...custom_fields, field.name] : without(custom_fields, field.name)})
-  }
+    this.setState({
+      custom_fields: field.value
+        ? [...custom_fields, field.name]
+        : without(custom_fields, field.name),
+    });
+  };
 
   render() {
     const panes = [
       {
         menuItem: 'Abstract Booklet',
-        render: () => <AbstractBookletTab />,
+        render: () => (
+          <AbstractBookletSettings
+            formState={this.state}
+            onFieldChange={this.onFieldChange}
+            onCustomFieldChange={this.onCustomFieldChange}
+          />
+        ),
       },
-      {menuItem: 'PDF Check', render: () => <PDFCheckTab />},
-      {menuItem: 'Final proceedings', render: () => <FinalProceedingsTab />},
+      {
+        menuItem: 'PDF Check',
+        render: () => (
+          <PDFCheckSettings formState={this.state} onFieldChange={this.onFieldChange} />
+        ),
+      },
+      {
+        menuItem: 'Final proceedings',
+        render: () => (
+          <FinalProceedingsSettings formState={this.state} onFieldChange={this.onFieldChange} />
+        ),
+      },
     ];
-
-    const AbstractBookletTab = () => {
-      return (
-        <Tab.Pane>
-          <Form.Field inline>
-            <label>Contribution h1</label>
-            <Input
-              name="ab_contribution_h1"
-              value={this.state.ab_contribution_h1}
-              placeholder="Insert contribution h1"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Contribution h2</label>
-            <Input
-              ame="ab_contribution_h2"
-              value={this.state.ab_contribution_h2}
-              placeholder="Insert contribution h2"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Session h1</label>
-            <Input
-              name="ab_session_h1"
-              value={this.state.ab_session_h1}
-              placeholder="Insert session h1"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Session h2</label>
-            <Input
-              name="ab_session_h2"
-              value={this.state.ab_session_h2}
-              placeholder="Insert session h2"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Group grouped >
-            <label>Custom Fields</label>
-            <CustomFields />
-          </Form.Group>
-        </Tab.Pane>
-      );
-    };
-
-    const PDFCheckTab = () => {
-      return (
-        <Tab.Pane>
-          <Form.Field inline>
-            <label>PDF Page Height</label>
-            <Input
-              name="pdf_page_height"
-              value={this.state.pdf_page_height}
-              placeholder="Insert PDF Page Height"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>PDF Page Width</label>
-            <Input
-              name="pdf_page_width"
-              value={this.state.pdf_page_width}
-              placeholder="Insert PDF Page Width"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-        </Tab.Pane>
-      );
-    };
-
-    const FinalProceedingsTab = () => {
-      return (
-        <Tab.Pane>
-          <Form.Field inline>
-            <label>DOI Base URL</label>
-            <Input
-              name="doi_base_url"
-              value={this.state.doi_base_url}
-              placeholder="Insert DOI Base URL"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>ISBN</label>
-            <Input
-              name="isbn"
-              value={this.state.isbn}
-              placeholder="Insert ISBN"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>ISSN</label>
-            <Input
-              ame="issn"
-              value={this.state.issn}
-              placeholder="Insert ISSN"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Booktitle short</label>
-            <Input
-              name="booktitle_short"
-              value={this.state.booktitle_short}
-              placeholder="Insert booktitle short"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Booktitle long</label>
-            <Input
-              name="booktitle_long"
-              value={this.state.booktitle_long}
-              placeholder="Insert booktitle long"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Series</label>
-            <Input
-              name="series"
-              value={this.state.series}
-              placeholder="Insert series"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-          <Form.Field inline>
-            <label>Series number</label>
-            <Input
-              name="series_number"
-              value={this.state.series_number}
-              placeholder="Insert series number"
-              onChange={this.onFieldChange}
-            />
-          </Form.Field>
-        </Tab.Pane>
-      );
-    };
-
-    const CustomFields = () => {
-      return (
-        flow(
-          // step 1, checked is true if settings.custom_fields includes the id of the considered contribution field
-          fields =>
-            map(fields, field => {
-              return {...field, checked: includes(this.state?.custom_fields, field.id)};
-            }),
-          // step 2, map contribution fields to an array of semantic-ui checkboxes
-          fields =>
-            map(fields, field => (
-              <Form.Checkbox
-                name={field.id}
-                label={field.title}
-                value={field.checked}
-
-                control="input"
-              />
-            )),
-          // step 3, concat all checkboxes to create JSX code to be rendered
-          jsxElements => reduce(jsxElements, (result, checkbox) => result.concat(checkbox))
-        )(this.state.contribution_fields) || <span> No custom field available</span>
-      );
-    };
 
     return (
       <Modal open={this.props.open} onClose={this.onDialogClose}>

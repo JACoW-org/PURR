@@ -24,6 +24,18 @@ class PurrPlugin(IndicoPlugin):
         'ab_session_h2': '{start} / {end}',
         'ab_contribution_h1': '| {code} | / | {start} |',
         'ab_contribution_h2': '| {code} | / | {start} |',
+        'isbn': '',
+        'issn': '',
+        'booktitle_short': '',
+        'booktitle_long': '',
+        'series': '',
+        'series_number': '',
+        'location': '',
+        'hostInfo': '',
+        'editorialBoard': '',
+        'doi_base_url': '',
+        'doi_user': '',
+        'doi_password': ''
     }
 
     def init(self):

@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {Button, Card, Icon} from 'semantic-ui-react';
 
 import {getSettings, download, openSocket, fetchJson, runPhase} from './purr.lib';
-import {SettingsDialog} from './purr.sd';
+import { SettingsDialog } from './settings/purr.settings.dialog';
 
 export const PurrSettingsCard = () => {
   const [settings] = useState(() => getSettings());
@@ -66,7 +66,7 @@ export const PurrSettingsCard = () => {
         </Card.Content>
       </Card>
 
-      <SettingsDialog settings={settings} open={open} onClose={onClose} onSubmit={onSubmit} />
+      <SettingsDialog settings={settings} open={open} setOpen={setOpen} onClose={onClose} onSubmit={onSubmit} />
     </>
   ) : (
     <Card fluid>
