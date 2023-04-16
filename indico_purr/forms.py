@@ -1,4 +1,4 @@
-from wtforms import BooleanField, FloatField, StringField, URLField
+from wtforms import BooleanField, FloatField, StringField, URLField, Form
 from wtforms.validators import URL, DataRequired
 
 from indico.web.forms.base import IndicoForm
@@ -16,7 +16,7 @@ class PurrDisconnectForm(IndicoForm):
     connected = BooleanField(_("Connected"), [DataRequired()])
 
 
-class PurrSettingsForm(IndicoForm):
+class PurrSettingsForm(Form):
    
     pdf_page_width = FloatField(_("PDF page width"), [DataRequired()])
     pdf_page_height = FloatField(_("PDF page height"), [DataRequired()])
@@ -30,16 +30,40 @@ class PurrSettingsForm(IndicoForm):
     )
     custom_fields = IndicoSelectMultipleCheckboxField(_("Custom fields"), coerce=int)
 
-    event_title = StringField(_("Event title"), [DataRequired()])
-    event_name = StringField(_("Event name"), [DataRequired()])
-    event_hosted = StringField(_("Event hosted"), [DataRequired()])
-    event_location = StringField(_("Event location"), [DataRequired()])
-    event_editorial = StringField(_("Event Editorial Board"), [DataRequired()])
-    event_context = StringField(_("Event context"), [DataRequired()])
-    event_date = StringField(_("Event date"), [DataRequired()])
-    event_isbn = StringField(_("Event ISBM"), [DataRequired()])
-    event_issn = StringField(_("Event ISSN"), [DataRequired()])
-    event_doi = StringField(_("Event DOI"), [DataRequired()])
+    # event_title = StringField(_("Event title"), [DataRequired()])
+    # event_name = StringField(_("Event name"), [DataRequired()])
+    # event_hosted = StringField(_("Event hosted"), [DataRequired()])
+    # event_location = StringField(_("Event location"), [DataRequired()])
+    # event_editorial = StringField(_("Event Editorial Board"), [DataRequired()])
+    # event_context = StringField(_("Event context"), [DataRequired()])
+    # event_date = StringField(_("Event date"), [DataRequired()])
+    # event_isbn = StringField(_("Event ISBN"), [DataRequired()])
+    # event_issn = StringField(_("Event ISSN"), [DataRequired()])
+    # event_doi = StringField(_("Event DOI"), [DataRequired()])
+    isbn = StringField(_("ISBN"), [DataRequired()])
+    issn = StringField(_("ISSN"), [DataRequired()])
+    booktitle_short = StringField(_("Booktitle short"), [DataRequired()])
+    booktitle_long = StringField(_("Booktitle long"), [DataRequired()])
+    series = StringField(_("Series"), [DataRequired()])
+    series_number = StringField(_("Series number"), [DataRequired()])
+    location = StringField(_("location"), [DataRequired()])
+    hostInfo = StringField(_("hostinfo"), [DataRequired()]) # TODO fix snake case
+    editorialBoard = StringField(_("editorial board"), [DataRequired()])
+    doi_base_url = StringField(_("Doi Base URL"), [DataRequired()])
+    doi_user = StringField(_("doi user"), [DataRequired()])
+    doi_password = StringField(_("doi password"), [DataRequired()])
+        #     'isbn': '',
+        # 'issn': '',
+        # 'booktitle_short': '',
+        # 'booktitle_long': '',
+        # 'series': '',
+        # 'series_number': '',
+        # 'location': '',
+        # 'hostInfo': '',
+        # 'editorialBoard': '',
+        # 'doi_base_url': '',
+        # 'doi_user': '',
+        # 'doi_password': ''
 
     def __init__(self, *args, event, **kwargs):
         super().__init__(*args, {**kwargs, "csrf_enabled": False})

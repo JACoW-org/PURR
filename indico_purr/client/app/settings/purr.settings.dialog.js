@@ -37,12 +37,20 @@ export function SettingsDialog({settings, open, setOpen, onSubmit, loading}) {
   const [finalProcSettings, setFinalProcSettings] = useState(() => defaultFinalProcSettings);
 
   const updateABSetting = (key, value) => setABSettings({...abSettings, [key]: value});
-  const updatePDFCheckSetting = (key, value) => setPDFCheckSettings({...pdfCheckSettings, [key]: value});
-  const updateFinalProcSetting = (key, value) => setFinalProcSettings({...finalProcSettings, [key]: value});
+  const updatePDFCheckSetting = (key, value) =>
+    setPDFCheckSettings({...pdfCheckSettings, [key]: value});
+  const updateFinalProcSetting = (key, value) =>
+    setFinalProcSettings({...finalProcSettings, [key]: value});
 
   const onFormSubmit = () => {
     onSubmit({
-      ...abSettings,
+      ...pick(abSettings, [
+        'ab_contribution_h1',
+        'ab_contribution_h2',
+        'ab_session_h1',
+        'ab_session_h2',
+        'custom_fields',
+      ]),
       ...pdfCheckSettings,
       ...finalProcSettings,
     });

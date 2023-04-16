@@ -95,8 +95,8 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
             <Form.Field inline>
               <label>Hosting info</label>
               <TextArea
-                name="hostInfo"
-                value={finalProcSettings.hostInfo || ''}
+                name="host_info"
+                value={finalProcSettings.host_info || ''}
                 placeholder="Add host info"
                 onChange={onFieldChange}
               />
@@ -104,8 +104,8 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
             <Form.Field inline>
               <label>Editorial Board</label>
               <TextArea
-                name="editorialBoard"
-                value={finalProcSettings.editorialBoard || ''}
+                name="editorial_board"
+                value={finalProcSettings.editorial_board || ''}
                 placeholder="Add editorial board"
                 onChange={onFieldChange}
               />

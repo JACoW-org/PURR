@@ -41,8 +41,8 @@ class PurrPlugin(IndicoPlugin):
         'series': '',
         'series_number': '',
         'location': '',
-        'hostInfo': '',
-        'editorialBoard': '',
+        'host_info': 'FEL2022 was hosted by Elettra-Sincrotrone Trieste, Trieste, Italy, and held at the Trieste Convention Center in Trieste, Italy 22-26 Aug 2022',
+        'editorial_board': 'Peter Forck (GSI), Adriana Wawrzyniak (SOLARIS), Agnieszka Cudek (SOLARIS), Volker R.W. Schaa (GSI), Grzegorz W. Kowalski (SOLARIS)',
         'doi_base_url': '',
         'doi_user': '',
         'doi_password': ''

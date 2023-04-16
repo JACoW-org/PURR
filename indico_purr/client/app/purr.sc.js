@@ -31,6 +31,7 @@ export const PurrSettingsCard = () => {
 
       of(null).pipe(
         concatMap(() => putJson('settings-data', body)),
+        tap(event => console.log(event.result)),
         concatMap((event) => {
           // TODO handle error properly
           if (event.error) {
