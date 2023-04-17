@@ -76,8 +76,8 @@ class PurrSettings:
     def _validate_issn(self, errors: dict):
         self._required_validator('issn', self.issn, errors)
 
-        if re.search(r'[\S]{4}\-[\S]{4}', self.issn) == None:
-            errors['issn'] = 'error:issn-format'
+        # if re.search(r'[\S]{4}\-[\S]{4}', self.issn) == None:
+        #     errors['issn'] = 'error:issn-format'
         
     def _validate_booktitle_short(self, errors: dict):
         self._required_validator('booktitle_short', self.booktitle_short, errors)

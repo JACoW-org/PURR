@@ -128,6 +128,23 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
             </Form.Field>
           </Accordion.Content>
 
+          <Accordion.Title active={activeIndex === 1} index={1} onClick={onClick}>
+            <Icon name="dropdown" />
+            Materials
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 1}>
+            {/* <Card text={'prova'} /> */}
+          </Accordion.Content>
+
+          <Accordion.Title active={activeIndex === 2} index={2} onClick={onClick}>
+            <Icon name="dropdown" />
+            Materials
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 2}>
+            {/* <Card text={'prova'} /> */}
+          </Accordion.Content>
+
+
 
           <Accordion.Title active={activeIndex === 3} index={3} onClick={onClick}>
             <Icon name="dropdown" />
@@ -142,7 +159,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
             <Icon name="dropdown" />
             DOI
           </Accordion.Title>
-          <Accordion.Content active={activeIndex === 2}>
+          <Accordion.Content active={activeIndex === 4}>
             <Form.Field error={hasError('doi_base_url')}>
               <label>DOI Base URL</label>
               <Input
