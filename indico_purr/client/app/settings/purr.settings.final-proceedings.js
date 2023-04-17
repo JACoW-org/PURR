@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
-import { Accordion, Form, Icon, Input, Tab, TextArea } from 'semantic-ui-react';
+import React, {useCallback, useState} from 'react';
+import {Accordion, Form, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
+import { has } from 'lodash';
 
-export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSetting }) {
+export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSetting, errors}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onClick = useCallback(
@@ -14,6 +15,8 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
 
   const onFieldChange = (e, field) => updateFinalProcSetting(field.name, field.value);
 
+  const hasError = useCallback(fieldName => has(errors, fieldName), [errors]);
+
   return (
     <Tab.Pane>
       <Form size="small">
@@ -24,95 +27,8 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
           </Accordion.Title>
 
           <Accordion.Content active={activeIndex === 0}>
-            <Form.Group widths='equal'>
-              <Form.Field>
-                <label>Booktitle short</label>
-                <Input
-                  fluid
-                  name="booktitle_short"
-                  value={finalProcSettings.booktitle_short || ''}
-                  placeholder="Insert booktitle short"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-
-            <Form.Group widths='equal'>
-              <Form.Field>
-                <label>Booktitle long</label>
-                <Input
-                  fluid
-                  name="booktitle_long"
-                  value={finalProcSettings.booktitle_long || ''}
-                  placeholder="Insert booktitle long"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-
-            <Form.Group widths='equal'>
-              <Form.Field>
-                <label>Location</label>
-                <Input
-                  fluid
-                  name="location"
-                  value={finalProcSettings.location || ''}
-                  placeholder="Insert location"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-          </Accordion.Content>
-
-          <Accordion.Title active={activeIndex === 1} index={1} onClick={onClick}>
-            <Icon name="dropdown" />
-            Home
-          </Accordion.Title>
-
-          <Accordion.Content active={activeIndex === 1}>
-
-            <Form.Group widths='equal'>
-              <Form.Field>
-                <label>Hosting info</label>
-                <TextArea
-                  name="host_info"
-                  value={finalProcSettings.host_info || ''}
-                  placeholder="Add host info"
-                  label={{ icon: 'asterisk' }}
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-
-            <Form.Group widths='equal'>
-              <Form.Field>
-                <label>Editorial Board</label>
-                <TextArea
-                  name="editorial_board"
-                  value={finalProcSettings.editorial_board || ''}
-                  label={{ icon: 'asterisk' }}
-                  placeholder="Add editorial board"
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-          </Accordion.Content>
-
-
-          <Accordion.Title active={activeIndex === 2} index={2} onClick={onClick}>
-            <Icon name="dropdown" />
-            Codes
-          </Accordion.Title>
-
-          <Accordion.Content active={activeIndex === 2}>
-            <Form.Group widths='equal'>
-              <Form.Field>
+            <Form.Group>
+              <Form.Field error={hasError('isbn')}>
                 <label>ISBN</label>
                 <Input
                   fluid
@@ -124,7 +40,7 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field>
+              <Form.Field error={hasError('issn')}>
                 <label>ISSN</label>
                 <Input
                   fluid
@@ -137,9 +53,28 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
                 />
               </Form.Field>
             </Form.Group>
-
-            <Form.Group widths='equal'>
-              <Form.Field>
+            <Form.Group>
+              <Form.Field error={hasError('booktitle_short')}>
+                <label>Booktitle short</label>
+                <Input
+                  name="booktitle_short"
+                  value={finalProcSettings.booktitle_short || ''}
+                  placeholder="Insert booktitle short"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('booktitle_long')}>
+                <label>Booktitle long</label>
+                <Input
+                  name="booktitle_long"
+                  value={finalProcSettings.booktitle_long || ''}
+                  placeholder="Insert booktitle long"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+            <Form.Group>
+              <Form.Field error={hasError('series')}>
                 <label>Series</label>
                 <Input
                   fluid
@@ -151,7 +86,7 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field>
+              <Form.Field error={hasError('series_number')}>
                 <label>Series number</label>
                 <Input
                   fluid
@@ -164,7 +99,33 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
                 />
               </Form.Field>
             </Form.Group>
-
+            <Form.Field error={hasError('location')}>
+              <label>Location</label>
+              <Input
+                name="location"
+                value={finalProcSettings.location || ''}
+                placeholder="Insert location"
+                onChange={onFieldChange}
+              />
+            </Form.Field>
+            <Form.Field error={hasError('host_info')}>
+              <label>Hosting info</label>
+              <TextArea
+                name="host_info"
+                value={finalProcSettings.host_info || ''}
+                placeholder="Add host info"
+                onChange={onFieldChange}
+              />
+            </Form.Field>
+            <Form.Field error={hasError('editorial_board')}>
+              <label>Editorial Board</label>
+              <TextArea
+                name="editorial_board"
+                value={finalProcSettings.editorial_board || ''}
+                placeholder="Add editorial board"
+                onChange={onFieldChange}
+              />
+            </Form.Field>
           </Accordion.Content>
 
 
@@ -181,10 +142,8 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
             <Icon name="dropdown" />
             DOI
           </Accordion.Title>
-
-
-          <Accordion.Content active={activeIndex === 4}>
-            <Form.Field>
+          <Accordion.Content active={activeIndex === 2}>
+            <Form.Field error={hasError('doi_base_url')}>
               <label>DOI Base URL</label>
               <Input
                 fluid
@@ -196,7 +155,7 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={hasError('doi_user')}>
               <label>DOI User</label>
               <Input
                 fluid
@@ -206,7 +165,7 @@ export function FinalProceedingsSettings({ finalProcSettings, updateFinalProcSet
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={hasError('doi_password')}>
               <label>DOI Password</label>
               <Input
                 fluid
