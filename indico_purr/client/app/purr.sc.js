@@ -10,6 +10,7 @@ export const PurrSettingsCard = () => {
   const [loading, setLoading] = useState(() => false);
   const [dialogLoading, setDialogLoading] = useState(() => false);
   const [open, setOpen] = useState(() => false);
+  const [formErrors, setFormErrors] = useState(() => {})
 
   const onSettingsOpen = useCallback(() => setOpen(true), []);
   const onClose = useCallback(() => setOpen(false), []);
@@ -31,20 +32,28 @@ export const PurrSettingsCard = () => {
 
       of(null).pipe(
         concatMap(() => putJson('settings-data', body)),
-        tap(event => console.log(event.result)),
+        // tap(event => console.log(event.result)),
         concatMap((event) => {
-          // TODO handle error properly
+          // TODO handle REST errors properly
           if (event.error) {
             throw new Error('error saving PURR settings')
           }
 
-          return of(true);
+          return of(event.result);
         }),
         catchError((error) => {
           console.log(error);
           return of(true);
-        }),  // TODO show error ?!
-        tap(() => setDialogLoading(false))
+        }),  // TODO show error
+        tap(result => {
+          setDialogLoading(false);
+          if (result.is_valid) {
+            setOpen(false);
+            // TODO show success card
+          } else {
+            setFormErrors(result.errors);
+          }
+        })
       ).subscribe();
     }
     return () => {};
@@ -102,6 +111,7 @@ export const PurrSettingsCard = () => {
         onClose={onClose}
         onSubmit={onSubmit}
         loading={dialogLoading}
+        errors={formErrors}
       />
     </>
   ) : (

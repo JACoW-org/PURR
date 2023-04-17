@@ -1,7 +1,8 @@
 import React, {useCallback, useState} from 'react';
 import {Accordion, Form, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
+import { has } from 'lodash';
 
-export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSetting}) {
+export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSetting, errors}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onClick = useCallback(
@@ -14,6 +15,8 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
 
   const onFieldChange = (e, field) => updateFinalProcSetting(field.name, field.value);
 
+  const hasError = useCallback(fieldName => has(errors, fieldName), [errors]);
+
   return (
     <Tab.Pane>
       <Form size="small">
@@ -24,7 +27,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 0}>
             <Form.Group>
-              <Form.Field>
+              <Form.Field error={hasError('isbn')}>
                 <label>ISBN</label>
                 <Input
                   name="isbn"
@@ -33,7 +36,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field>
+              <Form.Field error={hasError('issn')}>
                 <label>ISSN</label>
                 <Input
                   name="issn"
@@ -44,7 +47,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
               </Form.Field>
             </Form.Group>
             <Form.Group>
-              <Form.Field>
+              <Form.Field error={hasError('booktitle_short')}>
                 <label>Booktitle short</label>
                 <Input
                   name="booktitle_short"
@@ -53,7 +56,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field>
+              <Form.Field error={hasError('booktitle_long')}>
                 <label>Booktitle long</label>
                 <Input
                   name="booktitle_long"
@@ -64,7 +67,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
               </Form.Field>
             </Form.Group>
             <Form.Group>
-              <Form.Field>
+              <Form.Field error={hasError('series')}>
                 <label>Series</label>
                 <Input
                   name="series"
@@ -73,7 +76,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field>
+              <Form.Field error={hasError('series_number')}>
                 <label>Series number</label>
                 <Input
                   name="series_number"
@@ -83,7 +86,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 />
               </Form.Field>
             </Form.Group>
-            <Form.Field>
+            <Form.Field error={hasError('location')}>
               <label>Location</label>
               <Input
                 name="location"
@@ -92,7 +95,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field inline>
+            <Form.Field error={hasError('host_info')}>
               <label>Hosting info</label>
               <TextArea
                 name="host_info"
@@ -101,7 +104,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field inline>
+            <Form.Field error={hasError('editorial_board')}>
               <label>Editorial Board</label>
               <TextArea
                 name="editorial_board"
@@ -123,7 +126,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
             DOI
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 2}>
-            <Form.Field>
+            <Form.Field error={hasError('doi_base_url')}>
               <label>DOI Base URL</label>
               <Input
                 name="doi_base_url"
@@ -132,7 +135,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={hasError('doi_user')}>
               <label>DOI User</label>
               <Input
                 name="doi_user"
@@ -141,7 +144,7 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={hasError('doi_password')}>
               <label>DOI Password</label>
               <Input
                 name="doi_password"

@@ -1,8 +1,8 @@
-import React from 'react';
-import {flow, includes, map, reduce, tap, without} from 'lodash';
+import React, {useCallback} from 'react';
+import {flow, has, includes, map, reduce, tap, without} from 'lodash';
 import {Checkbox, Form, Input, Tab} from 'semantic-ui-react';
 
-export function AbstractBookletSettings({abSettings, updateABSetting}) {
+export function AbstractBookletSettings({abSettings, updateABSetting, errors}) {
   const onFieldChange = (e, field) => updateABSetting(field.name, field.value);
 
   const onCustomFieldChange = (e, field) => {
@@ -12,10 +12,12 @@ export function AbstractBookletSettings({abSettings, updateABSetting}) {
     updateABSetting('custom_fields', custom_fields);
   };
 
+  const hasError = useCallback(fieldName => has(errors, fieldName), [errors]);
+
   return (
     <Tab.Pane>
       <Form size="small">
-        <Form.Field>
+        <Form.Field error={hasError('ab_contribution_h1')}>
           <label>Contribution h1</label>
           <Input
             name="ab_contribution_h1"
@@ -24,7 +26,7 @@ export function AbstractBookletSettings({abSettings, updateABSetting}) {
             onChange={onFieldChange}
           />
         </Form.Field>
-        <Form.Field>
+        <Form.Field error={hasError('ab_contribution_h2')}>
           <label>Contribution h2</label>
           <Input
             name="ab_contribution_h2"
@@ -33,7 +35,7 @@ export function AbstractBookletSettings({abSettings, updateABSetting}) {
             onChange={onFieldChange}
           />
         </Form.Field>
-        <Form.Field>
+        <Form.Field error={hasError('ab_session_h1')}>
           <label>Session h1</label>
           <Input
             name="ab_session_h1"
@@ -42,7 +44,7 @@ export function AbstractBookletSettings({abSettings, updateABSetting}) {
             onChange={onFieldChange}
           />
         </Form.Field>
-        <Form.Field>
+        <Form.Field error={hasError('ab_session_h2')}>
           <label>Session h2</label>
           <Input
             name="ab_session_h2"
