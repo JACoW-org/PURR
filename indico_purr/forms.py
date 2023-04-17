@@ -16,7 +16,7 @@ class PurrDisconnectForm(IndicoForm):
     connected = BooleanField(_("Connected"), [DataRequired()])
 
 
-class PurrSettingsForm(Form):
+class __PurrSettingsForm(Form):
    
     pdf_page_width = FloatField(_("PDF page width"), [DataRequired()])
     pdf_page_height = FloatField(_("PDF page height"), [DataRequired()])

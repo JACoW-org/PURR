@@ -2,9 +2,7 @@ import re
 
 from flask import jsonify, request, session
 from flask_pluginengine import current_plugin
-from indico.web.forms.base import FormDefaults
 
-from indico_purr.forms import PurrSettingsForm
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
@@ -65,7 +63,7 @@ class PurrSettings:
         if value == None or value == '':
             errors[key] = 'error:required'
         
-    def _format_validator(key, value, regex):
+    def _format_validator(self, key, value, regex):
         pass
     
     def _validate_ab_session_h1(self, errors: dict):
@@ -88,8 +86,8 @@ class PurrSettings:
     def _validate_issn(self, errors: dict):
         self._required_validator('issn', self.issn, errors)
 
-        if re.search(r'[\S]{4}\-[\S]{4}', self.issn) == None:
-            errors['issn'] = 'error:issn-format'
+        # if re.search(r'[\S]{4}\-[\S]{4}', self.issn) == None:
+        #     errors['issn'] = 'error:issn-format'
         
     def _validate_booktitle_short(self, errors: dict):
         self._required_validator('booktitle_short', self.booktitle_short, errors)
@@ -136,22 +134,22 @@ class RHPurrSettingsDataJson(RHManageEventBase):
 
             settings_dict: dict = request.json.get("settings")
             purr_settings = PurrSettings(
-                ab_session_h1 = settings_dict.get('ab_session_h1'),
-                ab_session_h2 = settings_dict.get('ab_session_h1'),
-                ab_contribution_h1 = settings_dict.get('ab_contribution_h1'),
-                ab_contribution_h2 = settings_dict.get('ab_contribution_h2'),
-                isbn = settings_dict.get('isbn'),
-                issn = settings_dict.get('issn'),
-                booktitle_short = settings_dict.get('booktitle_short'),
-                booktitle_long = settings_dict.get('booktitle_long'),
-                series = settings_dict.get('series'),
-                series_number = settings_dict.get('series_number'),
-                location = settings_dict.get('location'),
-                host_info = settings_dict.get('host_info'),
-                editorial_board = settings_dict.get('editorial_board'),
-                doi_base_url = settings_dict.get('doi_base_url'),
-                doi_user = settings_dict.get('doi_user'),
-                doi_password = settings_dict.get('doi_password'),
+                ab_session_h1 = settings_dict.get('ab_session_h1', ''),
+                ab_session_h2 = settings_dict.get('ab_session_h1', ''),
+                ab_contribution_h1 = settings_dict.get('ab_contribution_h1', ''),
+                ab_contribution_h2 = settings_dict.get('ab_contribution_h2', ''),
+                isbn = settings_dict.get('isbn', ''),
+                issn = settings_dict.get('issn', ''),
+                booktitle_short = settings_dict.get('booktitle_short', ''),
+                booktitle_long = settings_dict.get('booktitle_long', ''),
+                series = settings_dict.get('series', ''),
+                series_number = settings_dict.get('series_number', ''),
+                location = settings_dict.get('location', ''),
+                host_info = settings_dict.get('host_info', ''),
+                editorial_board = settings_dict.get('editorial_board', ''),
+                doi_base_url = settings_dict.get('doi_base_url', ''),
+                doi_user = settings_dict.get('doi_user', ''),
+                doi_password = settings_dict.get('doi_password', ''),
             )
 
             errors = purr_settings.validate()
