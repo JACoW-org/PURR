@@ -28,8 +28,12 @@ export function SettingsDialog({settings, errors, open, setOpen, onSubmit, loadi
     'series',
     'series_number',
     'location',
-    'hostInfo',
-    'editorialBoard',
+    'host_info',
+    'editorial_board',
+    'doi_base_url',
+    'doi_user',
+    'doi_password',
+    'date'
   ]);
 
   const [abSettings, setABSettings] = useState(() => defaultABSettings);

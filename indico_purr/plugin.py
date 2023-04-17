@@ -45,7 +45,8 @@ class PurrPlugin(IndicoPlugin):
         'editorial_board': 'Peter Forck (GSI), Adriana Wawrzyniak (SOLARIS), Agnieszka Cudek (SOLARIS), Volker R.W. Schaa (GSI), Grzegorz W. Kowalski (SOLARIS)',
         'doi_base_url': '',
         'doi_user': '',
-        'doi_password': ''
+        'doi_password': '',
+        'date': ''
     }
 
     def init(self):

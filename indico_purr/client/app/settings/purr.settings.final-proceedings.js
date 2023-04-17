@@ -1,13 +1,13 @@
 import React, {useCallback, useState} from 'react';
 import {Accordion, Form, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
-import { has } from 'lodash';
+import {has} from 'lodash';
 
 export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSetting, errors}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onClick = useCallback(
     (e, titleProps) => {
-      const { index } = titleProps;
+      const {index} = titleProps;
       setActiveIndex(activeIndex === index ? -1 : index);
     },
     [activeIndex]
@@ -23,38 +23,12 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
         <Accordion fluid styled>
           <Accordion.Title active={activeIndex === 0} index={0} onClick={onClick}>
             <Icon name="dropdown" />
-            Main
+            General
           </Accordion.Title>
 
           <Accordion.Content active={activeIndex === 0}>
             <Form.Group>
-              <Form.Field error={hasError('isbn')}>
-                <label>ISBN</label>
-                <Input
-                  fluid
-                  name="isbn"
-                  value={finalProcSettings.isbn || ''}
-                  placeholder="Insert ISBN"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-              <Form.Field error={hasError('issn')}>
-                <label>ISSN</label>
-                <Input
-                  fluid
-                  name="issn"
-                  value={finalProcSettings.issn || ''}
-                  placeholder="Insert ISSN"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-            <Form.Group>
-              <Form.Field error={hasError('booktitle_short')}>
+              <Form.Field error={hasError('booktitle_short')} width="8">
                 <label>Booktitle short</label>
                 <Input
                   name="booktitle_short"
@@ -63,43 +37,26 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field error={hasError('booktitle_long')}>
-                <label>Booktitle long</label>
+              <Form.Field error={hasError('date')} width="8">
+                <label>Date</label>
                 <Input
-                  name="booktitle_long"
-                  value={finalProcSettings.booktitle_long || ''}
-                  placeholder="Insert booktitle long"
+                  name="date"
+                  value={finalProcSettings.date || ''}
+                  placeholder="Insert event date"
                   onChange={onFieldChange}
                 />
               </Form.Field>
             </Form.Group>
-            <Form.Group>
-              <Form.Field error={hasError('series')}>
-                <label>Series</label>
-                <Input
-                  fluid
-                  name="series"
-                  value={finalProcSettings.series || ''}
-                  placeholder="Insert series"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-              <Form.Field error={hasError('series_number')}>
-                <label>Series number</label>
-                <Input
-                  fluid
-                  name="series_number"
-                  value={finalProcSettings.series_number || ''}
-                  placeholder="Insert series number"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition='right corner'
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-            </Form.Group>
-            <Form.Field error={hasError('location')}>
+            <Form.Field error={hasError('booktitle_long')} width="16">
+              <label>Booktitle long</label>
+              <Input
+                name="booktitle_long"
+                value={finalProcSettings.booktitle_long || ''}
+                placeholder="Insert booktitle long"
+                onChange={onFieldChange}
+              />
+            </Form.Field>
+            <Form.Field error={hasError('location')} width="16">
               <label>Location</label>
               <Input
                 name="location"
@@ -108,58 +65,97 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field error={hasError('host_info')}>
-              <label>Hosting info</label>
+            <Form.Group>
+              <Form.Field error={hasError('series')} width="12">
+                <label>Series</label>
+                <Input
+                  fluid
+                  name="series"
+                  value={finalProcSettings.series || ''}
+                  placeholder="Insert series"
+                  label={{icon: 'asterisk'}}
+                  labelPosition="right corner"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('series_number')} width="4">
+                <label>Series number</label>
+                <Input
+                  fluid
+                  name="series_number"
+                  value={finalProcSettings.series_number || ''}
+                  placeholder="Insert series number"
+                  label={{icon: 'asterisk'}}
+                  labelPosition="right corner"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+          </Accordion.Content>
+
+          <Accordion.Title active={activeIndex === 1} index={1} onClick={onClick}>
+            <Icon name="dropdown" />
+            Extra
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 1}>
+            <Form.Field error={hasError('host_info')} width="16">
+              <label>Host info</label>
               <TextArea
                 name="host_info"
                 value={finalProcSettings.host_info || ''}
-                placeholder="Add host info"
+                placeholder="Add host info (you can use markdown)"
+                rows={3}
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field error={hasError('editorial_board')}>
+            <Form.Field error={hasError('editorial_board')} width="16">
               <label>Editorial Board</label>
               <TextArea
                 name="editorial_board"
                 value={finalProcSettings.editorial_board || ''}
                 placeholder="Add editorial board"
+                rows={3}
                 onChange={onFieldChange}
               />
             </Form.Field>
           </Accordion.Content>
 
-          <Accordion.Title active={activeIndex === 1} index={1} onClick={onClick}>
-            <Icon name="dropdown" />
-            Materials
-          </Accordion.Title>
-          <Accordion.Content active={activeIndex === 1}>
-            {/* <Card text={'prova'} /> */}
-          </Accordion.Content>
-
           <Accordion.Title active={activeIndex === 2} index={2} onClick={onClick}>
             <Icon name="dropdown" />
-            Materials
+            Identifiers
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 2}>
-            {/* <Card text={'prova'} /> */}
+            <Form.Group>
+              <Form.Field error={hasError('isbn')} width="8">
+                <label>ISBN</label>
+                <Input
+                  name="isbn"
+                  value={finalProcSettings.isbn || ''}
+                  placeholder="Insert ISBN"
+                  label={{icon: 'asterisk'}}
+                  labelPosition="right corner"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('issn')} width="8">
+                <label>ISSN</label>
+                <Input
+                  name="issn"
+                  value={finalProcSettings.issn || ''}
+                  placeholder="Insert ISSN"
+                  label={{icon: 'asterisk'}}
+                  labelPosition="right corner"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
           </Accordion.Content>
-
-
 
           <Accordion.Title active={activeIndex === 3} index={3} onClick={onClick}>
             <Icon name="dropdown" />
-            Materials
-          </Accordion.Title>
-          <Accordion.Content active={activeIndex === 3}>
-            {/* <Card text={'prova'} /> */}
-          </Accordion.Content>
-
-
-          <Accordion.Title active={activeIndex === 4} index={4} onClick={onClick}>
-            <Icon name="dropdown" />
             DOI
           </Accordion.Title>
-          <Accordion.Content active={activeIndex === 4}>
+          <Accordion.Content active={activeIndex === 3}>
             <Form.Field error={hasError('doi_base_url')}>
               <label>DOI Base URL</label>
               <Input
@@ -167,8 +163,8 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 name="doi_base_url"
                 value={finalProcSettings.doi_base_url || ''}
                 placeholder="Insert DOI Base URL"
-                label={{ icon: 'asterisk' }}
-                labelPosition='right corner'
+                label={{icon: 'asterisk'}}
+                labelPosition="right corner"
                 onChange={onFieldChange}
               />
             </Form.Field>
@@ -193,6 +189,14 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
                 type="password"
               />
             </Form.Field>
+          </Accordion.Content>
+
+          <Accordion.Title active={activeIndex === 4} index={4} onClick={onClick}>
+            <Icon name="dropdown" />
+            Materials
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 4}>
+            {/* <Card text={'prova'} /> */}
           </Accordion.Content>
         </Accordion>
       </Form>

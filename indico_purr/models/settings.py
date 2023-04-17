@@ -11,6 +11,7 @@ class PurrSettings:
     ab_contribution_h1: str = field(default='')
     ab_contribution_h2: str = field(default='')
     custom_fields: list = field(default_factory=list)
+    date: str = field(default='')
     isbn: str = field(default='')
     issn: str = field(default='')
     booktitle_short: str = field(default='')
@@ -67,6 +68,9 @@ class PurrSettings:
         
     def _validate_ab_contribution_h2(self, errors: dict):
         self._required_validator('ab_contribution_h2', self.ab_contribution_h2, errors)
+
+    def _validate_date(self, errors: dict):
+        self._required_validator('date', self.date, errors)
 
     def _validate_isbn(self, errors: dict):
         self._required_validator('isbn', self.isbn, errors)

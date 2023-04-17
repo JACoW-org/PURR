@@ -23,6 +23,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             current_plugin.logger.info(request.json)
 
             settings_dict: dict = request.json.get("settings")
+            print(settings_dict)
             purr_settings = PurrSettings(
                 ab_session_h1 = settings_dict.get('ab_session_h1'),
                 ab_session_h2 = settings_dict.get('ab_session_h2'),
@@ -40,6 +41,8 @@ class RHPurrSettingsDataJson(RHManageEventBase):
                 doi_base_url = settings_dict.get('doi_base_url'),
                 doi_user = settings_dict.get('doi_user'),
                 doi_password = settings_dict.get('doi_password'),
+                custom_fields=settings_dict.get('custom_fields'),
+                date=settings_dict.get('date')
             )
 
             errors = purr_settings.validate()

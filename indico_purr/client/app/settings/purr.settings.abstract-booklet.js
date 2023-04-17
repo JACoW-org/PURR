@@ -1,14 +1,21 @@
 import React, {useCallback} from 'react';
-import {flow, has, includes, map, reduce, tap, without} from 'lodash';
+import {find, flow, has, includes, map, reduce, remove, tap, without} from 'lodash';
 import {Checkbox, Form, Input, Tab} from 'semantic-ui-react';
 
 export function AbstractBookletSettings({abSettings, updateABSetting, errors}) {
   const onFieldChange = (e, field) => updateABSetting(field.name, field.value);
 
   const onCustomFieldChange = (e, field) => {
+    console.log(abSettings.contribution_fields, abSettings.custom_fields, field);
     const custom_fields = field.checked
-      ? [...abSettings.custom_fields, +field.name]
-      : without(...abSettings.custom_fields, +field.name);
+      ? [
+          ...abSettings.custom_fields,
+          find(abSettings.contribution_fields, contrField => +field.name === contrField.id),
+        ]
+      : remove(abSettings.custom_fields, custom => custom.id === +field.name);
+    // const custom_fields = field.checked
+    //   ? [...abSettings.custom_fields, find(abSettings.contribution_fields, contrField => contrField.id === field.name)]
+    //   : without(...abSettings.custom_fields, find(abSettings.contribution_fields, contrField => contrField.id === field.name));
     updateABSetting('custom_fields', custom_fields);
   };
 
@@ -72,7 +79,7 @@ function CustomFields({custom_fields, contribution_fields, onCustomFieldChange})
       // step 1, checked is true if custom_fields includes the id of the considered contribution field
       fields =>
         map(fields, field => {
-          return {...field, checked: includes(custom_fields, field.id)};
+          return {...field, checked: !!find(custom_fields, custom => custom.id === field.id)};
         }),
       // step 2, map contribution fields to an array of semantic-ui checkboxes
       fields =>
