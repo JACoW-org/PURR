@@ -10,9 +10,7 @@ class ABCExportFile(ABC):
         return [
             self._serialize_file(event, contribution, revision, erf)
             for erf in EditingRevisionFile.query.with_parent(revision)
-            # .filter(EditingFileType.publishable, EditingFileType.id != self.file_type.id).all()
             if erf.file_type.name == "PDF" and erf.file_type.type in [1, 2, 3]
-            # erf.file_type.type in [1, 2] and erf.file_type.publishable
         ]
 
     def _get_tags(self, revision):
