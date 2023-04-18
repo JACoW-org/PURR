@@ -1,8 +1,13 @@
 import React, {useCallback, useState} from 'react';
-import {Accordion, Form, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
-import {has} from 'lodash';
+import {Accordion, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
+import {has, isEmpty, isNil, map} from 'lodash';
 
-export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSetting, errors}) {
+export function FinalProceedingsSettings({
+  finalProcSettings,
+  updateFinalProcSetting,
+  attachments,
+  errors,
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onClick = useCallback(
@@ -196,7 +201,39 @@ export function FinalProceedingsSettings({finalProcSettings, updateFinalProcSett
             Materials
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 4}>
-            {/* <Card text={'prova'} /> */}
+            <Grid divided="vertically">
+              {/* HEADER */}
+              <Grid.Row columns={3}>
+                <Grid.Column>
+                  <h3>Title</h3>
+                </Grid.Column>
+                <Grid.Column>
+                  <h3>Filename</h3>
+                </Grid.Column>
+                <Grid.Column>
+                  <h3>Tag</h3>
+                </Grid.Column>
+              </Grid.Row>
+              {isEmpty(attachments) ? (
+                <p>No file has been attached to this event.</p>
+              ) : (
+                map(attachments, attachment => {
+                  return (
+                    <Grid.Row columns={3}>
+                      <Grid.Column>
+                        <span>{attachment.title}</span>
+                      </Grid.Column>
+                      <Grid.Column>
+                        <span>{attachment.filename}</span>
+                      </Grid.Column>
+                      <Grid.Column>
+                        <span>{attachment.description}</span>
+                      </Grid.Column>
+                    </Grid.Row>
+                  );
+                })
+              )}
+            </Grid>
           </Accordion.Content>
         </Accordion>
       </Form>
