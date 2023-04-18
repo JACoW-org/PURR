@@ -7,7 +7,7 @@ import {PurrAbstractBooklet} from './purr.ab';
 import {PurrPapersChecks} from './purr.pc';
 import {PurrFinalProceedings} from './purr.fp';
 import {catchError, concatMap, of, tap} from 'rxjs';
-import { fetchSettings } from './api/purr.api';
+import {fetchSettings} from './api/purr.api';
 
 document.addEventListener('DOMContentLoaded', () => {
   const PurrHome = () => {
@@ -50,11 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 settings={settings}
                 setSettings={setSettings}
                 connected={connected}
-                setConnected={connected}
+                setConnected={setConnected}
               />
-              <PurrAbstractBooklet />
-              <PurrPapersChecks />
-              <PurrFinalProceedings />
+              {connected ? (
+                <>
+                  <PurrAbstractBooklet settings={settings} />
+                  <PurrPapersChecks settings={settings} />
+                  <PurrFinalProceedings settings={settings} />
+                </>
+              ) : (
+                <></>
+              )}
             </Card.Group>
           </div>
         )}

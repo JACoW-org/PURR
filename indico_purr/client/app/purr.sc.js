@@ -1,6 +1,6 @@
-import {map} from 'lodash';
+import {isNil, map} from 'lodash';
 import React, {useState, useEffect, useCallback} from 'react';
-import {catchError, concatMap, forkJoin, of, tap} from 'rxjs';
+import {catchError, concatMap, filter, finalize, forkJoin, of, tap} from 'rxjs';
 import {Button, Card, Icon} from 'semantic-ui-react';
 import {
   connect,
@@ -23,7 +23,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
   const [formErrors, setFormErrors] = useState(() => {});
 
   const onClose = useCallback(() => setOpen(false), []);
-  const onDialogOpen = useCallback(() => setSettingsLoading(true), [connected]);
+  const onDialogOpen = useCallback(() => setSettingsLoading(true));
   const onSubmit = useCallback(formData => {
     setSettings(formData);
     setSubmitLoading(true);
@@ -37,18 +37,20 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
         .pipe(
           catchError(error => {
             console.log(error); // TODO display error
-            return of(true);
+            return of(null);
           }),
+          filter(settings => !isNil(settings)),
           concatMap(() => fetchSettings()),
           catchError(error => {
             console.log(error); // TODO display error
-            return of(true);
+            return of(null);
           }),
+          filter(settings => !isNil(settings)),
           tap(settings => {
             setSettings(settings);
             setConnected(true);
-            setConnecting(false);
-          })
+          }),
+          finalize(() => setConnecting(false))
         )
         .subscribe();
 

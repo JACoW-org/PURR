@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Card, Icon } from 'semantic-ui-react'
 
-export const PurrPapersChecks = () => {
+export const PurrPapersChecks = ({settings}) => {
 
     const [loading, setLoading] = useState(false);
 

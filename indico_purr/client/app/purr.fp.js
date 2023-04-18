@@ -6,9 +6,7 @@ import { concatMap } from 'rxjs/operators';
 import { getSettings, openSocket, fetchJson, runPhase } from './purr.lib';
 
 
-export const PurrFinalProceedings = () => {
-
-    const [settings] = useState(() => getSettings());
+export const PurrFinalProceedings = ({settings}) => {
     const [loading, setLoading] = useState(() => false);
 
     const onDownload = useCallback(() => setLoading(true), []);

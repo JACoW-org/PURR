@@ -2,7 +2,7 @@ import {concatMap, forkJoin, of} from 'rxjs';
 import {fetchJson, putJson} from '../purr.lib';
 
 export function connect() {
-  return fetchJson('connect').pipe(
+  return putJson('connect', {connection: {api_key: '01GDWDBTHHJNZ0KAVKZ1YP320S', api_url: 'http://127.0.0.1:8080/'}}).pipe(
     concatMap(event => {
       if (event.error) {
         throw new Error('error connecting');
@@ -16,7 +16,7 @@ export function disconnect() {
   return putJson('disconnect', {}).pipe(
     concatMap(event => {
       if (event.error) {
-        throw new Error('error connecting');
+        throw new Error('error connecting'); // TODO event.message
       }
       return of(event.result);
     })
@@ -24,7 +24,7 @@ export function disconnect() {
 }
 
 export function fetchSettings() {
-  return fetchJson('settings-and-event-data').pipe(
+  return fetchJson('settings-data').pipe(
     concatMap(event => {
       if (event.error) {
         throw new Error('error fetching PURR settings');
@@ -37,7 +37,7 @@ export function fetchSettings() {
 
 export function fetchSettingsAndAttachements() {
   return forkJoin([
-    fetchJson('settings-and-event-data'),
+    fetchJson('settings-data'),
     fetchJson('final-proceedings-attachments-data'),
   ]).pipe(
     concatMap(([settingsEvent, attachmentsEvent]) => {

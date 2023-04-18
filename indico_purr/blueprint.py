@@ -11,7 +11,7 @@ blueprint.add_url_rule("/", "purr_home", RHPurrHomePage)
 from indico_purr.controllers.html.connect_page import RHPurrConnectPage
 
 blueprint.add_url_rule(
-    "/connect", "purr_connect", RHPurrConnectPage, methods=("GET", "POST")
+    "/connect", "purr_connect", RHPurrConnectPage, methods=("POST",)
 )
 
 from indico_purr.controllers.html.disconnect_page import RHPurrDisconnectPage
