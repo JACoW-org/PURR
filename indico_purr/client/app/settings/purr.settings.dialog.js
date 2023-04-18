@@ -7,7 +7,7 @@ import {AbstractBookletSettings} from './purr.settings.abstract-booklet';
 import {FinalProceedingsSettings} from './purr.settings.final-proceedings';
 import {PDFCheckSettings} from './purr.settings.pdf-check';
 
-export function SettingsDialog({settings, errors, open, setOpen, onSubmit, loading}) {
+export function SettingsDialog({settings, attachments, errors, open, setOpen, onSubmit, loading}) {
   // TODO refactor as const array
   const defaultABSettings = pick(settings, [
     'ab_contribution_h1',
@@ -87,6 +87,7 @@ export function SettingsDialog({settings, errors, open, setOpen, onSubmit, loadi
         <FinalProceedingsSettings
           finalProcSettings={finalProcSettings}
           updateFinalProcSetting={updateFinalProcSetting}
+          attachments={attachments}
           errors={errors}
         />
       ),
