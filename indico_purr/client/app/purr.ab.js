@@ -12,12 +12,6 @@ export const PurrAbstractBooklet = () => {
 
     const onDownload = useCallback(() => setLoading(true), []);
 
-    const onSettings = useCallback(() => {
-
-        putJson('settings-data', { settings: { "event_context": "fel-23" } }).subscribe()
-
-    }, []);
-
     useEffect(() => {
         if (settings && loading) {
 
@@ -117,8 +111,6 @@ export const PurrAbstractBooklet = () => {
                     <Button onClick={onDownload} loading={loading}
                         disabled={loading} primary compact size='mini'
                         icon='right chevron' content='Download' />
-                    <Button onClick={onSettings} primary compact size='mini'
-                        icon='right chevron' content='Settings' />
                 </div>
             </Card.Content>
         </Card>
