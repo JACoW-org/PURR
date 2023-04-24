@@ -1,19 +1,22 @@
-import { capitalize, first, flow, join, map, slice, split } from 'lodash'
+import {first, flow, forOwn, groupBy, map, nth, sortBy, split} from 'lodash';
 
-export function buildAttachmentView(attachment) {
+export function buildAttachments(attachments) {
+  return flow(
+    attachments =>
+      map(attachments, attachment => ({
+        ...attachment,
+        ...getAttachmentIndexAndSection(attachment),
+      })), // add index and section to each attachment
+    attachments => groupBy(attachments, attachment => attachment.section), // group by sections
+    sections => forOwn(sections, attachments => sortBy(attachments, attachment => attachment.index)) // sort attachments in each section by index
+  )(attachments);
+}
 
-    const extractMeta = flow(
-        filename => split(filename, '.'),       // split by '.'
-        root => first(root),                    // get the root only
-        value => split(value, '-'),             // split by '-' 
-        tokens => slice(tokens, 3),             // keep tokens from index 3
-        metaTokens => map(metaTokens, token => capitalize(token)),   // capitalize first letters
-        metaTokens => join(metaTokens, ' ')     // join back the tokens
-    )(attachment.filename);
-
-    return {
-        title: attachment.title,
-        filename: attachment.filename,
-        scope: extractMeta
-    }
+function getAttachmentIndexAndSection(attachment) {
+  return flow(
+    filename => split(filename, '.'), // split by '.' to remove extension
+    tokens => first(tokens), // keep first element
+    root => split(root, '-'), // split by '-'
+    tokens => ({section: nth(tokens, 2), index: +nth(tokens, 1)}) // get section and index element
+  )(attachment.filename);
 }

@@ -1,7 +1,6 @@
 import React, {useCallback, useState} from 'react';
-import {Accordion, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
-import {has, isEmpty, isNil, map} from 'lodash';
-import {buildAttachmentView} from '../utils/purr.utils';
+import {Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
+import {capitalize, has, isEmpty, isNil, map} from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -212,34 +211,50 @@ export function FinalProceedingsSettings({
                   <h3>Filename</h3>
                 </Grid.Column>
                 <Grid.Column>
-                  <h3>Tag</h3>
+                  <h3>Section</h3>
                 </Grid.Column>
               </Grid.Row>
-              {isEmpty(attachments) ? (
-                <p>No file has been attached to this event.</p>
-              ) : (
-                map(attachments, (attachment, index) => {
-                  const attachmentView = buildAttachmentView(attachment);
-                  return (
-                    // TODO add fontsize
-                    <Grid.Row columns={3} key={index}>
-                      <Grid.Column>
-                        <span>{attachmentView.title}</span>
-                      </Grid.Column>
-                      <Grid.Column>
-                        <span>{attachmentView.filename}</span>
-                      </Grid.Column>
-                      <Grid.Column>
-                        <span>{attachmentView.scope}</span>
-                      </Grid.Column>
-                    </Grid.Row>
-                  );
-                })
-              )}
             </Grid>
+            {isEmpty(attachments) ? (
+              <p>No file has been attached to this event.</p>
+            ) : (
+              <>
+                <Section sectionKey="logo" section={attachments.logo} />
+                <Divider />
+                <Section sectionKey="poster" section={attachments.poster} />
+                <Divider />
+                <Section sectionKey="volumes" section={attachments.volumes} />
+                <Divider />
+                <Section sectionKey="attachments" section={attachments.attachments} />
+              </>
+            )}
           </Accordion.Content>
         </Accordion>
       </Form>
     </Tab.Pane>
+  );
+}
+
+function Section({sectionKey, section}) {
+  return isNil(section) ? (
+    <p>No material found for {sectionKey}.</p>
+  ) : (
+    <Grid>
+      {map(section, attachment => {
+        return (
+          <Grid.Row columns={3} key={sectionKey}>
+            <Grid.Column key={section.filename}>
+              <span>{attachment.title}</span>
+            </Grid.Column>
+            <Grid.Column key={section.filename}>
+              <span>{attachment.filename}</span>
+            </Grid.Column>
+            <Grid.Column key={section.filename}>
+              <span>{capitalize(attachment.section)}</span>
+            </Grid.Column>
+          </Grid.Row>
+        );
+      })}
+    </Grid>
   );
 }

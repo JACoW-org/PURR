@@ -1,17 +1,17 @@
-import {isNil, map} from 'lodash';
 import React, {useState, useEffect, useCallback} from 'react';
-import {catchError, concatMap, filter, finalize, forkJoin, of, tap} from 'rxjs';
+import {isNil} from 'lodash';
+import {catchError, filter, finalize, of, tap} from 'rxjs';
 import {Button, Card, Icon} from 'semantic-ui-react';
 import {
   connect,
   disconnect,
-  fetchSettings,
   fetchSettingsAndAttachements,
   saveSettings,
 } from './api/purr.api';
+import {ConnectDialog} from './connect/purr.connect.dialog';
 
-import {fetchJson, putJson} from './purr.lib';
 import {SettingsDialog} from './settings/purr.settings.dialog';
+import { buildAttachments } from './utils/purr.utils';
 
 export const PurrSettingsCard = ({settings, setSettings, connected, setConnected}) => {
   const [connecting, setConnecting] = useState(false);
@@ -20,6 +20,8 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
   const [submitLoading, setSubmitLoading] = useState(() => false);
   const [open, setOpen] = useState(() => false);
   const [attachments, setAttachments] = useState(null);
+  const [connection, setConnection] = useState({});
+  const [connDialogOpen, setConnDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState(() => {});
 
   const onClose = useCallback(() => setOpen(false), []);
@@ -28,27 +30,28 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
     setSettings(formData);
     setSubmitLoading(true);
   }, []);
-  const onConnect = useCallback(() => setConnecting(true), []);
+  const onConnect = useCallback(() => setConnecting(true), [connection]);
   const onDisconnect = useCallback(() => setDisconnecting(true), []);
 
   useEffect(() => {
     if (connecting) {
-      const sub$ = connect()
+      const sub$ = connect({connection})
         .pipe(
           catchError(error => {
             console.log(error); // TODO display error
             return of(null);
           }),
-          filter(settings => !isNil(settings)),
-          concatMap(() => fetchSettings()),
-          catchError(error => {
-            console.log(error); // TODO display error
-            return of(null);
-          }),
-          filter(settings => !isNil(settings)),
-          tap(settings => {
-            setSettings(settings);
-            setConnected(true);
+          filter(connectResult => !isNil(connectResult)),
+          tap(connectResult => {
+            if (connectResult.is_valid) {
+              // chiudi modale
+              setConnDialogOpen(false);
+              setSettings(settings);
+              setFormErrors({});
+              setConnected(true);
+            } else {
+              setFormErrors(connectResult.errors);
+            }
           }),
           finalize(() => setConnecting(false))
         )
@@ -67,6 +70,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
           tap(() => {
             setConnected(false);
             setSettings({});
+            setConnection({});
             setDisconnecting(false);
           })
         )
@@ -84,7 +88,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
           }),
           tap(result => {
             setSettings(result.settings);
-            setAttachments(result.attachments);
+            setAttachments(buildAttachments(result.attachments));
             setOpen(true);
             setSettingsLoading(false);
           })
@@ -97,7 +101,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
     if (submitLoading) {
       const body = {
         settings: {
-          ...settings
+          ...settings,
         },
       };
 
@@ -174,12 +178,21 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
             ) : (
               <>
                 <Button
-                  onClick={onConnect}
+                  onClick={() => setConnDialogOpen(true)}
                   positive
                   compact
                   size="mini"
                   icon="right chevron"
                   content="Connect"
+                />
+                <ConnectDialog
+                  connection={connection}
+                  setConnection={setConnection}
+                  onConnect={onConnect}
+                  open={connDialogOpen}
+                  loading={connecting}
+                  onClose={() => setConnDialogOpen(false)}
+                  errors={formErrors}
                 />
               </>
             )}

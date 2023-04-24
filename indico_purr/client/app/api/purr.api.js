@@ -1,8 +1,8 @@
 import {concatMap, forkJoin, of} from 'rxjs';
 import {fetchJson, putJson} from '../purr.lib';
 
-export function connect() {
-  return putJson('connect', {connection: {api_key: '01GDWDBTHHJNZ0KAVKZ1YP320S', api_url: 'http://127.0.0.1:8080/'}}).pipe(
+export function connect(connection) {
+  return putJson('connect', connection).pipe(
     concatMap(event => {
       if (event.error) {
         throw new Error('error connecting');
