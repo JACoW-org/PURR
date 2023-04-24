@@ -1,6 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Accordion, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
 import {has, isEmpty, isNil, map} from 'lodash';
+import {buildAttachmentView} from '../utils/purr.utils';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -217,17 +218,19 @@ export function FinalProceedingsSettings({
               {isEmpty(attachments) ? (
                 <p>No file has been attached to this event.</p>
               ) : (
-                map(attachments, attachment => {
+                map(attachments, (attachment, index) => {
+                  const attachmentView = buildAttachmentView(attachment);
                   return (
-                    <Grid.Row columns={3}>
+                    // TODO add fontsize
+                    <Grid.Row columns={3} key={index}>
                       <Grid.Column>
-                        <span>{attachment.title}</span>
+                        <span>{attachmentView.title}</span>
                       </Grid.Column>
                       <Grid.Column>
-                        <span>{attachment.filename}</span>
+                        <span>{attachmentView.filename}</span>
                       </Grid.Column>
                       <Grid.Column>
-                        <span>{attachment.description}</span>
+                        <span>{attachmentView.scope}</span>
                       </Grid.Column>
                     </Grid.Row>
                   );
