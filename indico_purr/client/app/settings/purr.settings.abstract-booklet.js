@@ -6,15 +6,7 @@ export function AbstractBookletSettings({abSettings, updateABSetting, errors}) {
   const onFieldChange = (e, field) => updateABSetting(field.name, field.value);
 
   const onCustomFieldChange = (e, field) => {
-    const custom_fields = field.checked
-      ? [
-          ...abSettings.custom_fields,
-          find(abSettings.contribution_fields, contrField => +field.name === contrField.id),
-        ]
-      : remove(abSettings.custom_fields, custom => custom.id === +field.name);
-    // const custom_fields = field.checked
-    //   ? [...abSettings.custom_fields, find(abSettings.contribution_fields, contrField => contrField.id === field.name)]
-    //   : without(...abSettings.custom_fields, find(abSettings.contribution_fields, contrField => contrField.id === field.name));
+    const custom_fields = field.checked ? [...abSettings.custom_fields, +field.name] : without(abSettings.custom_fields, +field.name);
     updateABSetting('custom_fields', custom_fields);
   };
 
@@ -73,12 +65,13 @@ export function AbstractBookletSettings({abSettings, updateABSetting, errors}) {
 }
 
 function CustomFields({custom_fields, contribution_fields, onCustomFieldChange}) {
+
   return (
     flow(
       // step 1, checked is true if custom_fields includes the id of the considered contribution field
       fields =>
         map(fields, field => {
-          return {...field, checked: !!find(custom_fields, custom => custom?.id === field.id)};
+          return {...field, checked: !!includes(custom_fields, field.id)}
         }),
       // step 2, map contribution fields to an array of semantic-ui checkboxes
       fields =>

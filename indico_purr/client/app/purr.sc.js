@@ -97,8 +97,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
     if (submitLoading) {
       const body = {
         settings: {
-          ...settings,
-          custom_fields: map(settings.custom_fields, field => field.id),
+          ...settings
         },
       };
 
