@@ -130,7 +130,7 @@ export function FinalProceedingsSettings({
                 rows={3}
                 onChange={onFieldChange}
               />
-              <div class="center icon-arrow-up instructions">
+              <div className='center icon-arrow-up instructions'>
                 You can use <b>Markdown</b>.
               </div>
             </Form.Field>
@@ -143,7 +143,7 @@ export function FinalProceedingsSettings({
                 rows={3}
                 onChange={onFieldChange}
               />
-              <div class="center icon-arrow-up instructions">
+              <div className='center icon-arrow-up instructions'>
                 You can use <b>Markdown</b>.
               </div>
             </Form.Field>
