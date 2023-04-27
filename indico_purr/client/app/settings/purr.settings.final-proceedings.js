@@ -219,13 +219,13 @@ export function FinalProceedingsSettings({
               <p>No file has been attached to this event.</p>
             ) : (
               <>
-                <Section sectionKey="logo" section={attachments.logo} />
+                <Section key='logo' sectionKey="logo" section={attachments.logo} />
                 <Divider />
-                <Section sectionKey="poster" section={attachments.poster} />
+                <Section key='poster' sectionKey="poster" section={attachments.poster} />
                 <Divider />
-                <Section sectionKey="volumes" section={attachments.volumes} />
+                <Section key='volumes' sectionKey="volumes" section={attachments.volumes} />
                 <Divider />
-                <Section sectionKey="attachments" section={attachments.attachments} />
+                <Section key='attachments' sectionKey="attachments" section={attachments.attachments} />
               </>
             )}
           </Accordion.Content>
@@ -236,20 +236,23 @@ export function FinalProceedingsSettings({
 }
 
 function Section({sectionKey, section}) {
+
+  // console.log({sectionKey, section})
+
   return isNil(section) ? (
     <p>No material found for {sectionKey}.</p>
   ) : (
     <Grid>
       {map(section, attachment => {
         return (
-          <Grid.Row columns={3} key={sectionKey}>
-            <Grid.Column key={section.filename}>
+          <Grid.Row columns={3} key={attachment.md5sum}>
+            <Grid.Column>
               <span>{attachment.title}</span>
             </Grid.Column>
-            <Grid.Column key={section.filename}>
+            <Grid.Column>
               <span>{attachment.filename}</span>
             </Grid.Column>
-            <Grid.Column key={section.filename}>
+            <Grid.Column>
               <span>{capitalize(attachment.section)}</span>
             </Grid.Column>
           </Grid.Row>

@@ -3,11 +3,12 @@ import { Button, Card, Icon } from 'semantic-ui-react'
 import { of, forkJoin, throwError } from 'rxjs';
 import { concatMap } from 'rxjs/operators';
 
-import { getSettings, openSocket, fetchJson, runPhase } from './purr.lib';
+import { downloadByUrl, openSocket, fetchJson, runPhase } from './purr.lib';
 
 
-export const PurrFinalProceedings = ({settings}) => {
+export const PurrFinalProceedings = ({ settings }) => {
     const [loading, setLoading] = useState(() => false);
+    const [progress, setProgress] = useState(() => 'Processing...');
 
     const onDownload = useCallback(() => setLoading(true), []);
 
@@ -17,8 +18,21 @@ export const PurrFinalProceedings = ({settings}) => {
             const [task_id, socket] = openSocket(settings);
 
             const actions = {
-                'task:progress': (head, body) => console.log(head, body),
-                'task:result': (head, body) => alert('end'),
+                'task:progress': (head, body) => {
+                    if (body?.params?.text) {
+                        console.log(body.params.text)
+                        setProgress(`${body.params.text}`)
+                    }
+                },
+                'task:result': (head, body) => {
+                    console.log(head, body)
+
+                    if (body?.params?.event_path) {
+                        downloadByUrl(
+                            new URL(`${body?.params?.event_path}.7z`, `${settings.api_url}`)
+                        )
+                    }
+                },
             };
 
             socket.subscribe({
@@ -97,7 +111,7 @@ export const PurrFinalProceedings = ({settings}) => {
                     {loading ? (
                         <div>
                             <Icon loading name='spinner' />
-                            Processing...
+                            {progress}
                         </div>
                     ) : (
                         <div>

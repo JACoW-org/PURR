@@ -125,6 +125,23 @@ export function download(body) {
   });
 }
 
+export function downloadByUrl(url, name) {
+  const a = document.body.appendChild(
+    Object.assign(document.createElement('a'), {
+      href: url,
+      download: true,
+      style: 'display:none',
+    })
+  );
+
+  a.dispatchEvent(new MouseEvent('click'));
+
+  setTimeout(() => {
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  });
+}
+
 export function log_data({head, body, store}) {
   if (head) store[head.uuid] = store[head.uuid] || {};
 

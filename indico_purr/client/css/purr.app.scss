@@ -74,7 +74,13 @@ a.purr-btn.disabled {
   }
 }
 
-
+.pdf-check-title {
+  width: 40rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
 
 .meter {
   box-sizing: content-box;

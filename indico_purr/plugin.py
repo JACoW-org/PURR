@@ -10,15 +10,15 @@ from indico_purr.blueprint import blueprint
 
 
 class PurrPlugin(IndicoPlugin):
-    """PURR"""
+    """ PURR """
 
     configurable = False
     default_event_settings = {
         'connected': False,
         'api_url': '',
         'api_key': '',
-        'pdf_page_width': 0.1,
-        'pdf_page_height': 0.1,
+        'pdf_page_width': 595.0,
+        'pdf_page_height': 791.0,
         'custom_fields': [],
         'ab_session_h1': '{code} - {title}',
         'ab_session_h2': '{start} / {end}',
@@ -37,7 +37,9 @@ class PurrPlugin(IndicoPlugin):
         'doi_user': 'Insert DOI user',
         'doi_password': 'Insert password',
         'date': 'Insert event date',
-        'primary_color': '#F39433'
+        
+        'primary_color': '#F39433',
+        'site_base_url': 'http://127.0.0.1:8080/fel2022/'
     }
 
     def init(self):
