@@ -51,7 +51,8 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             return jsonify(
                 {
                     "method": request.method,
-                    "settings": dict(**get_purr_settings(self.event), contribution_fields=contribution_fields),
+                    "settings": dict(**get_purr_settings(self.event),
+                                     contribution_fields=contribution_fields),
                     "is_valid": True
                 }
             )

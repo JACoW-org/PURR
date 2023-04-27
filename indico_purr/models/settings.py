@@ -1,5 +1,3 @@
-import re
-
 from dataclasses import dataclass, field, asdict
 
 @dataclass
@@ -27,6 +25,7 @@ class PurrSettings:
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')
+    site_base_url: str = field(default='//accelconf.web.cern.ch') 
 
     def as_dict(self):
         return asdict(self)
@@ -53,77 +52,82 @@ class PurrSettings:
         self._validate_doi_user(errors)
         self._validate_doi_password(errors)
         self._validate_primary_color(errors)
+        self._validate_site_base_url(errors)
 
         return errors
     
-    def _required_validator(self, key, value, errors: dict):
+    def _required_validator(self, key, value, errors):
         if value == None or value == '':
             errors[key] = 'error:required'
         
-    def _format_validator(key, value, regex):
+    def _format_validator(self, key, value, regex):
         pass
     
-    def _validate_ab_session_h1(self, errors: dict):
+    def _validate_ab_session_h1(self, errors):
         self._required_validator('ab_session_h1', self.ab_session_h1, errors)
         
-    def _validate_ab_session_h2(self, errors: dict):
+    def _validate_ab_session_h2(self, errors):
         self._required_validator('ab_session_h2', self.ab_session_h2, errors)
         
-    def _validate_ab_contribution_h1(self, errors: dict):
+    def _validate_ab_contribution_h1(self, errors):
         self._required_validator('ab_contribution_h1', self.ab_contribution_h1, errors)
         
-    def _validate_ab_contribution_h2(self, errors: dict):
+    def _validate_ab_contribution_h2(self, errors):
         self._required_validator('ab_contribution_h2', self.ab_contribution_h2, errors)
 
-    def _validate_pdf_page_height(self, errors: dict):
+    def _validate_pdf_page_height(self, errors):
         self._required_validator('pdf_page_height', self.pdf_page_height, errors)
 
-    def _validate_pdf_page_width(self, errors: dict):
+    def _validate_pdf_page_width(self, errors):
         self._required_validator('pdf_page_width', self.pdf_page_width, errors)
 
-    def _validate_date(self, errors: dict):
+    def _validate_date(self, errors):
         self._required_validator('date', self.date, errors)
 
-    def _validate_isbn(self, errors: dict):
+    def _validate_isbn(self, errors):
         self._required_validator('isbn', self.isbn, errors)
 
         # TODO use isbnlib to validate if ISBN-10 or ISBN-13
 
-    def _validate_issn(self, errors: dict):
+    def _validate_issn(self, errors):
         self._required_validator('issn', self.issn, errors)
 
         # if re.search(r'[\S]{4}\-[\S]{4}', self.issn) == None:
         #     errors['issn'] = 'error:issn-format'
         
-    def _validate_booktitle_short(self, errors: dict):
+    def _validate_booktitle_short(self, errors):
         self._required_validator('booktitle_short', self.booktitle_short, errors)
 
-    def _validate_booktitle_long(self, errors: dict):
+    def _validate_booktitle_long(self, errors):
         self._required_validator('booktitle_long', self.booktitle_long, errors)
         
-    def _validate_series(self, errors: dict):
+    def _validate_series(self, errors):
         self._required_validator('series', self.series, errors)
 
-    def _validate_series_number(self, errors: dict):
+    def _validate_series_number(self, errors):
         self._required_validator('series_number', self.series_number, errors)
 
-    def _validate_location(self, errors: dict):
+    def _validate_location(self, errors):
         self._required_validator('location', self.location, errors)
 
-    def _validate_host_info(self, errors: dict):
+    def _validate_host_info(self, errors):
         self._required_validator('host_info', self.host_info, errors)
 
-    def _validate_editorial_board(self, errors: dict):
+    def _validate_editorial_board(self, errors):
         self._required_validator('editorial_board', self.editorial_board, errors)
 
-    def _validate_doi_base_url(self, errors: dict):
+    def _validate_doi_base_url(self, errors):
         self._required_validator('doi_base_url', self.doi_base_url, errors)
 
-    def _validate_doi_user(self, errors: dict):
+    def _validate_doi_user(self, errors):
         self._required_validator('doi_user', self.doi_user, errors)
 
-    def _validate_doi_password(self, errors: dict):
+    def _validate_doi_password(self, errors):
         self._required_validator('doi_password', self.doi_password, errors)
 
-    def _validate_primary_color(self, errors: dict):
+    def _validate_primary_color(self, errors):
         self._required_validator('primary_color', self.primary_color, errors)
+        
+    def _validate_site_base_url(self, errors):
+        self._required_validator('site_base_url', self.site_base_url, errors)
+    

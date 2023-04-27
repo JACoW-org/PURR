@@ -39,7 +39,7 @@ class PurrPlugin(IndicoPlugin):
         'date': 'Insert event date',
         
         'primary_color': '#F39433',
-        'site_base_url': 'http://127.0.0.1:8080/fel2022/'
+        'site_base_url': '//accelconf.web.cern.ch'
     }
 
     def init(self):

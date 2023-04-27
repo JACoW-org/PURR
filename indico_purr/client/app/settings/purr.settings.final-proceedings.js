@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react';
-import {Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
-import {capitalize, has, isEmpty, isNil, map} from 'lodash';
+import React, { useCallback, useState } from 'react';
+import { Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea } from 'semantic-ui-react';
+import { capitalize, has, isEmpty, isNil, map } from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -12,7 +12,7 @@ export function FinalProceedingsSettings({
 
   const onClick = useCallback(
     (e, titleProps) => {
-      const {index} = titleProps;
+      const { index } = titleProps;
       setActiveIndex(activeIndex === index ? -1 : index);
     },
     [activeIndex]
@@ -52,6 +52,7 @@ export function FinalProceedingsSettings({
                 />
               </Form.Field>
             </Form.Group>
+
             <Form.Field error={hasError('booktitle_long')} width="16">
               <label>Booktitle long</label>
               <Input
@@ -61,15 +62,29 @@ export function FinalProceedingsSettings({
                 onChange={onFieldChange}
               />
             </Form.Field>
-            <Form.Field error={hasError('location')} width="16">
-              <label>Location</label>
-              <Input
-                name="location"
-                value={finalProcSettings.location || ''}
-                placeholder="Insert location"
-                onChange={onFieldChange}
-              />
-            </Form.Field>
+
+            <Form.Group>
+              <Form.Field error={hasError('location')} width="8">
+                <label>Location</label>
+                <Input
+                  name="location"
+                  value={finalProcSettings.location || ''}
+                  placeholder="Insert location"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+
+              <Form.Field error={hasError('site_base_url')} width="8">
+                <label>Site base URL</label>
+                <Input
+                  name="site_base_url"
+                  value={finalProcSettings.site_base_url || ''}
+                  placeholder="Insert location"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+
             <Form.Group>
               <Form.Field error={hasError('series')} width="12">
                 <label>Series</label>
@@ -78,7 +93,7 @@ export function FinalProceedingsSettings({
                   name="series"
                   value={finalProcSettings.series || ''}
                   placeholder="Insert series"
-                  label={{icon: 'asterisk'}}
+                  label={{ icon: 'asterisk' }}
                   labelPosition="right corner"
                   onChange={onFieldChange}
                 />
@@ -90,7 +105,7 @@ export function FinalProceedingsSettings({
                   name="series_number"
                   value={finalProcSettings.series_number || ''}
                   placeholder="Insert series number"
-                  label={{icon: 'asterisk'}}
+                  label={{ icon: 'asterisk' }}
                   labelPosition="right corner"
                   onChange={onFieldChange}
                 />
@@ -103,6 +118,18 @@ export function FinalProceedingsSettings({
             Extra
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 1}>
+            <Form.Field error={hasError('primary_color')} width="16">
+              <label>Primary color</label>
+              <Input
+                fluid
+                name="primary_color"
+                value={finalProcSettings.primary_color || ''}
+                placeholder="Primary color"
+                label={{ icon: 'asterisk' }}
+                labelPosition="right corner"
+                onChange={onFieldChange}
+              />
+            </Form.Field>
             <Form.Field error={hasError('host_info')} width="16">
               <label>Host info</label>
               <TextArea
@@ -137,7 +164,7 @@ export function FinalProceedingsSettings({
                   name="isbn"
                   value={finalProcSettings.isbn || ''}
                   placeholder="Insert ISBN"
-                  label={{icon: 'asterisk'}}
+                  label={{ icon: 'asterisk' }}
                   labelPosition="right corner"
                   onChange={onFieldChange}
                 />
@@ -148,7 +175,7 @@ export function FinalProceedingsSettings({
                   name="issn"
                   value={finalProcSettings.issn || ''}
                   placeholder="Insert ISSN"
-                  label={{icon: 'asterisk'}}
+                  label={{ icon: 'asterisk' }}
                   labelPosition="right corner"
                   onChange={onFieldChange}
                 />
@@ -168,7 +195,7 @@ export function FinalProceedingsSettings({
                 name="doi_base_url"
                 value={finalProcSettings.doi_base_url || ''}
                 placeholder="Insert DOI Base URL"
-                label={{icon: 'asterisk'}}
+                label={{ icon: 'asterisk' }}
                 labelPosition="right corner"
                 onChange={onFieldChange}
               />
@@ -235,7 +262,7 @@ export function FinalProceedingsSettings({
   );
 }
 
-function Section({sectionKey, section}) {
+function Section({ sectionKey, section }) {
 
   // console.log({sectionKey, section})
 
