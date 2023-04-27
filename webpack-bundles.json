@@ -1,6 +1,6 @@
 {
   "entry": {
-    "script": "./app/jpsp-ng.app.js",
-    "style": "./css/jpsp-ng.app.scss"
+    "script": "./app/purr.app.js",
+    "style": "./css/purr.app.scss"
   }
 }

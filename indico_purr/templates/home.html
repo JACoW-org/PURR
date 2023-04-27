@@ -1,0 +1,15 @@
+{% extends "events/management/base.html" %}
+
+{% block title %}
+    {% trans %}PURR{% endtrans %}
+{% endblock title %}
+
+{% block content %}
+    {{ template_hook('event-actions', event=event) }}
+
+    {% if connected %}
+        <script id="purr-settings" type="application/json">{{ settings | tojson }}</script>
+    {% endif %}
+
+    <div id="purr-spa"></div>
+{% endblock %}
