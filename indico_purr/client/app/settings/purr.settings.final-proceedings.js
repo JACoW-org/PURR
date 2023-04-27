@@ -245,7 +245,7 @@ function Section({sectionKey, section}) {
     <Grid>
       {map(section, attachment => {
         return (
-          <Grid.Row columns={3} key={attachment.md5sum}>
+          <Grid.Row columns={3} key={attachment.filename}>
             <Grid.Column>
               <span>{attachment.title}</span>
             </Grid.Column>
