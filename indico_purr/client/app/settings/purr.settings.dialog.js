@@ -23,6 +23,8 @@ export function SettingsDialog({settings, attachments, errors, open, setOpen, on
   const defaultFinalProcSettings = pick(settings, [
     'isbn',
     'issn',
+    'primary_color',
+    'site_base_url',
     'booktitle_short',
     'booktitle_long',
     'series',
@@ -102,9 +104,9 @@ export function SettingsDialog({settings, attachments, errors, open, setOpen, on
   };
 
   return (
-    <Modal open={open} onClose={onDialogClose}>
+    <Modal size='large' open={open} onClose={onDialogClose}>
       <Modal.Header>Settings</Modal.Header>
-      <Modal.Content>
+      <Modal.Content scrolling>
         {loading ? (
           <div>
             <Icon loading name="spinner" />

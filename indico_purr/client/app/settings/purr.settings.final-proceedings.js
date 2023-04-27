@@ -89,24 +89,18 @@ export function FinalProceedingsSettings({
               <Form.Field error={hasError('series')} width="12">
                 <label>Series</label>
                 <Input
-                  fluid
                   name="series"
                   value={finalProcSettings.series || ''}
                   placeholder="Insert series"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition="right corner"
                   onChange={onFieldChange}
                 />
               </Form.Field>
               <Form.Field error={hasError('series_number')} width="4">
                 <label>Series number</label>
                 <Input
-                  fluid
                   name="series_number"
                   value={finalProcSettings.series_number || ''}
                   placeholder="Insert series number"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition="right corner"
                   onChange={onFieldChange}
                 />
               </Form.Field>
@@ -121,12 +115,9 @@ export function FinalProceedingsSettings({
             <Form.Field error={hasError('primary_color')} width="16">
               <label>Primary color</label>
               <Input
-                fluid
                 name="primary_color"
                 value={finalProcSettings.primary_color || ''}
                 placeholder="Primary color"
-                label={{ icon: 'asterisk' }}
-                labelPosition="right corner"
                 onChange={onFieldChange}
               />
             </Form.Field>
@@ -139,6 +130,9 @@ export function FinalProceedingsSettings({
                 rows={3}
                 onChange={onFieldChange}
               />
+              <div class="center icon-arrow-up instructions">
+                You can use <b>Markdown</b>.
+              </div>
             </Form.Field>
             <Form.Field error={hasError('editorial_board')} width="16">
               <label>Editorial Board</label>
@@ -149,6 +143,9 @@ export function FinalProceedingsSettings({
                 rows={3}
                 onChange={onFieldChange}
               />
+              <div class="center icon-arrow-up instructions">
+                You can use <b>Markdown</b>.
+              </div>
             </Form.Field>
           </Accordion.Content>
 
@@ -164,8 +161,6 @@ export function FinalProceedingsSettings({
                   name="isbn"
                   value={finalProcSettings.isbn || ''}
                   placeholder="Insert ISBN"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition="right corner"
                   onChange={onFieldChange}
                 />
               </Form.Field>
@@ -175,8 +170,6 @@ export function FinalProceedingsSettings({
                   name="issn"
                   value={finalProcSettings.issn || ''}
                   placeholder="Insert ISSN"
-                  label={{ icon: 'asterisk' }}
-                  labelPosition="right corner"
                   onChange={onFieldChange}
                 />
               </Form.Field>
@@ -195,8 +188,6 @@ export function FinalProceedingsSettings({
                 name="doi_base_url"
                 value={finalProcSettings.doi_base_url || ''}
                 placeholder="Insert DOI Base URL"
-                label={{ icon: 'asterisk' }}
-                labelPosition="right corner"
                 onChange={onFieldChange}
               />
             </Form.Field>
