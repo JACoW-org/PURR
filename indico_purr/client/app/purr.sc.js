@@ -1,12 +1,13 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {isNil} from 'lodash';
-import {catchError, filter, finalize, of, tap} from 'rxjs';
+import {catchError, filter, finalize, of, switchMap, tap} from 'rxjs';
 import {Button, Card, Icon} from 'semantic-ui-react';
 import {connect, disconnect, fetchSettingsAndAttachements, saveSettings} from './api/purr.api';
 import {ConnectDialog} from './connect/purr.connect.dialog';
 
 import {SettingsDialog} from './settings/purr.settings.dialog';
 import {buildAttachments} from './utils/purr.utils';
+import {PurrErrorAlert} from './purr.error.alert';
 
 export const PurrSettingsCard = ({
   settings,
@@ -24,6 +25,10 @@ export const PurrSettingsCard = ({
   const [connection, setConnection] = useState({});
   const [connDialogOpen, setConnDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState(() => {});
+  const [settingsErrorMessage, setSettingsErrorMessage] = useState(null);
+  const [connErrorMessage, setConnErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [showError, setShowError] = useState(false);
 
   const onClose = useCallback(() => setOpen(false), []);
   const onDialogOpen = useCallback(() => setSettingsLoading(true));
@@ -36,19 +41,21 @@ export const PurrSettingsCard = ({
 
   useEffect(() => {
     if (connecting) {
-      const sub$ = connect({connection})
+      const sub$ = of(null)
         .pipe(
+          tap(() => setConnErrorMessage(null)),
+          switchMap(() => connect({connection})),
           catchError(error => {
-            console.log(error); // TODO display error
+            setConnErrorMessage('Could not connect to plugin.');
             return of(null);
           }),
           filter(connectResult => !isNil(connectResult)),
           tap(connectResult => {
             if (connectResult.connectionOk) {
-              // chiudi modale
+              // close modal
               setConnDialogOpen(false);
               setSettings(connectResult.settings);
-              setSettingsValid(connectResult.settingsValid)
+              setSettingsValid(connectResult.settingsValid);
               setFormErrors({});
               setConnected(true);
             } else {
@@ -66,15 +73,17 @@ export const PurrSettingsCard = ({
       const sub$ = disconnect()
         .pipe(
           catchError(error => {
-            console.log(error); // TODO display error
-            return of(true);
+            setErrorMessage('Could not disconnect from plugin.');
+            setShowError(true);
+            return of(null);
           }),
+          filter(result => !isNil(result)),
           tap(() => {
             setConnected(false);
             setSettings({});
             setConnection({});
-            setDisconnecting(false);
-          })
+          }),
+          finalize(() => setDisconnecting(false))
         )
         .subscribe();
 
@@ -85,15 +94,17 @@ export const PurrSettingsCard = ({
       const sub$ = fetchSettingsAndAttachements()
         .pipe(
           catchError(error => {
-            console.log(error); // TODO display error
-            return of(true);
+            setErrorMessage('Could not fetch settings.');
+            setShowError(true);
+            return of(null);
           }),
+          filter(result => !isNil(result)),
           tap(result => {
             setSettings(result.settings);
             setAttachments(buildAttachments(result.attachments));
             setOpen(true);
-            setSettingsLoading(false);
-          })
+          }),
+          finalize(() => setSettingsLoading(false))
         )
         .subscribe();
 
@@ -107,14 +118,16 @@ export const PurrSettingsCard = ({
         },
       };
 
-      const sub$ = saveSettings(body)
+      const sub$ = of(null)
         .pipe(
+          tap(() => setSettingsErrorMessage(null)),
+          switchMap(() => saveSettings(body)),
           catchError(error => {
-            console.log(error);
-            return of(true);
-          }), // TODO show error
+            setSettingsErrorMessage('Something occured while attempting to save the settings!');
+            return of(null);
+          }),
+          filter(result => !isNil(result)),
           tap(result => {
-            setSubmitLoading(false);
             if (result.is_valid) {
               setOpen(false);
               setSettings(result.settings);
@@ -123,7 +136,8 @@ export const PurrSettingsCard = ({
             } else {
               setFormErrors(result.errors);
             }
-          })
+          }),
+          finalize(() => setSubmitLoading(false))
         )
         .subscribe();
 
@@ -196,6 +210,7 @@ export const PurrSettingsCard = ({
                   loading={connecting}
                   onClose={() => setConnDialogOpen(false)}
                   errors={formErrors}
+                  errorMessage={connErrorMessage}
                 />
               </>
             )}
@@ -211,7 +226,13 @@ export const PurrSettingsCard = ({
         onSubmit={onSubmit}
         loading={submitLoading}
         errors={formErrors}
+        errorMessage={settingsErrorMessage}
       />
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
     </>
   );
 };

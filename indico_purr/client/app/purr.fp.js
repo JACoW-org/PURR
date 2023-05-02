@@ -4,10 +4,13 @@ import {of, forkJoin, throwError} from 'rxjs';
 import {concatMap} from 'rxjs/operators';
 
 import {downloadByUrl, openSocket, fetchJson, runPhase} from './purr.lib';
+import {PurrErrorAlert} from './purr.error.alert';
 
 export const PurrFinalProceedings = ({settings, settingsValid}) => {
   const [loading, setLoading] = useState(() => false);
   const [progress, setProgress] = useState(() => 'Processing...');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [showError, setShowError] = useState(false);
 
   const onDownload = useCallback(() => setLoading(true), []);
 
@@ -36,6 +39,9 @@ export const PurrFinalProceedings = ({settings, settingsValid}) => {
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
+          // TODO based on the error, build a map of error messages to display
+          setErrorMessage('Error while generating final proceedings.');
+          setShowError(true);
           setLoading(false);
         },
       });
@@ -83,39 +89,46 @@ export const PurrFinalProceedings = ({settings, settingsValid}) => {
   }, [settings, loading]);
 
   return (
-    <Card fluid>
-      <Card.Content>
-        <Card.Header>Final Proceedings</Card.Header>
-        <Card.Meta>Click "Generate" button to download Final Proceedings</Card.Meta>
-      </Card.Content>
+    <>
+      <Card fluid>
+        <Card.Content>
+          <Card.Header>Final Proceedings</Card.Header>
+          <Card.Meta>Click "Generate" button to download Final Proceedings</Card.Meta>
+        </Card.Content>
 
-      <Card.Content extra>
-        <div className="ui left">
-          {loading ? (
-            <div>
-              <Icon loading name="spinner" />
-              {progress}
-            </div>
-          ) : (
-            <div>
-              <Icon name="plug" />
-              Ready.
-            </div>
-          )}
-        </div>
-        <div className="ui right">
-          <Button
-            onClick={onDownload}
-            loading={loading}
-            disabled={loading || !settingsValid}
-            primary
-            compact
-            size="mini"
-            icon="right chevron"
-            content="Download"
-          />
-        </div>
-      </Card.Content>
-    </Card>
+        <Card.Content extra>
+          <div className="ui left">
+            {loading ? (
+              <div>
+                <Icon loading name="spinner" />
+                {progress}
+              </div>
+            ) : (
+              <div>
+                <Icon name="plug" />
+                Ready.
+              </div>
+            )}
+          </div>
+          <div className="ui right">
+            <Button
+              onClick={onDownload}
+              loading={loading}
+              disabled={loading || !settingsValid}
+              primary
+              compact
+              size="mini"
+              icon="right chevron"
+              content="Download"
+            />
+          </div>
+        </Card.Content>
+      </Card>
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
+    </>
   );
 };

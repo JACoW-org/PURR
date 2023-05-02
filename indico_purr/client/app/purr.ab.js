@@ -4,9 +4,12 @@ import {of, forkJoin, throwError} from 'rxjs';
 import {concatMap} from 'rxjs/operators';
 
 import {download, openSocket, fetchJson, runPhase} from './purr.lib';
+import { PurrErrorAlert } from './purr.error.alert';
 
 export const PurrAbstractBooklet = ({settings, settingsValid}) => {
   const [loading, setLoading] = useState(() => false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [showError, setShowError] = useState(false);
 
   const onDownload = useCallback(() => setLoading(true), []);
 
@@ -24,6 +27,8 @@ export const PurrAbstractBooklet = ({settings, settingsValid}) => {
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
+          setErrorMessage('Error while generating the abstract booklet.');
+          setShowError(true);
           setLoading(false);
         },
       });
@@ -71,39 +76,46 @@ export const PurrAbstractBooklet = ({settings, settingsValid}) => {
   }, [settings, loading]);
 
   return (
-    <Card fluid>
-      <Card.Content>
-        <Card.Header>Abstract Booklet</Card.Header>
-        <Card.Meta>Click "Download" button to download the Abstract Booklet document.</Card.Meta>
-      </Card.Content>
+    <>
+      <Card fluid>
+        <Card.Content>
+          <Card.Header>Abstract Booklet</Card.Header>
+          <Card.Meta>Click "Download" button to download the Abstract Booklet document.</Card.Meta>
+        </Card.Content>
 
-      <Card.Content extra>
-        <div className="ui left">
-          {loading ? (
-            <div>
-              <Icon loading name="spinner" />
-              Processing...
-            </div>
-          ) : (
-            <div>
-              <Icon name="plug" />
-              Ready.
-            </div>
-          )}
-        </div>
-        <div className="ui right">
-          <Button
-            onClick={onDownload}
-            loading={loading}
-            disabled={loading || !settingsValid}
-            primary
-            compact
-            size="mini"
-            icon="right chevron"
-            content="Download"
-          />
-        </div>
-      </Card.Content>
-    </Card>
+        <Card.Content extra>
+          <div className="ui left">
+            {loading ? (
+              <div>
+                <Icon loading name="spinner" />
+                Processing...
+              </div>
+            ) : (
+              <div>
+                <Icon name="plug" />
+                Ready.
+              </div>
+            )}
+          </div>
+          <div className="ui right">
+            <Button
+              onClick={onDownload}
+              loading={loading}
+              disabled={loading || !settingsValid}
+              primary
+              compact
+              size="mini"
+              icon="right chevron"
+              content="Download"
+            />
+          </div>
+        </Card.Content>
+      </Card>
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
+    </>
   );
 };

@@ -1,6 +1,7 @@
 import {has} from 'lodash';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Button, Form, Icon, Input, Modal} from 'semantic-ui-react';
+import {PurrErrorAlert} from '../purr.error.alert';
 
 export function ConnectDialog({
   connection,
@@ -10,7 +11,10 @@ export function ConnectDialog({
   onClose,
   loading,
   errors,
+  errorMessage
 }) {
+  const [showError, setShowError] = useState(false);
+
   const onFieldChange = (e, field) => setConnection({...connection, [field.name]: field.value});
 
   const hasError = useCallback(fieldName => has(errors, fieldName), [errors]);
@@ -51,6 +55,11 @@ export function ConnectDialog({
         <Button content="Cancel" onClick={onClose} secondary />
         <Button content="Save" onClick={onConnect} primary />
       </Modal.Actions>
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
     </Modal>
   );
 }

@@ -5,11 +5,14 @@ import {size, map, isNil} from 'lodash';
 import {concatMap} from 'rxjs/operators';
 
 import {openSocket, fetchJson, runPhase} from './purr.lib';
+import { PurrErrorAlert } from './purr.error.alert';
 
 export const PurrPapersChecks = ({settings, settingsValid}) => {
   const [errors, setErrors] = useState(() => undefined);
   const [loading, setLoading] = useState(() => false);
   const [progress, setProgress] = useState(() => 'Processing...');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [showError, setShowError] = useState(false);
 
   const onCheck = useCallback(() => setLoading(true), []);
 
@@ -45,6 +48,8 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
+          setErrorMessage('Error while generating final proceedings.');
+          setShowError(true);
           setLoading(false);
         },
       });
@@ -128,6 +133,11 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
           </div>
         </Card.Content>
       </Card>
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
 
       {errors ? (
         <Modal size="large" open={!isNil(errors)} onClose={() => setErrors(undefined)}>

@@ -148,3 +148,12 @@ a.purr-btn.disabled {
     background-position: 50px 50px;
   }
 }
+
+.error-alert .header {
+  background-color: #FFF6F6 !important;
+  color: #CC0000 !important;
+}
+
+.error-alert .content, .error-alert .actions {
+  background-color: #FFF6F6 !important;
+}
