@@ -2,18 +2,19 @@ import React, {useState, useEffect, useCallback} from 'react';
 import {isNil} from 'lodash';
 import {catchError, filter, finalize, of, tap} from 'rxjs';
 import {Button, Card, Icon} from 'semantic-ui-react';
-import {
-  connect,
-  disconnect,
-  fetchSettingsAndAttachements,
-  saveSettings,
-} from './api/purr.api';
+import {connect, disconnect, fetchSettingsAndAttachements, saveSettings} from './api/purr.api';
 import {ConnectDialog} from './connect/purr.connect.dialog';
 
 import {SettingsDialog} from './settings/purr.settings.dialog';
-import { buildAttachments } from './utils/purr.utils';
+import {buildAttachments} from './utils/purr.utils';
 
-export const PurrSettingsCard = ({settings, setSettings, connected, setConnected}) => {
+export const PurrSettingsCard = ({
+  settings,
+  setSettings,
+  connected,
+  setConnected,
+  setSettingsValid,
+}) => {
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -43,10 +44,11 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
           }),
           filter(connectResult => !isNil(connectResult)),
           tap(connectResult => {
-            if (connectResult.is_valid) {
+            if (connectResult.connectionOk) {
               // chiudi modale
               setConnDialogOpen(false);
               setSettings(settings);
+              setSettingsValid(connectResult.settingsValid)
               setFormErrors({});
               setConnected(true);
             } else {
@@ -116,6 +118,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
             if (result.is_valid) {
               setOpen(false);
               setSettings(result.settings);
+              setSettingsValid(true);
               // TODO show success card
             } else {
               setFormErrors(result.errors);

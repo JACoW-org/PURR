@@ -11,6 +11,7 @@ from indico_purr import _
 from indico_purr.utils import get_purr_settings, set_purr_settings
 
 from indico_purr.models.connection import PurrConnection
+from indico_purr.models.settings import PurrSettings
 
 
 class RHPurrConnectPage(RHManageEventBase):
@@ -25,7 +26,7 @@ class RHPurrConnectPage(RHManageEventBase):
         errors = connection.validate()
         if errors:
             return jsonify({
-                "is_valid": False,
+                "connection_ok": False,
                 "errors": errors
             })
 
@@ -39,9 +40,36 @@ class RHPurrConnectPage(RHManageEventBase):
             session.user,
         )
 
-        return jsonify(
-            {
-                "settings": get_purr_settings(self.event),
-                "is_valid": True
-            }
+        settings = get_purr_settings(self.event)
+        purr_settings = PurrSettings(
+            ab_session_h1=settings.get("ab_session_h1"),
+            ab_session_h2=settings.get("ab_session_h2"),
+            ab_contribution_h1=settings.get("ab_contribution_h1"),
+            ab_contribution_h2=settings.get("ab_contribution_h2"),
+            custom_fields=settings.get("custom_fields"),
+            pdf_page_height=settings.get("pdf_page_height"),
+            pdf_page_width=settings.get("pdf_page_width"),
+            date=settings.get("date"),
+            isbn=settings.get("isbn"),
+            issn=settings.get("date"),
+            booktitle_short=settings.get("booktitle_short"),
+            booktitle_long=settings.get("booktitle_long"),
+            series=settings.get("series"),
+            series_number=settings.get("series_number"),
+            location=settings.get("location"),
+            host_info=settings.get("host_info"),
+            editorial_board=settings.get("editorial_board"),
+            doi_base_url=settings.get("doi_base_url"),
+            doi_user=settings.get("doi_user"),
+            doi_password=settings.get("doi_password"),
+            primary_color=settings.get("primary_color"),
+            site_base_url=settings.get("site_base_url")
         )
+
+        errors = purr_settings.validate()
+
+        return jsonify({
+            "settings": settings,
+            "connection_ok": True,
+            "settings_valid": False if errors else True,
+        })
