@@ -47,7 +47,7 @@ export const PurrSettingsCard = ({
             if (connectResult.connectionOk) {
               // chiudi modale
               setConnDialogOpen(false);
-              setSettings(settings);
+              setSettings(connectResult.settings);
               setSettingsValid(connectResult.settingsValid)
               setFormErrors({});
               setConnected(true);
