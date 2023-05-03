@@ -1,19 +1,21 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {isNil} from 'lodash';
-import {catchError, filter, finalize, of, tap} from 'rxjs';
+import {catchError, filter, finalize, of, switchMap, tap} from 'rxjs';
 import {Button, Card, Icon} from 'semantic-ui-react';
-import {
-  connect,
-  disconnect,
-  fetchSettingsAndAttachements,
-  saveSettings,
-} from './api/purr.api';
+import {connect, disconnect, fetchSettingsAndAttachements, saveSettings} from './api/purr.api';
 import {ConnectDialog} from './connect/purr.connect.dialog';
 
 import {SettingsDialog} from './settings/purr.settings.dialog';
-import { buildAttachments } from './utils/purr.utils';
+import {buildAttachments} from './utils/purr.utils';
+import {PurrErrorAlert} from './purr.error.alert';
 
-export const PurrSettingsCard = ({settings, setSettings, connected, setConnected}) => {
+export const PurrSettingsCard = ({
+  settings,
+  setSettings,
+  connected,
+  setConnected,
+  setSettingsValid,
+}) => {
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
@@ -23,6 +25,10 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
   const [connection, setConnection] = useState({});
   const [connDialogOpen, setConnDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState(() => {});
+  const [settingsErrorMessage, setSettingsErrorMessage] = useState(null);
+  const [connErrorMessage, setConnErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [showError, setShowError] = useState(false);
 
   const onClose = useCallback(() => setOpen(false), []);
   const onDialogOpen = useCallback(() => setSettingsLoading(true));
@@ -35,18 +41,21 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
 
   useEffect(() => {
     if (connecting) {
-      const sub$ = connect({connection})
+      const sub$ = of(null)
         .pipe(
+          tap(() => setConnErrorMessage(null)),
+          switchMap(() => connect({connection})),
           catchError(error => {
-            console.log(error); // TODO display error
+            setConnErrorMessage('Could not connect to plugin.');
             return of(null);
           }),
           filter(connectResult => !isNil(connectResult)),
           tap(connectResult => {
-            if (connectResult.is_valid) {
-              // chiudi modale
+            if (connectResult.connectionOk) {
+              // close modal
               setConnDialogOpen(false);
-              setSettings(settings);
+              setSettings(connectResult.settings);
+              setSettingsValid(connectResult.settingsValid);
               setFormErrors({});
               setConnected(true);
             } else {
@@ -64,15 +73,17 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
       const sub$ = disconnect()
         .pipe(
           catchError(error => {
-            console.log(error); // TODO display error
-            return of(true);
+            setErrorMessage('Could not disconnect from plugin.');
+            setShowError(true);
+            return of(null);
           }),
+          filter(result => !isNil(result)),
           tap(() => {
             setConnected(false);
             setSettings({});
             setConnection({});
-            setDisconnecting(false);
-          })
+          }),
+          finalize(() => setDisconnecting(false))
         )
         .subscribe();
 
@@ -83,15 +94,17 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
       const sub$ = fetchSettingsAndAttachements()
         .pipe(
           catchError(error => {
-            console.log(error); // TODO display error
-            return of(true);
+            setErrorMessage('Could not fetch settings.');
+            setShowError(true);
+            return of(null);
           }),
+          filter(result => !isNil(result)),
           tap(result => {
             setSettings(result.settings);
             setAttachments(buildAttachments(result.attachments));
             setOpen(true);
-            setSettingsLoading(false);
-          })
+          }),
+          finalize(() => setSettingsLoading(false))
         )
         .subscribe();
 
@@ -105,22 +118,26 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
         },
       };
 
-      const sub$ = saveSettings(body)
+      const sub$ = of(null)
         .pipe(
+          tap(() => setSettingsErrorMessage(null)),
+          switchMap(() => saveSettings(body)),
           catchError(error => {
-            console.log(error);
-            return of(true);
-          }), // TODO show error
+            setSettingsErrorMessage('Something occured while attempting to save the settings!');
+            return of(null);
+          }),
+          filter(result => !isNil(result)),
           tap(result => {
-            setSubmitLoading(false);
             if (result.is_valid) {
               setOpen(false);
               setSettings(result.settings);
+              setSettingsValid(true);
               // TODO show success card
             } else {
               setFormErrors(result.errors);
             }
-          })
+          }),
+          finalize(() => setSubmitLoading(false))
         )
         .subscribe();
 
@@ -193,6 +210,7 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
                   loading={connecting}
                   onClose={() => setConnDialogOpen(false)}
                   errors={formErrors}
+                  errorMessage={connErrorMessage}
                 />
               </>
             )}
@@ -208,7 +226,13 @@ export const PurrSettingsCard = ({settings, setSettings, connected, setConnected
         onSubmit={onSubmit}
         loading={submitLoading}
         errors={formErrors}
+        errorMessage={settingsErrorMessage}
       />
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
     </>
   );
 };

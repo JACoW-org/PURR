@@ -1,14 +1,35 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {useState} from 'react';
 import {Button, Icon, Modal, Tab} from 'semantic-ui-react';
-import {pick} from 'lodash';
+import {isEmpty, pick} from 'lodash';
 
 import {AbstractBookletSettings} from './purr.settings.abstract-booklet';
 import {FinalProceedingsSettings} from './purr.settings.final-proceedings';
 import {PDFCheckSettings} from './purr.settings.pdf-check';
+import {PurrErrorAlert} from '../purr.error.alert';
 
-export function SettingsDialog({settings, attachments, errors, open, setOpen, onSubmit, loading}) {
-  // TODO refactor as const array
+export function SettingsDialog({
+  settings,
+  attachments,
+  errors,
+  open,
+  setOpen,
+  onSubmit,
+  loading,
+  errorMessage,
+}) {
+  const [showError, setShowError] = useState(false);
+
+  useEffect(() => {
+
+    if (isEmpty(errorMessage)) {
+      // no error --> don't display any error
+      return;
+    }
+
+    setShowError(true);
+  }, [errorMessage]);
+
   const defaultABSettings = pick(settings, [
     'ab_contribution_h1',
     'ab_contribution_h2',
@@ -35,7 +56,7 @@ export function SettingsDialog({settings, attachments, errors, open, setOpen, on
     'doi_base_url',
     'doi_user',
     'doi_password',
-    'date'
+    'date',
   ]);
 
   const [abSettings, setABSettings] = useState(() => defaultABSettings);
@@ -104,7 +125,7 @@ export function SettingsDialog({settings, attachments, errors, open, setOpen, on
   };
 
   return (
-    <Modal size='large' open={open} onClose={onDialogClose}>
+    <Modal size="large" open={open} onClose={onDialogClose}>
       <Modal.Header>Settings</Modal.Header>
       <Modal.Content scrolling>
         {loading ? (
@@ -120,6 +141,11 @@ export function SettingsDialog({settings, attachments, errors, open, setOpen, on
         <Button content="Cancel" onClick={onDialogClose} secondary />
         <Button content="Save" onClick={onFormSubmit} primary />
       </Modal.Actions>
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
     </Modal>
   );
 }

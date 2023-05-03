@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import ReactDOM from 'react-dom';
-import {Container, Card, Icon} from 'semantic-ui-react';
+import {Container, Card, Icon, Message} from 'semantic-ui-react';
 
 import {PurrSettingsCard} from './purr.sc';
 import {PurrAbstractBooklet} from './purr.ab';
@@ -12,6 +12,7 @@ import {fetchSettings} from './api/purr.api';
 document.addEventListener('DOMContentLoaded', () => {
   const PurrHome = () => {
     const [settings, setSettings] = useState();
+    const [settingsValid, setSettingsValid] = useState(false);
     const [connected, setConnected] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -24,9 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(error); // TODO display error card
             return of(true);
           }),
-          tap(settings => {
-            setSettings(settings);
-            setConnected(!!settings.connected);
+          tap(result => {
+            setSettings(result.settings);
+            setSettingsValid(result.valid);
+            setConnected(!!result.settings.connected);
             setLoading(false);
           })
         )
@@ -51,12 +53,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 setSettings={setSettings}
                 connected={connected}
                 setConnected={setConnected}
+                setSettingsValid={setSettingsValid}
               />
               {connected ? (
                 <>
-                  <PurrAbstractBooklet settings={settings} />
-                  <PurrPapersChecks settings={settings} />
-                  <PurrFinalProceedings settings={settings} />
+                  <PurrAbstractBooklet settings={settings} settingsValid={settingsValid} />
+                  <PurrPapersChecks settings={settings} settingsValid={settingsValid} />
+                  <PurrFinalProceedings settings={settings} settingsValid={settingsValid} />
+                  {settingsValid ? (
+                    <></>
+                  ) : (
+                    <Message warning>
+                      <Message.Header>Check settings</Message.Header>
+                      <p>
+                        It looks like one or more settings are not valid! Please configure the
+                        settings before using any task!
+                      </p>
+                    </Message>
+                  )}
                 </>
               ) : (
                 <></>

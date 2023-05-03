@@ -7,7 +7,11 @@ export function connect(connection) {
       if (event.error) {
         throw new Error('error connecting');
       }
-      return of(event.result);
+      return of({
+        settings: event.result.settings,
+        connectionOk: event.result.connection_ok,
+        settingsValid: !!event.result.settings_valid,
+      });
     })
   );
 }
@@ -30,7 +34,7 @@ export function fetchSettings() {
         throw new Error('error fetching PURR settings');
       }
 
-      return of(event.result.settings);
+      return of({settings: event.result.settings, valid: event.result.is_valid});
     })
   );
 }
