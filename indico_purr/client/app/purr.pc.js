@@ -17,7 +17,7 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
   const onCheck = useCallback(() => setLoading(true), []);
 
   const goToContrib = useCallback(
-    error => (window.location.href = `${error.url}/editing/paper`),
+    error => (window.open(`${error.url}/editing/paper`, '_black').focus()),
     []
   );
 
