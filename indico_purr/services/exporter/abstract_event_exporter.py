@@ -234,6 +234,7 @@ class ABCExportEvent(ABCExportFile):
                 {
                     "id": str(editable.id),
                     "type": editable.type,
+                    "state": editable.state,
                     "all_revisions": self._get_all_revisions(event, contrib, editable),
                     "latest_revision": self._get_latest_revision(
                         event, contrib, editable
