@@ -22,6 +22,8 @@ class PurrSettings:
     host_info: str = field(default='')
     editorial_board: str = field(default='')
     doi_base_url: str = field(default='')
+    organization_segment: str = field(default='')
+    conference_segment: str = field(default='')
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')

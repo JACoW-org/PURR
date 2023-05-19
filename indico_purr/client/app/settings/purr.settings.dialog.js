@@ -54,6 +54,8 @@ export function SettingsDialog({
     'host_info',
     'editorial_board',
     'doi_base_url',
+    'organization_segment',
+    'conference_segment',
     'doi_user',
     'doi_password',
     'date',

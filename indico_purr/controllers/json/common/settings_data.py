@@ -77,6 +77,8 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             host_info=settings.get("host_info"),
             editorial_board=settings.get("editorial_board"),
             doi_base_url=settings.get("doi_base_url"),
+            organization_segment=settings.get("organization_segment"),
+            conference_segment=settings.get("conference_segment"),
             doi_user=settings.get("doi_user"),
             doi_password=settings.get("doi_password"),
             primary_color=settings.get("primary_color"),

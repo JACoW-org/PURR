@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
-import { Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea } from 'semantic-ui-react';
-import { capitalize, has, isEmpty, isNil, map } from 'lodash';
+import React, {useCallback, useState} from 'react';
+import {Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
+import {capitalize, has, isEmpty, isNil, map} from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -12,7 +12,7 @@ export function FinalProceedingsSettings({
 
   const onClick = useCallback(
     (e, titleProps) => {
-      const { index } = titleProps;
+      const {index} = titleProps;
       setActiveIndex(activeIndex === index ? -1 : index);
     },
     [activeIndex]
@@ -130,7 +130,7 @@ export function FinalProceedingsSettings({
                 rows={3}
                 onChange={onFieldChange}
               />
-              <div className='center icon-arrow-up instructions'>
+              <div className="center icon-arrow-up instructions">
                 You can use <b>Markdown</b>.
               </div>
             </Form.Field>
@@ -143,7 +143,7 @@ export function FinalProceedingsSettings({
                 rows={3}
                 onChange={onFieldChange}
               />
-              <div className='center icon-arrow-up instructions'>
+              <div className="center icon-arrow-up instructions">
                 You can use <b>Markdown</b>.
               </div>
             </Form.Field>
@@ -191,6 +191,28 @@ export function FinalProceedingsSettings({
                 onChange={onFieldChange}
               />
             </Form.Field>
+            <Form.Group widths="equal">
+              <Form.Field error={hasError('organization_segment')}>
+                <label>Organization segment</label>
+                <Input
+                  fluid
+                  name="organization_segment"
+                  value={finalProcSettings.organization_segment || ''}
+                  placeholder="Insert value for organization segment (e.g. JACoW)"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('conference_segment')}>
+                <label>Conference segment</label>
+                <Input
+                  fluid
+                  name="conference_segment"
+                  value={finalProcSettings.conference_segment || ''}
+                  placeholder="Insert value for conference segment (e.g. IPAC-24)"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
             <Form.Field error={hasError('doi_user')}>
               <label>DOI User</label>
               <Input
@@ -237,13 +259,17 @@ export function FinalProceedingsSettings({
               <p>No file has been attached to this event.</p>
             ) : (
               <>
-                <Section key='logo' sectionKey="logo" section={attachments.logo} />
+                <Section key="logo" sectionKey="logo" section={attachments.logo} />
                 <Divider />
-                <Section key='poster' sectionKey="poster" section={attachments.poster} />
+                <Section key="poster" sectionKey="poster" section={attachments.poster} />
                 <Divider />
-                <Section key='volumes' sectionKey="volumes" section={attachments.volumes} />
+                <Section key="volumes" sectionKey="volumes" section={attachments.volumes} />
                 <Divider />
-                <Section key='attachments' sectionKey="attachments" section={attachments.attachments} />
+                <Section
+                  key="attachments"
+                  sectionKey="attachments"
+                  section={attachments.attachments}
+                />
               </>
             )}
           </Accordion.Content>
@@ -253,8 +279,7 @@ export function FinalProceedingsSettings({
   );
 }
 
-function Section({ sectionKey, section }) {
-
+function Section({sectionKey, section}) {
   // console.log({sectionKey, section})
 
   return isNil(section) ? (
