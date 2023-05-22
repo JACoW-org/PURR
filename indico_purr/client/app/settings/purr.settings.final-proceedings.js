@@ -181,34 +181,56 @@ export function FinalProceedingsSettings({
             DOI
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 3}>
-            <Form.Field error={hasError('doi_base_url')}>
-              <label>DOI Base URL</label>
-              <Input
-                fluid
-                name="doi_base_url"
-                value={finalProcSettings.doi_base_url || ''}
-                placeholder="Insert DOI Base URL"
-                onChange={onFieldChange}
-              />
-            </Form.Field>
             <Form.Group widths="equal">
-              <Form.Field error={hasError('organization_segment')}>
-                <label>Organization segment</label>
+              <Form.Field error={hasError('doi_protocol')}>
+                <label>DOI URL Protocol</label>
                 <Input
                   fluid
-                  name="organization_segment"
-                  value={finalProcSettings.organization_segment || ''}
-                  placeholder="Insert value for organization segment (e.g. JACoW)"
+                  name="doi_protocol"
+                  value={finalProcSettings.doi_protocol || ''}
+                  placeholder="Insert DOI URL protocol"
                   onChange={onFieldChange}
                 />
               </Form.Field>
-              <Form.Field error={hasError('conference_segment')}>
-                <label>Conference segment</label>
+              <Form.Field error={hasError('doi_domain')}>
+                <label>DOI URL Domain</label>
                 <Input
                   fluid
-                  name="conference_segment"
-                  value={finalProcSettings.conference_segment || ''}
-                  placeholder="Insert value for conference segment (e.g. IPAC-24)"
+                  name="doi_domain"
+                  value={finalProcSettings.doi_domain || ''}
+                  placeholder="Insert DOI URL domain"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('doi_context')}>
+                <label>DOI URL Context</label>
+                <Input
+                  fluid
+                  name="doi_context"
+                  value={finalProcSettings.doi_context || ''}
+                  placeholder="Insert DOI URL context"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+            <Form.Group widths="equal">
+              <Form.Field error={hasError('doi_organization')}>
+                <label>DOI Organization</label>
+                <Input
+                  fluid
+                  name="doi_organization"
+                  value={finalProcSettings.doi_organization || ''}
+                  placeholder="Insert DOI URL organization segment (e.g. JACoW)"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('doi_conference')}>
+                <label>DOI Conference</label>
+                <Input
+                  fluid
+                  name="doi_conference"
+                  value={finalProcSettings.doi_conference || ''}
+                  placeholder="Insert DOI URL conference code (e.g. IPAC-24)"
                   onChange={onFieldChange}
                 />
               </Form.Field>

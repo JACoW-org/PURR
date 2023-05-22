@@ -21,9 +21,11 @@ class PurrSettings:
     location: str = field(default='')
     host_info: str = field(default='')
     editorial_board: str = field(default='')
-    doi_base_url: str = field(default='')
-    organization_segment: str = field(default='')
-    conference_segment: str = field(default='')
+    doi_protocol: str = field(default='')
+    doi_domain: str = field(default='')
+    doi_context: str = field(default='')
+    doi_organization: str = field(default='')
+    doi_conference: str = field(default='')
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')
@@ -50,7 +52,7 @@ class PurrSettings:
         self._validate_location(errors)
         self._validate_host_info(errors)
         self._validate_editorial_board(errors)
-        self._validate_doi_base_url(errors)
+        self._validate_doi(errors)
         self._validate_doi_user(errors)
         self._validate_doi_password(errors)
         self._validate_primary_color(errors)
@@ -118,8 +120,12 @@ class PurrSettings:
     def _validate_editorial_board(self, errors):
         self._required_validator('editorial_board', self.editorial_board, errors)
 
-    def _validate_doi_base_url(self, errors):
-        self._required_validator('doi_base_url', self.doi_base_url, errors)
+    def _validate_doi(self, errors):
+        self._required_validator('doi_protocol', self.doi_protocol, errors)
+        self._required_validator('doi_domain', self.doi_domain, errors)
+        self._required_validator('doi_context', self.doi_context, errors)
+        self._required_validator('doi_organization', self.doi_organization, errors)
+        self._required_validator('doi_conference', self.doi_conference, errors)
 
     def _validate_doi_user(self, errors):
         self._required_validator('doi_user', self.doi_user, errors)
