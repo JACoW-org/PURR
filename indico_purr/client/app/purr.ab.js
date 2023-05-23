@@ -4,7 +4,7 @@ import {of, forkJoin, throwError} from 'rxjs';
 import {concatMap} from 'rxjs/operators';
 
 import {download, openSocket, fetchJson, runPhase} from './purr.lib';
-import { PurrErrorAlert } from './purr.error.alert';
+import {PurrErrorAlert} from './purr.error.alert';
 
 export const PurrAbstractBooklet = ({settings, settingsValid}) => {
   const [loading, setLoading] = useState(() => false);
@@ -105,9 +105,9 @@ export const PurrAbstractBooklet = ({settings, settingsValid}) => {
               primary
               compact
               size="mini"
-              icon="right chevron"
-              content="Download"
-            />
+            >
+              <Icon name="download" />
+            </Button>
           </div>
         </Card.Content>
       </Card>

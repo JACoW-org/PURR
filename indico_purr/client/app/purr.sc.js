@@ -180,9 +180,9 @@ export const PurrSettingsCard = ({
                   primary
                   compact
                   size="mini"
-                  icon="right chevron"
-                  content="Settings"
-                />
+                >
+                  <Icon name='settings' />
+                </Button>
                 <Button
                   onClick={onDisconnect}
                   negative
