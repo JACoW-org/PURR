@@ -1,7 +1,6 @@
 from flask import jsonify, request, session
-from flask_pluginengine import current_plugin
-
-from werkzeug.exceptions import BadRequest
+# from flask_pluginengine import current_plugin
+# from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 
@@ -17,8 +16,8 @@ class RHPurrSettingsDataJson(RHManageEventBase):
     def _process(self):
         settings = get_purr_settings(self.event)
 
-        current_plugin.logger.info(settings)
-        current_plugin.logger.info(request.method)
+        # current_plugin.logger.info(settings)
+        # current_plugin.logger.info(request.method)
 
         contribution_fields = [{
             "id": f.id,
@@ -26,7 +25,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
         } for f in self.event.contribution_fields]
 
         if request.method == "POST":
-            current_plugin.logger.info(request.json)
+            # current_plugin.logger.info(request.json)
 
             purr_settings = PurrSettings(**request.json.get("settings"))
 

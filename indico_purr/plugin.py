@@ -41,7 +41,7 @@ class PurrPlugin(IndicoPlugin):
         'doi_user': '',
         'doi_password': '',
         'date': '',
-        
+
         'primary_color': '#F39433',
         'site_base_url': '//accelconf.web.cern.ch'
     }
@@ -62,4 +62,3 @@ class PurrPlugin(IndicoPlugin):
     def register_assets(self):
         self.inject_bundle('script.js', WPEventManagement)
         self.inject_bundle('style.css', WPEventManagement)
-

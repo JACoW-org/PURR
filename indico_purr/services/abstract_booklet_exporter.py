@@ -1,5 +1,6 @@
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 
+
 class PurrAbstractBookletExporter(ABCExportEvent):
     """ """
 

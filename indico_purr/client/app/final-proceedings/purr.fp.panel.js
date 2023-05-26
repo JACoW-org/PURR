@@ -1,18 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {Modal, Button, Icon} from 'semantic-ui-react';
-import {concatMap, forkJoin, of, throwError} from 'rxjs';
-import {downloadByUrl, fetchJson, openSocket, runPhase} from '../purr.lib';
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Icon } from 'semantic-ui-react';
+import { concatMap, forkJoin, of, throwError } from 'rxjs';
+import { fetchJson, openSocket, runPhase } from '../purr.lib';
 import Logger from './purr.fp.logger';
 
-const FinalProcPanel = ({open, setOpen, settings}) => {
+const FinalProcPanel = ({ open, setOpen, settings }) => {
   const [prePressProcessing, setPrePressProcessing] = useState(false);
   const [finalProcProcessing, setFinalProcProcessing] = useState(false);
-  const [aborting, setAborting] = useState(false);
-  const [progress, setProgress] = useState(() => 'Processing...');
+  const [aborting, setAborting] = useState(() => false);
+  const [ops, setOps] = useState(() => []);
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    if (prePressProcessing) {
+    if (prePressProcessing || finalProcProcessing) {
+
+      const method = finalProcProcessing ? 'event_fp' : 'event_pp'
+
       // empty logs
       setLogs([]);
 
@@ -23,8 +26,10 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
       const actions = {
         'task:progress': (head, body) => {
           if (body?.params?.text) {
-            console.log(body.params.text);
-            setProgress(`${body.params.text}`);
+            setOps(prevOps => [
+              ...prevOps.map(o => ({ icon: "check", text: o.text })),
+              { last: true, icon: 'spinner', text: `${body.params.text}` }
+            ]);
           }
         },
         'task:log': (head, body) => {
@@ -35,6 +40,10 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
         'task:result': (head, body) => {
           console.log(head, body);
 
+          setOps(prevOps => [
+            ...prevOps.map(o => ({ icon: "check", text: o.text }))
+          ]);
+
           if (body?.params?.event_path) {
             // downloadByUrl(new URL(`${body?.params?.event_path}.7z`, `${settings.api_url}`));
           }
@@ -43,7 +52,7 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
 
       // subscription to the socket
       socket.subscribe({
-        next: ({head, body}) => runPhase(head, body, actions, socket),
+        next: ({ head, body }) => runPhase(head, body, actions, socket),
         complete: () => setPrePressProcessing(false),
         error: err => {
           console.error(err);
@@ -54,7 +63,7 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
         },
       });
 
-      const context = {params: {}};
+      const context = { params: {} };
 
       of(null)
         .pipe(
@@ -64,10 +73,12 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
             })
           ),
 
-          concatMap(({event}) => {
+          concatMap(({ event }) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
+
+            setOps([]);
 
             context.params = {
               ...context.params,
@@ -82,7 +93,7 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
                 uuid: task_id,
               },
               body: {
-                method: `event_zip`,
+                method: method,
                 params: context.params,
               },
             });
@@ -93,8 +104,9 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
         .subscribe();
     }
 
-    return () => {};
-  }, [prePressProcessing]);
+    return () => { };
+  }, [prePressProcessing, finalProcProcessing]);
+
 
   useEffect(() => {
     if (aborting) {
@@ -103,30 +115,27 @@ const FinalProcPanel = ({open, setOpen, settings}) => {
     }
   }, [aborting]);
 
+
   return (
     <Modal open={open}>
       <Modal.Header>Generating final proceedings</Modal.Header>
       <Modal.Content>
-        <div style={{display: 'flex', gap: '1em'}}>
-          <div style={{width: '40%', position: 'sticky', top: 0}}>
-            {prePressProcessing || finalProcProcessing ? (
-              <>
-                <Icon loading name="spinner" />
-                <span>Current task: {progress}</span>
-              </>
-            ) : (
-              <>
-                <span>Ready</span>
-              </>
-            )}
+        <div style={{ display: 'flex', gap: '1em' }}>
+          <div style={{ width: '40%', position: 'sticky', top: 0 }}>
+            {ops.length > 0 ? ops.map((op, key) =>
+              <div key={key}>
+                <Icon loading={!!op.last} name={op.icon} />
+                <span>{op.text}</span>
+              </div>) : <span>Ready</span>
+            }
           </div>
-          <div style={{width: '60%'}}>
+          <div style={{ width: '60%' }}>
             <Logger logs={logs} />
           </div>
         </div>
       </Modal.Content>
       <Modal.Actions>
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
             {prePressProcessing || finalProcProcessing ? (
               <Button negative onClick={() => setAborting(true)}>

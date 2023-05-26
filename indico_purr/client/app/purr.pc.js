@@ -82,7 +82,7 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
                 uuid: task_id,
               },
               body: {
-                method: `check_pdf`,
+                method: `event_pc`,
                 params: context.params,
               },
             });
