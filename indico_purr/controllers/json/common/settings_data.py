@@ -11,8 +11,6 @@ from indico.modules.logs import EventLogRealm, LogKind
 
 
 class RHPurrSettingsDataJson(RHManageEventBase):
-    CSRF_ENABLED = False
-
     def _process(self):
         settings = get_purr_settings(self.event)
 
