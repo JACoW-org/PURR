@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Modal, Button, Icon } from 'semantic-ui-react';
 import { concatMap, forkJoin, of, throwError } from 'rxjs';
 import { fetchJson, openSocket, runPhase } from '../purr.lib';
@@ -7,11 +7,33 @@ import Logger from './purr.fp.logger';
 const FinalProcPanel = ({ open, setOpen, settings }) => {
   const [prePressProcessing, setPrePressProcessing] = useState(false);
   const [finalProcProcessing, setFinalProcProcessing] = useState(false);
-  const [aborting, setAborting] = useState(() => false);
+  // const [aborting, setAborting] = useState(() => false);
+  // const [socket, setSocket] = useState(() => undefined);
   const [ops, setOps] = useState(() => []);
   const [logs, setLogs] = useState([]);
 
+  const onClose = useCallback(() => {
+
+    console.log('onClose', prePressProcessing, finalProcProcessing)
+
+    if (prePressProcessing) {
+      console.log('onClose - prePressProcessing')
+      setPrePressProcessing(false);
+    }
+
+    if (finalProcProcessing) {
+      console.log('onClose - finalProcProcessing')
+      setFinalProcProcessing(false);
+    }
+
+  }, [prePressProcessing, finalProcProcessing]);
+
   useEffect(() => {
+
+    let [task_id, socket] = [];
+
+    console.log("useEffect - socket", socket, prePressProcessing, finalProcProcessing);
+
     if (prePressProcessing || finalProcProcessing) {
 
       const method = finalProcProcessing ? 'event_fp' : 'event_pp'
@@ -20,7 +42,9 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
       setLogs([]);
 
       // references to open web socket
-      const [task_id, socket] = openSocket(settings);
+      [task_id, socket] = openSocket(settings);
+
+      // setSocket(socket)
 
       // actions
       const actions = {
@@ -102,18 +126,22 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
           })
         )
         .subscribe();
-    }
+    } 
 
-    return () => { };
+    return () => { 
+
+      console.log('useEffect close -->', socket)
+
+      if (socket) { 
+        socket.complete();
+        
+        setOps(prevOps => [
+          ...prevOps.map(o => ({ icon: "check", text: o.text }))
+        ]);
+      }
+
+    };
   }, [prePressProcessing, finalProcProcessing]);
-
-
-  useEffect(() => {
-    if (aborting) {
-      console.log('Aborting...not implemented yet');
-      setAborting(false);
-    }
-  }, [aborting]);
 
 
   return (
@@ -138,7 +166,7 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
             {prePressProcessing || finalProcProcessing ? (
-              <Button negative onClick={() => setAborting(true)}>
+              <Button negative onClick={() => onClose()}>
                 Abort
               </Button>
             ) : (
