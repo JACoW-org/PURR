@@ -61,7 +61,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid}) => {
                 uuid: task_id,
               },
               body: {
-                method: `event_ab`,
+                method: `event_abstract_booklet`,
                 params: context.params,
               },
             });

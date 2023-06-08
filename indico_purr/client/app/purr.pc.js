@@ -82,7 +82,7 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
                 uuid: task_id,
               },
               body: {
-                method: `event_pc`,
+                method: `event_papers_check`,
                 params: context.params,
               },
             });

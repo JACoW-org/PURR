@@ -14,15 +14,15 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
 
   const onClose = useCallback(() => {
 
-    console.log('onClose', prePressProcessing, finalProcProcessing)
+    // console.log('onClose', prePressProcessing, finalProcProcessing)
 
     if (prePressProcessing) {
-      console.log('onClose - prePressProcessing')
+      // console.log('onClose - prePressProcessing')
       setPrePressProcessing(false);
     }
 
     if (finalProcProcessing) {
-      console.log('onClose - finalProcProcessing')
+      // console.log('onClose - finalProcProcessing')
       setFinalProcProcessing(false);
     }
 
@@ -32,11 +32,9 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
 
     let [task_id, socket] = [];
 
-    console.log("useEffect - socket", socket, prePressProcessing, finalProcProcessing);
-
     if (prePressProcessing || finalProcProcessing) {
 
-      const method = finalProcProcessing ? 'event_fp' : 'event_pp'
+      const method = finalProcProcessing ? 'event_final_proceedings' : 'event_pre_press'
 
       // empty logs
       setLogs([]);
@@ -129,8 +127,6 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
     } 
 
     return () => { 
-
-      console.log('useEffect close -->', socket)
 
       if (socket) { 
         socket.complete();
