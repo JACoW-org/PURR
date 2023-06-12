@@ -174,22 +174,29 @@ a.purr-btn.disabled {
   color: red;
 }
 
-.fp-panel-content {
-  display: flex;
-  gap: 1em;
-
-  > .operations {
-    width: 40%;
-    position: sticky;
-    top: 0;
+.fp-panel.ui.modal {
+  > .content {
+    display: flex;
+    gap: 1em;
+  
+    > .operations {
+      width: 40%;
+      position: sticky;
+      top: 0;
+    }
+  
+    > .logs {
+      width: 60%;
+    }
   }
 
-  > .logs {
-    width: 60%;
+  > .actions {
+    display: flex;
+    justify-content: space-between;
   }
 }
 
-.fp-panel-actions {
-  display: flex;
-  justify-content: space-between;
+.logs-list {
+  overflow-y: auto;
+  max-height: 300px;
 }

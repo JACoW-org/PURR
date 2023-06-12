@@ -250,10 +250,9 @@ const FinalProcPanel = ({open, setOpen, info, settings}) => {
   }, [downloadProceedings]);
 
   return (
-    <Modal open={open} size='small'>
+    <Modal open={open} size='small' className='fp-panel'>
       <Modal.Header>Generating final proceedings</Modal.Header>
       <Modal.Content>
-        <div className='fp-panel-content'>
           <div className='operations'>
             <h3>Tasks</h3>
             {ops.length > 0 ? (
@@ -271,10 +270,8 @@ const FinalProcPanel = ({open, setOpen, info, settings}) => {
           <h3>Logs</h3>
             <Logger logs={logs} />
           </div>
-        </div>
       </Modal.Content>
       <Modal.Actions>
-        <div className='fp-panel-actions'>
           <div>
             {prePressProcessing || finalProcProcessing ? (
               <Button negative onClick={() => onClose()} size='mini'>
@@ -325,7 +322,6 @@ const FinalProcPanel = ({open, setOpen, info, settings}) => {
               <Icon name="download" />
             </Button>
           </div>
-        </div>
       </Modal.Actions>
     </Modal>
   );
