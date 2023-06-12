@@ -173,3 +173,18 @@ a.purr-btn.disabled {
 .log.error {
   color: red;
 }
+
+.fp-panel-content {
+  display: flex;
+  gap: 1em;
+
+  > .operations {
+    width: 40%;
+    position: sticky;
+    top: 0;
+  }
+
+  > .logs {
+    width: 60%;
+  }
+}
