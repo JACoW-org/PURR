@@ -8,10 +8,11 @@ import { PurrErrorAlert } from './purr.error.alert';
 import FinalProcPanel from './final-proceedings/purr.fp.panel';
 
 export const PurrFinalProceedings = ({ settings, settingsValid }) => {
+
   const [loading, setLoading] = useState(() => false); // TODO rimuovere non appena logica loading completamente spostata
   const [errorMessage, setErrorMessage] = useState(null);
-  const [showError, setShowError] = useState(false);
-  const [openPanel, setOpenPanel] = useState(false);
+  const [showError, setShowError] = useState(() => false);
+  const [openPanel, setOpenPanel] = useState(() => false);
 
   const [draftDoi, setDraftDoi] = useState(() => false);
   const [deleteDoi, setDeleteDoi] = useState(() => false);
@@ -20,7 +21,6 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
   const [compressProceedings, setCompressProceedings] = useState(() => false);
   const [downloadProceedings, setDownloadProceedings] = useState(() => false);
 
-
   const onDraftDoi = useCallback(() => setDraftDoi(true), []);
   const onDeleteDoi = useCallback(() => setDeleteDoi(true), []);
   const onHideDoi = useCallback(() => setHideDoi(true), []);
@@ -28,7 +28,6 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
 
   const onCompressProceedings = useCallback(() => setCompressProceedings(true), []);
   const onDownloadProceedings = useCallback(() => setDownloadProceedings(true), []);
-
 
   const onFinishTask = useCallback(() => {
 
