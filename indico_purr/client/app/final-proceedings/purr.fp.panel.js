@@ -3,7 +3,6 @@ import {Modal, Button, Icon} from 'semantic-ui-react';
 import {concatMap, forkJoin, of, throwError} from 'rxjs';
 import {downloadByUrl, fetchJson, openSocket, runPhase} from '../purr.lib';
 import Logger from './purr.fp.logger';
-import { size } from 'lodash';
 
 const FinalProcPanel = ({open, setOpen, info, settings}) => {
   const [processing, setProcessing] = useState(() => false);
@@ -32,10 +31,16 @@ const FinalProcPanel = ({open, setOpen, info, settings}) => {
 
   const onCompressProceedings = useCallback(() => setCompressProceedings(true), []);
   const onDownloadProceedings = useCallback(() => setDownloadProceedings(true), []);
+  const onVisitProceedings = useCallback(() => {
+    const url = new URL(`${info?.event_id}`, `${settings?.api_url}`);
+    window.open(url, '_blank');
+  }, [info, settings]);
 
   useEffect(() => {
-    setProcessing(prePressProcessing || finalProcProcessing || compressProceedings || downloadProceedings);
-  }, [prePressProcessing, finalProcProcessing, compressProceedings, downloadProceedings])
+    setProcessing(
+      prePressProcessing || finalProcProcessing || compressProceedings || downloadProceedings
+    );
+  }, [prePressProcessing, finalProcProcessing, compressProceedings, downloadProceedings]);
 
   // open
   useEffect(() => {
@@ -250,78 +255,90 @@ const FinalProcPanel = ({open, setOpen, info, settings}) => {
   }, [downloadProceedings]);
 
   return (
-    <Modal open={open} size='small' className='fp-panel'>
+    <Modal open={open} size="small" className="fp-panel">
       <Modal.Header>Generating final proceedings</Modal.Header>
       <Modal.Content>
-          <div className='operations'>
-            <h3>Tasks</h3>
-            {ops.length > 0 ? (
-              ops.map((op, key) => (
-                <div key={key}>
-                  <Icon loading={!!op.last} name={op.icon} />
-                  <span>{op.text}</span>
-                </div>
-              ))
-            ) : (
-              <span>Ready</span>
-            )}
-          </div>
-          <div className='logs'>
+        <div className="operations">
+          <h3>Tasks</h3>
+          {ops.length > 0 ? (
+            ops.map((op, key) => (
+              <div key={key}>
+                <Icon loading={!!op.last} name={op.icon} />
+                <span>{op.text}</span>
+              </div>
+            ))
+          ) : (
+            <span>Ready</span>
+          )}
+        </div>
+        <div className="logs">
           <h3>Logs</h3>
-            <Logger logs={logs} />
-          </div>
+          <Logger logs={logs} />
+        </div>
       </Modal.Content>
       <Modal.Actions>
-          <div>
-            {prePressProcessing || finalProcProcessing ? (
-              <Button negative onClick={() => onClose()} size='mini'>
-                Abort
-              </Button>
-            ) : (
-              <Button onClick={() => setOpen(false)} size='mini'>Close</Button>
-            )}
-          </div>
-          <div>
-            <Button
-              primary
-              disabled={processing}
-              loading={prePressProcessing}
-              onClick={() => setPrePressProcessing(true)}
-              size="mini"
-            >
-              Pre press
+        <div>
+          {prePressProcessing || finalProcProcessing ? (
+            <Button negative onClick={() => onClose()} size="mini">
+              Abort
             </Button>
-            <Button
-              primary
-              disabled={processing}
-              loading={finalProcProcessing}
-              onClick={() => setFinalProcProcessing(true)}
-              size="mini"
-            >
-              Final Proceedings
+          ) : (
+            <Button onClick={() => setOpen(false)} size="mini">
+              Close
             </Button>
-            <Button
-              icon
-              title="Compress final proceedings"
-              onClick={onCompressProceedings}
-              loading={compressProceedings}
-              disabled={processing}
-              primary
-              size="mini"
-            >
-              <Icon name="compress" />
-            </Button>
-            <Button
-              icon
-              title="Download final proceedings' ZIP"
-              onClick={onDownloadProceedings}
-              disabled={processing}
-              primary
-              size="mini"
-            >
-              <Icon name="download" />
-            </Button>
-          </div>
+          )}
+        </div>
+        <div>
+          <Button
+            primary
+            disabled={processing}
+            loading={prePressProcessing}
+            onClick={() => setPrePressProcessing(true)}
+            size="mini"
+          >
+            Pre press
+          </Button>
+          <Button
+            primary
+            disabled={processing}
+            loading={finalProcProcessing}
+            onClick={() => setFinalProcProcessing(true)}
+            size="mini"
+          >
+            Final Proceedings
+          </Button>
+          <Button
+            icon
+            title="Compress final proceedings"
+            onClick={onCompressProceedings}
+            loading={compressProceedings}
+            disabled={processing}
+            primary
+            size="mini"
+          >
+            <Icon name="compress" />
+          </Button>
+          <Button
+            icon
+            title="Download final proceedings' ZIP"
+            onClick={onDownloadProceedings}
+            disabled={processing}
+            primary
+            size="mini"
+          >
+            <Icon name="download" />
+          </Button>
+          <Button
+            icon
+            title="Visit static website"
+            onClick={onVisitProceedings}
+            disabled={processing}
+            primary
+            size="mini"
+          >
+            <Icon name="external alternate" />
+          </Button>
+        </div>
       </Modal.Actions>
     </Modal>
   );
