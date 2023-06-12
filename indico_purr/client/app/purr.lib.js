@@ -3,9 +3,9 @@ import { webSocket } from 'rxjs/webSocket';
 import { switchMap, catchError, map } from 'rxjs/operators';
 import { fromFetch } from 'rxjs/fetch';
 
-export function getSettings() {
+export function getEventId() {
   try {
-    return JSON.parse(document.querySelector('#purr-settings').textContent);
+    return JSON.parse(document.querySelector('#purr-event-id').textContent);
   } catch (e) {
     console.error(err);
     return undefined;
@@ -135,7 +135,7 @@ export function downloadByUrl(url, name) {
   const a = document.body.appendChild(
     Object.assign(document.createElement('a'), {
       href: url,
-      download: true,
+      download: name,
       style: 'display:none',
     })
   );

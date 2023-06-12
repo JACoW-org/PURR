@@ -51,6 +51,8 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
 
       if (downloadProceedings) {
 
+        downloadByUrl
+
       } else
 
         if (draftDoi || deleteDoi || hideDoi || publishDoi || compressProceedings) {
