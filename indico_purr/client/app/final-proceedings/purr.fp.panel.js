@@ -3,6 +3,7 @@ import {Modal, Button, Icon} from 'semantic-ui-react';
 import {concatMap, forkJoin, of, throwError} from 'rxjs';
 import {downloadByUrl, fetchJson, openSocket, runPhase} from '../purr.lib';
 import Logger from './purr.fp.logger';
+import { size } from 'lodash';
 
 const FinalProcPanel = ({open, setOpen, info, settings}) => {
   const [processing, setProcessing] = useState(() => false);
@@ -273,14 +274,14 @@ const FinalProcPanel = ({open, setOpen, info, settings}) => {
         </div>
       </Modal.Content>
       <Modal.Actions>
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+        <div className='fp-panel-actions'>
           <div>
             {prePressProcessing || finalProcProcessing ? (
-              <Button negative onClick={() => onClose()}>
+              <Button negative onClick={() => onClose()} size='mini'>
                 Abort
               </Button>
             ) : (
-              <Button onClick={() => setOpen(false)}>Close</Button>
+              <Button onClick={() => setOpen(false)} size='mini'>Close</Button>
             )}
           </div>
           <div>
