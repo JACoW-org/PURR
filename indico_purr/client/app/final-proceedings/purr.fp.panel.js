@@ -289,9 +289,9 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
       </Modal.Content>
 
       <Modal.Description>
-        <div className="progress">
-          <Progress color='blue' progress disabled={!ops?.length}
-            percent={ops?.length ? ops?.length * 100 / 17 : 0} />
+        <div className="info">
+          <Progress color='blue' disabled={!ops?.length}
+            value={ops?.length} total={18} progress='ratio' />
         </div>
       </Modal.Description>
 

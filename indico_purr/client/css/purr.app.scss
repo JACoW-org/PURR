@@ -193,8 +193,22 @@ a.purr-btn.disabled {
   }
 
   > .description {
-    > .progress {
+    > .info {
       margin: 1rem;
+
+      .ui.progress {
+        &.disabled {
+          opacity: 1;
+  
+          .bar {
+            visibility: hidden;
+
+            > .progress {
+              color: black;
+            }
+          }
+        } 
+      }
     }
   } 
 
