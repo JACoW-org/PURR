@@ -1,18 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Card, Icon } from 'semantic-ui-react';
 import { of, forkJoin, throwError } from 'rxjs';
-import { concatMap } from 'rxjs/operators';
+import { catchError, concatMap, filter, finalize, switchMap, tap } from 'rxjs/operators';
 
 import { downloadByUrl, openSocket, fetchJson, runPhase } from './purr.lib';
 import { PurrErrorAlert } from './purr.error.alert';
 import FinalProcPanel from './final-proceedings/purr.fp.panel';
+import { fetchInfo } from './api/purr.api';
+import { isNil, result } from 'lodash';
 
-export const PurrFinalProceedings = ({ settings, settingsValid }) => {
+export const PurrFinalProceedings = ({ eventId, settings, settingsValid }) => {
 
-  const [loading, setLoading] = useState(() => false); // TODO rimuovere non appena logica loading completamente spostata
+  const [loading, setLoading] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showError, setShowError] = useState(() => false);
-  const [openPanel, setOpenPanel] = useState(() => false);
+  const [openFPPanel, setOpenFPPanel] = useState(() => false);
+  const [openDOIPanel, setOpenDOIPanel] = useState(() => false);
+  const [fpPanelOpening, setFPPanelOpening] = useState(() => false);
+  const [doiPanelOpening, setDOIPanelOpening] = useState(() => false);
+  const [fpInfo, setFPInfo] = useState(() => null);
 
   const [draftDoi, setDraftDoi] = useState(() => false);
   const [deleteDoi, setDeleteDoi] = useState(() => false);
@@ -20,6 +26,8 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
   const [publishDoi, setPublishDoi] = useState(() => false);
   const [compressProceedings, setCompressProceedings] = useState(() => false);
   const [downloadProceedings, setDownloadProceedings] = useState(() => false);
+
+  const onFPPanelOpening = useCallback(() => setFPPanelOpening(true), [eventId, settings]);
 
   const onDraftDoi = useCallback(() => setDraftDoi(true), []);
   const onDeleteDoi = useCallback(() => setDeleteDoi(true), []);
@@ -40,7 +48,6 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
     setPublishDoi(false);
 
   }, []);
-
 
   useEffect(() => {
 
@@ -134,6 +141,40 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
 
   }, [settings, draftDoi, deleteDoi, hideDoi, publishDoi, compressProceedings, downloadProceedings]);
 
+  // useEffect info API when opening FP or DOI panels
+  useEffect(() => {
+    if (fpPanelOpening || doiPanelOpening) {
+
+      const sub$ = of(null).pipe(
+        tap(() => setLoading(true)),
+        switchMap(() => fetchInfo(settings.api_url, eventId, settings.api_key)),
+        catchError(error => {
+          // TODO display error
+          return of(null);
+        }),
+        filter(result => !!result),
+        tap(result => {
+          setFPInfo(result.info);
+          
+          if (fpPanelOpening) {
+            setFPPanelOpening(false);
+            setOpenFPPanel(true);
+          }
+
+          if (doiPanelOpening) {
+            setDOIPanelOpening(false);
+            setOpenDOIPanel(true);
+          }
+        }),
+        finalize(() => setLoading(false))
+      ).subscribe();
+
+      return () => sub$.unsubscribe();
+    }
+
+    return () => {};
+  }, [fpPanelOpening, doiPanelOpening])
+
   return (
     <>
       <Card fluid>
@@ -147,7 +188,7 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
             {loading ? (
               <div>
                 <Icon loading name="spinner" />
-                {progress}
+                {loading}
               </div>
             ) : (
               <div>
@@ -157,7 +198,7 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
             )}
           </div>
           <div className="ui right">
-            <Button icon title='draft doi' onClick={onDraftDoi} disabled={!settingsValid} primary size='mini'>
+            {/* <Button icon title='draft doi' onClick={onDraftDoi} disabled={!settingsValid} primary size='mini'>
               <Icon name='server' />
             </Button>
             <Button icon title='hide doi' onClick={onHideDoi} disabled={!settingsValid} primary size='mini'>
@@ -174,8 +215,8 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
             </Button>
             <Button icon title='download' onClick={onDownloadProceedings} disabled={!settingsValid} primary size='mini'>
               <Icon name='download' />
-            </Button>
-            <Button icon onClick={() => setOpenPanel(true)} disabled={!settingsValid} primary size='mini'>
+            </Button> */}
+            <Button icon onClick={onFPPanelOpening} disabled={!settingsValid || loading} primary size='mini'>
               <Icon name='book' />
             </Button>
           </div>
@@ -186,7 +227,7 @@ export const PurrFinalProceedings = ({ settings, settingsValid }) => {
         open={showError}
         setOpen={setShowError}
       ></PurrErrorAlert>
-      <FinalProcPanel open={openPanel} setOpen={setOpenPanel} settings={settings} />
+      <FinalProcPanel open={openFPPanel} setOpen={setOpenFPPanel} info={fpInfo} settings={settings} />
     </>
   );
 };

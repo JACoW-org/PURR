@@ -1,5 +1,5 @@
 import React from 'react';
-import {map} from 'lodash';
+import {isEmpty, map} from 'lodash';
 
 const Logger = ({logs}) => {
   const header = severity => {
@@ -16,13 +16,19 @@ const Logger = ({logs}) => {
   };
 
   return (
-    <ul style={{overflowY: 'auto', maxHeight:'300px'}}>
-      {map(logs, (log, index) => (
-        <li className={`log ${log.severity}`} key={index}>
-          {`[${log.timestamp}]`} {header(log.severity)} {log.message}
-        </li>
-      ))}
-    </ul>
+    <>
+      {isEmpty(logs) ? (
+        '-'
+      ) : (
+        <ul className="logs-list">
+          {map(logs, (log, index) => (
+            <li className={`log ${log.severity}`} key={index}>
+              {`[${log.timestamp}]`} {header(log.severity)} {log.message}
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 };
 

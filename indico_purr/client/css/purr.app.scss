@@ -173,3 +173,30 @@ a.purr-btn.disabled {
 .log.error {
   color: red;
 }
+
+.fp-panel.ui.modal {
+  > .content {
+    display: flex;
+    gap: 1em;
+  
+    > .operations {
+      width: 40%;
+      position: sticky;
+      top: 0;
+    }
+  
+    > .logs {
+      width: 60%;
+    }
+  }
+
+  > .actions {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.logs-list {
+  overflow-y: auto;
+  max-height: 300px;
+}

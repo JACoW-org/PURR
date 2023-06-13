@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <>
                     <PurrAbstractBooklet settings={settings} settingsValid={settingsValid} />
                     <PurrPapersChecks settings={settings} settingsValid={settingsValid} />
-                    <PurrFinalProceedings settings={settings} settingsValid={settingsValid} />
+                    <PurrFinalProceedings eventId={eventId} settings={settings} settingsValid={settingsValid} />
                     {settingsValid ? (
                       <></>
                     ) : (
