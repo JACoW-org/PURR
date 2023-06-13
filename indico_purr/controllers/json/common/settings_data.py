@@ -73,6 +73,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             location=settings.get("location"),
             host_info=settings.get("host_info"),
             editorial_board=settings.get("editorial_board"),
+            editorial_json=settings.get("editorial_json"),
             doi_protocol=settings.get("doi_protocol"),
             doi_domain=settings.get("doi_domain"),
             doi_context=settings.get("doi_context"),
@@ -81,7 +82,6 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             doi_user=settings.get("doi_user"),
             doi_password=settings.get("doi_password"),
             primary_color=settings.get("primary_color"),
-            site_base_url=settings.get("site_base_url")
         )
 
         errors = purr_settings.validate()

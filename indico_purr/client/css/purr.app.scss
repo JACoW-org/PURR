@@ -176,7 +176,7 @@ a.purr-btn.disabled {
 
 .fp-panel.ui.modal {
   > .content {
-    min-height: 50vh;
+    min-height: 45vh;
     display: flex;
     align-items: stretch;
     justify-content: stretch;
@@ -191,6 +191,12 @@ a.purr-btn.disabled {
       flex: 1 1 60%;
     }
   }
+
+  > .description {
+    > .progress {
+      margin: 1rem;
+    }
+  } 
 
   > .actions {
     display: flex;
@@ -207,4 +213,8 @@ a.purr-btn.disabled {
 .pre-press-btn {
   background-color: rgb(233, 158, 24) !important;
   color: white !important;
+}
+
+.ui.message {
+  width: 100%;
 }

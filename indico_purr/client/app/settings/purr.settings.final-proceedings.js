@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react';
-import {Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea} from 'semantic-ui-react';
-import {capitalize, has, isEmpty, isNil, map} from 'lodash';
+import React, { useCallback, useState } from 'react';
+import { Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea } from 'semantic-ui-react';
+import { capitalize, has, isEmpty, isNil, map } from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -12,7 +12,7 @@ export function FinalProceedingsSettings({
 
   const onClick = useCallback(
     (e, titleProps) => {
-      const {index} = titleProps;
+      const { index } = titleProps;
       setActiveIndex(activeIndex === index ? -1 : index);
     },
     [activeIndex]
@@ -30,15 +30,14 @@ export function FinalProceedingsSettings({
             <Icon name="dropdown" />
             General
           </Accordion.Title>
-
           <Accordion.Content active={activeIndex === 0}>
             <Form.Group>
-              <Form.Field error={hasError('booktitle_short')} width="8">
-                <label>Booktitle short</label>
+              <Form.Field error={hasError('location')} width="8">
+                <label>Location</label>
                 <Input
-                  name="booktitle_short"
-                  value={finalProcSettings.booktitle_short || ''}
-                  placeholder="Insert booktitle short"
+                  name="location"
+                  value={finalProcSettings.location || ''}
+                  placeholder="Insert location"
                   onChange={onFieldChange}
                 />
               </Form.Field>
@@ -52,55 +51,42 @@ export function FinalProceedingsSettings({
                 />
               </Form.Field>
             </Form.Group>
-
-            <Form.Field error={hasError('booktitle_long')} width="16">
-              <label>Booktitle long</label>
-              <Input
-                name="booktitle_long"
-                value={finalProcSettings.booktitle_long || ''}
-                placeholder="Insert booktitle long"
-                onChange={onFieldChange}
-              />
-            </Form.Field>
-
             <Form.Group>
-              <Form.Field error={hasError('location')} width="8">
-                <label>Location</label>
+              <Form.Field error={hasError('booktitle_short')} width="6">
+                <label>Booktitle short</label>
                 <Input
-                  name="location"
-                  value={finalProcSettings.location || ''}
-                  placeholder="Insert location"
+                  name="booktitle_short"
+                  value={finalProcSettings.booktitle_short || ''}
+                  placeholder="Insert booktitle short"
                   onChange={onFieldChange}
                 />
               </Form.Field>
-
-              <Form.Field error={hasError('site_base_url')} width="8">
-                <label>Site base URL</label>
+              <Form.Field error={hasError('booktitle_long')} width="12">
+                <label>Booktitle long</label>
                 <Input
-                  name="site_base_url"
-                  value={finalProcSettings.site_base_url || ''}
-                  placeholder="Insert location"
+                  name="booktitle_long"
+                  value={finalProcSettings.booktitle_long || ''}
+                  placeholder="Insert booktitle long"
                   onChange={onFieldChange}
                 />
               </Form.Field>
             </Form.Group>
-
             <Form.Group>
+              <Form.Field error={hasError('series_number')} width="6">
+                <label>Series number</label>
+                <Input
+                  name="series_number"
+                  value={finalProcSettings.series_number || ''}
+                  placeholder="Insert series number"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
               <Form.Field error={hasError('series')} width="12">
                 <label>Series</label>
                 <Input
                   name="series"
                   value={finalProcSettings.series || ''}
                   placeholder="Insert series"
-                  onChange={onFieldChange}
-                />
-              </Form.Field>
-              <Form.Field error={hasError('series_number')} width="4">
-                <label>Series number</label>
-                <Input
-                  name="series_number"
-                  value={finalProcSettings.series_number || ''}
-                  placeholder="Insert series number"
                   onChange={onFieldChange}
                 />
               </Form.Field>
@@ -145,6 +131,19 @@ export function FinalProceedingsSettings({
               />
               <div className="center icon-arrow-up instructions">
                 You can use <b>Markdown</b>.
+              </div>
+            </Form.Field>
+            <Form.Field error={hasError('editorial_json')} width="16">
+              <label>Editorial JSON</label>
+              <TextArea
+                name="editorial_json"
+                value={finalProcSettings.editorial_json || ''}
+                placeholder="Add editorial json"
+                rows={3}
+                onChange={onFieldChange}
+              />
+              <div className="center icon-arrow-up instructions">
+                You have to use <b>JSON</b>.
               </div>
             </Form.Field>
           </Accordion.Content>
@@ -235,27 +234,29 @@ export function FinalProceedingsSettings({
                 />
               </Form.Field>
             </Form.Group>
-            <Form.Field error={hasError('doi_user')}>
-              <label>DOI User</label>
-              <Input
-                fluid
-                name="doi_user"
-                value={finalProcSettings.doi_user || ''}
-                placeholder="Insert DOI user"
-                onChange={onFieldChange}
-              />
-            </Form.Field>
-            <Form.Field error={hasError('doi_password')}>
-              <label>DOI Password</label>
-              <Input
-                fluid
-                name="doi_password"
-                value={finalProcSettings.doi_password || ''}
-                placeholder="Insert DOI Password"
-                onChange={onFieldChange}
-                type="password"
-              />
-            </Form.Field>
+            <Form.Group widths="equal">
+              <Form.Field error={hasError('doi_user')}>
+                <label>DOI User</label>
+                <Input
+                  fluid
+                  name="doi_user"
+                  value={finalProcSettings.doi_user || ''}
+                  placeholder="Insert DOI user"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('doi_password')}>
+                <label>DOI Password</label>
+                <Input
+                  fluid
+                  name="doi_password"
+                  value={finalProcSettings.doi_password || ''}
+                  placeholder="Insert DOI Password"
+                  onChange={onFieldChange}
+                  type="password"
+                />
+              </Form.Field>
+            </Form.Group>
           </Accordion.Content>
 
           <Accordion.Title active={activeIndex === 4} index={4} onClick={onClick}>
@@ -301,7 +302,7 @@ export function FinalProceedingsSettings({
   );
 }
 
-function Section({sectionKey, section}) {
+function Section({ sectionKey, section }) {
   // console.log({sectionKey, section})
 
   return isNil(section) ? (

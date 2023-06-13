@@ -33,6 +33,7 @@ class PurrPlugin(IndicoPlugin):
         'location': '',
         'host_info': '',
         'editorial_board': '',
+        'editorial_json': '',
         'doi_protocol': 'https',
         'doi_domain': 'doi.org',
         'doi_context': '10.18429',
@@ -42,8 +43,7 @@ class PurrPlugin(IndicoPlugin):
         'doi_password': '',
         'date': '',
 
-        'primary_color': '#F39433',
-        'site_base_url': '//accelconf.web.cern.ch'
+        'primary_color': '#F39433'
     }
 
     def init(self):

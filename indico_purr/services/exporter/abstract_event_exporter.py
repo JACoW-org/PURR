@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.config import config
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.contributions.models.contributions import Contribution, PaperRevision
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.date_time import iterdays
@@ -155,6 +155,8 @@ class ABCExportEvent(ABCExportFile):
         field_values = [self._serialize_field_value(f) for f in contrib.field_values]
 
         editables = self._serialize_editables(event, contrib)
+        
+        paper = self._serialize_paper(contrib)
 
         session_code = ""
         if contrib.session_block:
@@ -172,6 +174,8 @@ class ABCExportEvent(ABCExportFile):
             "friendly_id": contrib.friendly_id,
             "field_values": field_values,
             "title": contrib.title,
+            "paper": paper,
+            # "revision": contrib._paper_last_revision,
             "start_dt": export_serialize_date(contrib.start_dt)
             if contrib.start_dt
             else None,
@@ -196,6 +200,19 @@ class ABCExportEvent(ABCExportFile):
             "sub_contributions": sub_contributions,
             "editables": editables,
         }
+
+    def _serialize_paper(self, contrib):
+        return {
+            "title": contrib.paper.title,
+            "state": contrib.paper.state,
+            "verbose_title": contrib.paper.verbose_title,
+            "last_revision": self._serialize_paper_revison(contrib.paper.last_revision),
+        } if contrib.paper else None
+        
+    def _serialize_paper_revison(self, paper_revision):
+        return {
+            "judgment_comment": paper_revision.judgment_comment,
+        } if paper_revision else None
 
     def _serialize_track_data(self, contrib):
         track = None

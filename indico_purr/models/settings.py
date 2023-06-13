@@ -22,6 +22,7 @@ class PurrSettings:
     location: str = field(default='')
     host_info: str = field(default='')
     editorial_board: str = field(default='')
+    editorial_json: str = field(default='')
     doi_protocol: str = field(default='')
     doi_domain: str = field(default='')
     doi_context: str = field(default='')
@@ -30,7 +31,6 @@ class PurrSettings:
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')
-    site_base_url: str = field(default='//accelconf.web.cern.ch')
 
     def as_dict(self):
         return asdict(self)
@@ -53,11 +53,11 @@ class PurrSettings:
         self._validate_location(errors)
         self._validate_host_info(errors)
         self._validate_editorial_board(errors)
+        self._validate_editorial_json(errors)
         self._validate_doi(errors)
         self._validate_doi_user(errors)
         self._validate_doi_password(errors)
         self._validate_primary_color(errors)
-        self._validate_site_base_url(errors)
 
         return errors
 
@@ -119,6 +119,9 @@ class PurrSettings:
     def _validate_editorial_board(self, errors):
         self._required_validator('editorial_board', self.editorial_board, errors)
 
+    def _validate_editorial_json(self, errors):
+        self._required_validator('editorial_json', self.editorial_json, errors)
+
     def _validate_doi(self, errors):
         self._required_validator('doi_protocol', self.doi_protocol, errors)
         self._required_validator('doi_domain', self.doi_domain, errors)
@@ -134,6 +137,3 @@ class PurrSettings:
 
     def _validate_primary_color(self, errors):
         self._required_validator('primary_color', self.primary_color, errors)
-
-    def _validate_site_base_url(self, errors):
-        self._required_validator('site_base_url', self.site_base_url, errors)

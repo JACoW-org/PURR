@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, Button, Icon } from 'semantic-ui-react';
+import { Modal, Button, Icon, Progress } from 'semantic-ui-react';
 import { concatMap, forkJoin, of, throwError } from 'rxjs';
 import { downloadByUrl, fetchJson, openSocket, runPhase } from '../purr.lib';
 import Logger from './purr.fp.logger';
@@ -269,6 +269,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
     <Modal open={open} className="fp-panel">
       <Modal.Header>Generating final proceedings</Modal.Header>
       <Modal.Content>
+
         <div className="operations">
           <h3>Tasks</h3>
           {ops.length > 0 ? (
@@ -278,15 +279,22 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
                 <span>{op.text}</span>
               </div>
             ))
-          ) : (
-            <span>Ready</span>
-          )}
+          ) : (<span>-</span>)}
         </div>
+
         <div className="logs">
           <h3>Logs</h3>
           <Logger logs={logs} />
         </div>
       </Modal.Content>
+
+      <Modal.Description>
+        <div className="progress">
+          <Progress color='blue' progress disabled={!ops?.length}
+            percent={ops?.length ? ops?.length * 100 / 17 : 0} />
+        </div>
+      </Modal.Description>
+
       <Modal.Actions>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           {prePressProcessing || finalProcProcessing ? (
