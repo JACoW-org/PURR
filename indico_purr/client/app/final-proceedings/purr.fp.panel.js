@@ -13,6 +13,12 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
   const [logs, setLogs] = useState([]);
 
   const onClose = useCallback(() => {
+    setOpen(false);
+    setLogs([]);
+    setOps([]);
+  }, [])
+
+  const onAbort = useCallback(() => {
 
     // console.log('onClose', prePressProcessing, finalProcProcessing)
 
@@ -75,13 +81,17 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
       // subscription to the socket
       socket.subscribe({
         next: ({ head, body }) => runPhase(head, body, actions, socket),
-        complete: () => setPrePressProcessing(false),
+        complete: () => {
+          setPrePressProcessing(false);
+          setFinalProcProcessing(false);
+        },
         error: err => {
           console.error(err);
           // TODO based on the error, build a map of error messages to display
           // setErrorMessage('Error while generating final proceedings.');
           // setShowError(true);
           setPrePressProcessing(false);
+          setFinalProcProcessing(false);
         },
       });
 
@@ -162,11 +172,11 @@ const FinalProcPanel = ({ open, setOpen, settings }) => {
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
             {prePressProcessing || finalProcProcessing ? (
-              <Button negative onClick={() => onClose()}>
+              <Button negative onClick={onAbort}>
                 Abort
               </Button>
             ) : (
-              <Button onClick={() => setOpen(false)}>Close</Button>
+              <Button onClick={onClose}>Close</Button>
             )}
           </div>
           <div>
