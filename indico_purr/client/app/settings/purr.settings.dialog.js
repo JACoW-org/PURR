@@ -49,6 +49,7 @@ export function SettingsDialog({
     'booktitle_long',
     'series',
     'series_number',
+    'pre_print',
     'location',
     'host_info',
     'editorial_board',

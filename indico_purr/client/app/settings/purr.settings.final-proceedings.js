@@ -91,6 +91,17 @@ export function FinalProceedingsSettings({
                 />
               </Form.Field>
             </Form.Group>
+            <Form.Group>
+              <Form.Field error={hasError('series')} width="16">
+                <label>Pre print</label>
+                <Input
+                  name="pre_print"
+                  value={finalProcSettings.pre_print || ''}
+                  placeholder="Insert pre print"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
           </Accordion.Content>
 
           <Accordion.Title active={activeIndex === 1} index={1} onClick={onClick}>

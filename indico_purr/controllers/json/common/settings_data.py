@@ -70,6 +70,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             booktitle_long=settings.get("booktitle_long"),
             series=settings.get("series"),
             series_number=settings.get("series_number"),
+            pre_print=settings.get("pre_print"),
             location=settings.get("location"),
             host_info=settings.get("host_info"),
             editorial_board=settings.get("editorial_board"),

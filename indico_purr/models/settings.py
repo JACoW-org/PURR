@@ -19,6 +19,7 @@ class PurrSettings:
     booktitle_long: str = field(default='')
     series: str = field(default='')
     series_number: str = field(default='')
+    pre_print: str = field(default='')
     location: str = field(default='')
     host_info: str = field(default='')
     editorial_board: str = field(default='')
@@ -50,6 +51,7 @@ class PurrSettings:
         self._validate_booktitle_long(errors)
         self._validate_series(errors)
         self._validate_series_number(errors)
+        self._validate_pre_print(errors)
         self._validate_location(errors)
         self._validate_host_info(errors)
         self._validate_editorial_board(errors)
@@ -109,6 +111,9 @@ class PurrSettings:
 
     def _validate_series_number(self, errors):
         self._required_validator('series_number', self.series_number, errors)
+
+    def _validate_pre_print(self, errors):
+        self._required_validator('pre_print', self.pre_print, errors)
 
     def _validate_location(self, errors):
         self._required_validator('location', self.location, errors)
