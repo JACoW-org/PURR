@@ -92,8 +92,6 @@ class PurrSettings:
     def _validate_isbn(self, errors):
         self._required_validator('isbn', self.isbn, errors)
 
-        # TODO use isbnlib to validate if ISBN-10 or ISBN-13
-
     def _validate_issn(self, errors):
         self._required_validator('issn', self.issn, errors)
 
