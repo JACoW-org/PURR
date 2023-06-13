@@ -8,6 +8,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
   const [processing, setProcessing] = useState(() => false);
   const [prePressProcessing, setPrePressProcessing] = useState(false);
   const [finalProcProcessing, setFinalProcProcessing] = useState(false);
+  const [taskCount, setTaskCount] = useState(() => 0);
   // const [aborting, setAborting] = useState(() => false);
   // const [socket, setSocket] = useState(() => undefined);
   const [ops, setOps] = useState(() => []);
@@ -43,6 +44,21 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
     const url = new URL(`${info?.event_id}`, `${settings?.api_url}`);
     window.open(url, '_blank');
   }, [info, settings]);
+
+  // set task count based on the selected event
+  useEffect(() => {
+
+    if (prePressProcessing) {
+      setTaskCount(17)
+    }
+
+    if (finalProcProcessing) {
+      setTaskCount(18)
+    }
+
+    return () => {}
+
+  }, [prePressProcessing, finalProcProcessing])
 
   useEffect(() => {
     setProcessing(
@@ -293,7 +309,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
       <Modal.Description>
         <div className="info">
           <Progress color='blue' disabled={!ops?.length}
-            value={ops?.length} total={18} progress='ratio' />
+            value={ops?.length} total={taskCount} progress='ratio' />
         </div>
       </Modal.Description>
 
