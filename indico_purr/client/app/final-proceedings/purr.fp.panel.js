@@ -38,6 +38,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
   const onCompressProceedings = useCallback(() => setCompressProceedings(true), []);
   const onDownloadProceedings = useCallback(() => setDownloadProceedings(true), []);
+
   const onVisitProceedings = useCallback(() => {
     const url = new URL(`${info?.event_id}`, `${settings?.api_url}`);
     window.open(url, '_blank');
@@ -65,6 +66,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
     let [task_id, socket] = [];
 
     if (prePressProcessing || finalProcProcessing) {
+
       const method = finalProcProcessing ? 'event_final_proceedings' : 'event_pre_press';
 
       // empty logs
