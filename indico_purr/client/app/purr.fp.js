@@ -9,7 +9,7 @@ import FinalProcPanel from './final-proceedings/purr.fp.panel';
 import { fetchInfo } from './api/purr.api';
 import { isNil, result } from 'lodash';
 
-export const PurrFinalProceedings = ({ eventId, settings, settingsValid }) => {
+export const PurrFinalProceedings = ({ eventId, settings, settingsValid, processing, setProcessing }) => {
 
   const [loading, setLoading] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -34,13 +34,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid }) => {
   const onHideDoi = useCallback(() => setHideDoi(true), []);
   const onPublishDoi = useCallback(() => setPublishDoi(true), []);
 
-  const onCompressProceedings = useCallback(() => setCompressProceedings(true), []);
-  const onDownloadProceedings = useCallback(() => setDownloadProceedings(true), []);
-
   const onFinishTask = useCallback(() => {
-
-    setCompressProceedings(false);
-    setDownloadProceedings(false);
 
     setDraftDoi(false);
     setDeleteDoi(false);
@@ -48,6 +42,11 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid }) => {
     setPublishDoi(false);
 
   }, []);
+
+  useEffect(() => {
+    setProcessing(loading || fpPanelOpening || doiPanelOpening);
+    return () => {};
+  }, [loading, fpPanelOpening, doiPanelOpening])
 
   useEffect(() => {
 
@@ -216,7 +215,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid }) => {
             <Button icon title='download' onClick={onDownloadProceedings} disabled={!settingsValid} primary size='mini'>
               <Icon name='download' />
             </Button> */}
-            <Button icon onClick={onFPPanelOpening} disabled={!settingsValid || loading} primary size='mini'>
+            <Button icon onClick={onFPPanelOpening} disabled={!settingsValid || processing} primary size='mini'>
               <Icon name='book' />
             </Button>
           </div>

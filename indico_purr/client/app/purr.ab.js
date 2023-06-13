@@ -6,12 +6,17 @@ import {concatMap} from 'rxjs/operators';
 import {download, openSocket, fetchJson, runPhase} from './purr.lib';
 import {PurrErrorAlert} from './purr.error.alert';
 
-export const PurrAbstractBooklet = ({settings, settingsValid}) => {
+export const PurrAbstractBooklet = ({settings, settingsValid, processing, setProcessing}) => {
   const [loading, setLoading] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showError, setShowError] = useState(false);
 
   const onDownload = useCallback(() => setLoading(true), []);
+
+  useEffect(() => {
+    setProcessing(loading);
+    return () => {};
+  }, [loading]);
 
   useEffect(() => {
     if (settings && loading) {
@@ -101,7 +106,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid}) => {
             <Button
               onClick={onDownload}
               loading={loading}
-              disabled={loading || !settingsValid}
+              disabled={processing || !settingsValid}
               primary
               compact
               size="mini"
