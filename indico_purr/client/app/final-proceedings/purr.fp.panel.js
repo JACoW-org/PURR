@@ -299,20 +299,20 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
         </div>
         <div>
           <Button
-            primary
             disabled={processing}
             loading={prePressProcessing}
             onClick={() => setPrePressProcessing(true)}
             size="mini"
+            className='pre-press-btn'
           >
-            Pre press
+            Pre Press
           </Button>
           <Button
-            primary
             disabled={processing}
             loading={finalProcProcessing}
             onClick={() => setFinalProcProcessing(true)}
             size="mini"
+            color='green'
           >
             Final Proceedings
           </Button>
