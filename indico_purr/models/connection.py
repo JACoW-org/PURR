@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, asdict
 
+
 @dataclass
 class PurrConnection:
     """DTO dataclass for connection to PURR"""
@@ -9,7 +10,7 @@ class PurrConnection:
 
     def as_dict(self):
         return asdict(self)
-    
+
     def validate(self):
         errors = dict()
 
@@ -17,9 +18,9 @@ class PurrConnection:
         self._validate_api_url(errors)
 
         return errors
-    
+
     def _required_validator(self, key, value, errors: dict):
-        if value == None or value == '':
+        if value is None or value == '':
             errors[key] = 'error:required'
 
     def _validate_api_url(self, errors: dict):

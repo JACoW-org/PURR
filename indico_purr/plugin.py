@@ -30,16 +30,21 @@ class PurrPlugin(IndicoPlugin):
         'booktitle_long': '',
         'series': '',
         'series_number': '',
+        'pre_print': '',
         'location': '',
         'host_info': '',
         'editorial_board': '',
-        'doi_base_url': '',
+        'editorial_json': '',
+        'doi_protocol': 'https',
+        'doi_domain': 'doi.org',
+        'doi_context': '10.18429',
+        'doi_organization': 'JACoW',
+        'doi_conference': '',
         'doi_user': '',
         'doi_password': '',
         'date': '',
-        
-        'primary_color': '#F39433',
-        'site_base_url': '//accelconf.web.cern.ch'
+
+        'primary_color': '#F39433'
     }
 
     def init(self):
@@ -58,4 +63,3 @@ class PurrPlugin(IndicoPlugin):
     def register_assets(self):
         self.inject_bundle('script.js', WPEventManagement)
         self.inject_bundle('style.css', WPEventManagement)
-

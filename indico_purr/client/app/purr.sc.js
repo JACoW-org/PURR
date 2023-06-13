@@ -15,6 +15,8 @@ export const PurrSettingsCard = ({
   connected,
   setConnected,
   setSettingsValid,
+  processing,
+  setProcessing,
 }) => {
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
@@ -38,6 +40,12 @@ export const PurrSettingsCard = ({
   }, []);
   const onConnect = useCallback(() => setConnecting(true), [connection]);
   const onDisconnect = useCallback(() => setDisconnecting(true), []);
+
+  // update value of processing
+  useEffect(() => {
+    setProcessing(connecting || disconnecting || settingsLoading || submitLoading);
+    return () => {};
+  }, [connecting, disconnecting, settingsLoading, submitLoading]);
 
   useEffect(() => {
     if (connecting) {
@@ -176,14 +184,15 @@ export const PurrSettingsCard = ({
                 <Button
                   onClick={onDialogOpen}
                   loading={settingsLoading}
-                  disabled={settingsLoading}
+                  disabled={processing}
                   primary
                   compact
                   size="mini"
-                  icon="right chevron"
-                  content="Settings"
-                />
+                >
+                  <Icon name="settings" />
+                </Button>
                 <Button
+                  disabled={processing}
                   onClick={onDisconnect}
                   negative
                   compact
@@ -195,6 +204,7 @@ export const PurrSettingsCard = ({
             ) : (
               <>
                 <Button
+                  disabled={processing}
                   onClick={() => setConnDialogOpen(true)}
                   positive
                   compact

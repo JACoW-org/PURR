@@ -1,11 +1,11 @@
-import {of, from} from 'rxjs';
-import {webSocket} from 'rxjs/webSocket';
-import {switchMap, catchError, map} from 'rxjs/operators';
-import {fromFetch} from 'rxjs/fetch';
+import { of, from } from 'rxjs';
+import { webSocket } from 'rxjs/webSocket';
+import { switchMap, catchError, map } from 'rxjs/operators';
+import { fromFetch } from 'rxjs/fetch';
 
-export function getSettings() {
+export function getEventId() {
   try {
-    return JSON.parse(document.querySelector('#purr-settings').textContent);
+    return JSON.parse(document.querySelector('#purr-event-id').textContent);
   } catch (e) {
     console.error(err);
     return undefined;
@@ -15,7 +15,7 @@ export function getSettings() {
 export function openSocket(settings) {
   const task_id = ulid();
 
-  const {api_url, api_key} = settings;
+  const { api_url, api_key } = settings;
 
   const ws_url = new URL(api_url);
   const ws_pro = 'https:' === ws_url.protocol ? 'wss:' : 'ws:';
@@ -27,12 +27,30 @@ export function openSocket(settings) {
   return [task_id, socket];
 }
 
-export function putJson(url, body) {
-  return fromFetch(url, {
-    method: 'POST', credentials: 'include', headers: {
+function getRequestOpts(method, body) {
+  const CSRFToken = document
+  .getElementById('csrf-token')
+  .getAttribute('content');
+
+  const opts = {
+    method: method,
+    credentials: 'include',
+    headers: {
       "Content-Type": "application/json",
-    }, body: JSON.stringify(body)
-  }).pipe(
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-Token': CSRFToken
+    },
+    body: body
+  }
+
+  return opts;
+}
+
+export function putJson(url, body) {
+
+  const opts = getRequestOpts('POST', JSON.stringify(body));
+
+  return fromFetch(url, opts).pipe(
     switchMap(response => {
       return (response.ok)
         ? from(response.json()).pipe(map(result => ({ error: false, result })))
@@ -46,35 +64,23 @@ export function putJson(url, body) {
 }
 
 export function fetchJson(url) {
-  return fromFetch(url).pipe(
+
+  // config.headers.common['X-Requested-With'] = 'XMLHttpRequest'; // needed for `request.is_xhr`
+  // config.headers.common['X-CSRF-Token'] = document
+  //     .getElementById('csrf-token')
+  //     .getAttribute('content');
+
+  const opts = getRequestOpts('GET');
+
+  return fromFetch(url, opts).pipe(
     switchMap(response => {
       return response.ok
-        ? from(response.json()).pipe(map(result => ({error: false, result})))
-        : of({error: true, message: `Error ${response.status}`});
+        ? from(response.json()).pipe(map(result => ({ error: false, result })))
+        : of({ error: true, message: `Error ${response.status}` });
     }),
     catchError(err => {
       console.error(err);
-      return of({error: true, message: err.message});
-    })
-  );
-}
-
-// TODO rename
-export function httpPost(url, body) {
-  const request = new Request(url, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  });
-
-  return fromFetch(request).pipe(
-    switchMap(response => {
-      return response.ok
-        ? from(response.json()).pipe(map(result => ({error: false, result})))
-        : of({error: true, message: `Error ${response.status}`});
-    }),
-    catchError(err => {
-      console.error(err);
-      return of({error: true, message: err.message});
+      return of({ error: true, message: err.message });
     })
   );
 }
@@ -129,7 +135,7 @@ export function downloadByUrl(url, name) {
   const a = document.body.appendChild(
     Object.assign(document.createElement('a'), {
       href: url,
-      download: true,
+      download: name,
       style: 'display:none',
     })
   );
@@ -142,7 +148,7 @@ export function downloadByUrl(url, name) {
   });
 }
 
-export function log_data({head, body, store}) {
+export function log_data({ head, body, store }) {
   if (head) store[head.uuid] = store[head.uuid] || {};
 
   if (['task:queued'].includes(head.code)) {
@@ -177,18 +183,18 @@ export function log_data({head, body, store}) {
   }
 }
 
-export function run_handler({head, body, store}) {
+export function run_handler({ head, body, store }) {
   if (head.code === 'task:progress') {
     if (head.uuid in store) {
       if ('progress' in store[head.uuid]) {
-        store[head.uuid].progress.call(null, {head, body});
+        store[head.uuid].progress.call(null, { head, body });
       }
     }
   }
   if (head.code === 'task:result') {
     if (head.uuid in store) {
       if ('result' in store[head.uuid]) {
-        store[head.uuid].result.call(null, {head, body});
+        store[head.uuid].result.call(null, { head, body });
       }
     }
   }
@@ -196,7 +202,7 @@ export function run_handler({head, body, store}) {
   if (head.code === 'task:end') {
     if (head.uuid in store) {
       if ('post' in store[head.uuid]) {
-        store[head.uuid].post.call(null, {head, body});
+        store[head.uuid].post.call(null, { head, body });
       }
       if ('ws' in store[head.uuid]) {
         store[head.uuid].ws.close();
@@ -266,7 +272,7 @@ function get_ulid() {
     return dest.join('');
   }
 
-  return function() {
+  return function () {
     let now = Date.now();
     if (now === last) {
       /* 80-bit overflow is so incredibly unlikely that it's not

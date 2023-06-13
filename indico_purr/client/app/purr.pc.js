@@ -7,7 +7,7 @@ import {concatMap} from 'rxjs/operators';
 import {openSocket, fetchJson, runPhase} from './purr.lib';
 import { PurrErrorAlert } from './purr.error.alert';
 
-export const PurrPapersChecks = ({settings, settingsValid}) => {
+export const PurrPapersChecks = ({settings, settingsValid, processing, setProcessing}) => {
   const [errors, setErrors] = useState(() => undefined);
   const [loading, setLoading] = useState(() => false);
   const [progress, setProgress] = useState(() => 'Processing...');
@@ -17,9 +17,14 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
   const onCheck = useCallback(() => setLoading(true), []);
 
   const goToContrib = useCallback(
-    error => (window.location.href = `${error.url}/editing/paper`),
+    error => (window.open(`${error.url}/editing/paper`, '_black').focus()),
     []
   );
+
+  useEffect(() => {
+    setProcessing(loading);
+    return () => {}
+  }, [loading])
 
   useEffect(() => {
     if (settings && loading) {
@@ -82,7 +87,7 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
                 uuid: task_id,
               },
               body: {
-                method: `check_pdf`,
+                method: `event_papers_check`,
                 params: context.params,
               },
             });
@@ -122,7 +127,7 @@ export const PurrPapersChecks = ({settings, settingsValid}) => {
             <Button
               onClick={onCheck}
               loading={loading}
-              disabled={loading || !settingsValid}
+              disabled={processing || !settingsValid}
               primary
               compact
               size="mini"

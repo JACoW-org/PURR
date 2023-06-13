@@ -72,3 +72,17 @@ export function saveSettings(requestBody) {
     })
   );
 }
+
+export function fetchInfo(apiUrl, eventId, apiKey) {
+  const url = new URL(`/api/info/${eventId}/${apiKey}`, apiUrl);
+
+  return fetchJson(url).pipe(
+    concatMap(response => {
+      if (response.error) {
+        throw new Error('error fetching MEOW info');
+      }
+
+      return of({info: response.result.params});
+    })
+  );
+}

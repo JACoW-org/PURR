@@ -8,7 +8,7 @@
     {{ template_hook('event-actions', event=event) }}
 
     {% if connected %}
-        <script id="purr-settings" type="application/json">{{ settings | tojson }}</script>
+        <script id="purr-event-id" type="application/json">{{ event.id | tojson }}</script>
     {% endif %}
 
     <div id="purr-spa"></div>

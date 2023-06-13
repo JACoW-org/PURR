@@ -13,4 +13,3 @@ class PurrConnectForm(IndicoForm):
 
 class PurrDisconnectForm(IndicoForm):
     connected = BooleanField(_("Connected"), [DataRequired()])
-

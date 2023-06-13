@@ -1,7 +1,6 @@
 from flask import jsonify, request, session
-from flask_pluginengine import current_plugin
-
-from werkzeug.exceptions import BadRequest
+# from flask_pluginengine import current_plugin
+# from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 
@@ -12,13 +11,11 @@ from indico.modules.logs import EventLogRealm, LogKind
 
 
 class RHPurrSettingsDataJson(RHManageEventBase):
-    CSRF_ENABLED = False
-
     def _process(self):
         settings = get_purr_settings(self.event)
 
-        current_plugin.logger.info(settings)
-        current_plugin.logger.info(request.method)
+        # current_plugin.logger.info(settings)
+        # current_plugin.logger.info(request.method)
 
         contribution_fields = [{
             "id": f.id,
@@ -26,7 +23,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
         } for f in self.event.contribution_fields]
 
         if request.method == "POST":
-            current_plugin.logger.info(request.json)
+            # current_plugin.logger.info(request.json)
 
             purr_settings = PurrSettings(**request.json.get("settings"))
 
@@ -73,14 +70,19 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             booktitle_long=settings.get("booktitle_long"),
             series=settings.get("series"),
             series_number=settings.get("series_number"),
+            pre_print=settings.get("pre_print"),
             location=settings.get("location"),
             host_info=settings.get("host_info"),
             editorial_board=settings.get("editorial_board"),
-            doi_base_url=settings.get("doi_base_url"),
+            editorial_json=settings.get("editorial_json"),
+            doi_protocol=settings.get("doi_protocol"),
+            doi_domain=settings.get("doi_domain"),
+            doi_context=settings.get("doi_context"),
+            doi_organization=settings.get("doi_organization"),
+            doi_conference=settings.get("doi_conference"),
             doi_user=settings.get("doi_user"),
             doi_password=settings.get("doi_password"),
             primary_color=settings.get("primary_color"),
-            site_base_url=settings.get("site_base_url")
         )
 
         errors = purr_settings.validate()

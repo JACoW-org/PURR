@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, asdict
 
+
 @dataclass
 class PurrSettings:
     """DTO dataclass for PURR settings"""
@@ -18,18 +19,23 @@ class PurrSettings:
     booktitle_long: str = field(default='')
     series: str = field(default='')
     series_number: str = field(default='')
+    pre_print: str = field(default='')
     location: str = field(default='')
     host_info: str = field(default='')
     editorial_board: str = field(default='')
-    doi_base_url: str = field(default='')
+    editorial_json: str = field(default='')
+    doi_protocol: str = field(default='')
+    doi_domain: str = field(default='')
+    doi_context: str = field(default='')
+    doi_organization: str = field(default='')
+    doi_conference: str = field(default='')
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')
-    site_base_url: str = field(default='//accelconf.web.cern.ch') 
 
     def as_dict(self):
         return asdict(self)
-    
+
     def validate(self):
         errors = dict()
 
@@ -45,33 +51,34 @@ class PurrSettings:
         self._validate_booktitle_long(errors)
         self._validate_series(errors)
         self._validate_series_number(errors)
+        self._validate_pre_print(errors)
         self._validate_location(errors)
         self._validate_host_info(errors)
         self._validate_editorial_board(errors)
-        self._validate_doi_base_url(errors)
+        self._validate_editorial_json(errors)
+        self._validate_doi(errors)
         self._validate_doi_user(errors)
         self._validate_doi_password(errors)
         self._validate_primary_color(errors)
-        self._validate_site_base_url(errors)
 
         return errors
-    
+
     def _required_validator(self, key, value, errors):
-        if value == None or value == '':
+        if value is None or value == '':
             errors[key] = 'error:required'
-        
+
     def _format_validator(self, key, value, regex):
         pass
-    
+
     def _validate_ab_session_h1(self, errors):
         self._required_validator('ab_session_h1', self.ab_session_h1, errors)
-        
+
     def _validate_ab_session_h2(self, errors):
         self._required_validator('ab_session_h2', self.ab_session_h2, errors)
-        
+
     def _validate_ab_contribution_h1(self, errors):
         self._required_validator('ab_contribution_h1', self.ab_contribution_h1, errors)
-        
+
     def _validate_ab_contribution_h2(self, errors):
         self._required_validator('ab_contribution_h2', self.ab_contribution_h2, errors)
 
@@ -87,25 +94,26 @@ class PurrSettings:
     def _validate_isbn(self, errors):
         self._required_validator('isbn', self.isbn, errors)
 
-        # TODO use isbnlib to validate if ISBN-10 or ISBN-13
-
     def _validate_issn(self, errors):
         self._required_validator('issn', self.issn, errors)
 
         # if re.search(r'[\S]{4}\-[\S]{4}', self.issn) == None:
         #     errors['issn'] = 'error:issn-format'
-        
+
     def _validate_booktitle_short(self, errors):
         self._required_validator('booktitle_short', self.booktitle_short, errors)
 
     def _validate_booktitle_long(self, errors):
         self._required_validator('booktitle_long', self.booktitle_long, errors)
-        
+
     def _validate_series(self, errors):
         self._required_validator('series', self.series, errors)
 
     def _validate_series_number(self, errors):
         self._required_validator('series_number', self.series_number, errors)
+
+    def _validate_pre_print(self, errors):
+        self._required_validator('pre_print', self.pre_print, errors)
 
     def _validate_location(self, errors):
         self._required_validator('location', self.location, errors)
@@ -116,8 +124,15 @@ class PurrSettings:
     def _validate_editorial_board(self, errors):
         self._required_validator('editorial_board', self.editorial_board, errors)
 
-    def _validate_doi_base_url(self, errors):
-        self._required_validator('doi_base_url', self.doi_base_url, errors)
+    def _validate_editorial_json(self, errors):
+        self._required_validator('editorial_json', self.editorial_json, errors)
+
+    def _validate_doi(self, errors):
+        self._required_validator('doi_protocol', self.doi_protocol, errors)
+        self._required_validator('doi_domain', self.doi_domain, errors)
+        self._required_validator('doi_context', self.doi_context, errors)
+        self._required_validator('doi_organization', self.doi_organization, errors)
+        self._required_validator('doi_conference', self.doi_conference, errors)
 
     def _validate_doi_user(self, errors):
         self._required_validator('doi_user', self.doi_user, errors)
@@ -127,7 +142,3 @@ class PurrSettings:
 
     def _validate_primary_color(self, errors):
         self._required_validator('primary_color', self.primary_color, errors)
-        
-    def _validate_site_base_url(self, errors):
-        self._required_validator('site_base_url', self.site_base_url, errors)
-    

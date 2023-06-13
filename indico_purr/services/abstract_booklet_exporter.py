@@ -1,9 +1,11 @@
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
 
+
 class PurrAbstractBookletExporter(ABCExportEvent):
     """ """
 
     def _export_event_contributions_data(self, event, session_block_id):
+
         contributions = self.find_contributions_list(
             event=event, session_block_id=session_block_id, files=False
         )

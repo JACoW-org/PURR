@@ -157,3 +157,78 @@ a.purr-btn.disabled {
 .error-alert .content, .error-alert .actions {
   background-color: #FFF6F6 !important;
 }
+
+.log {
+  list-style-type: none;
+}
+
+.log.info {
+  color: lightseagreen;
+}
+
+.log.warning {
+  color: orange;
+}
+
+.log.error {
+  color: red;
+}
+
+.fp-panel.ui.modal {
+  > .content {
+    min-height: 45vh;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    flex-flow: row nowrap;
+    gap: 1em;
+  
+    > .operations {
+      flex: 1 1 40%;
+    }
+  
+    > .logs {
+      flex: 1 1 60%;
+    }
+  }
+
+  > .description {
+    > .info {
+      margin: 1rem;
+
+      .ui.progress {
+        &.disabled {
+          opacity: 1;
+  
+          .bar {
+            visibility: hidden;
+
+            > .progress {
+              color: black;
+            }
+          }
+        } 
+      }
+    }
+  } 
+
+  > .actions {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.logs-list {
+  overflow-y: auto;
+  max-height: 300px;
+  padding: 0;
+}
+
+.pre-press-btn {
+  background-color: rgb(233, 158, 24) !important;
+  color: white !important;
+}
+
+.ui.message {
+  width: 100%;
+}

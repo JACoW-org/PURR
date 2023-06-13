@@ -2,9 +2,9 @@ from flask import session, jsonify, request
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.logs import EventLogRealm, LogKind
-from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
-from flask_pluginengine import current_plugin
+
+# from indico.web.util import jsonify_data, jsonify_form
+# from flask_pluginengine import current_plugin
 
 from indico_purr import _
 # from indico_purr.forms import PurrConnectForm
@@ -14,12 +14,10 @@ from indico_purr.models.connection import PurrConnection
 from indico_purr.models.settings import PurrSettings
 
 
-class RHPurrConnectPage(RHManageEventBase):
-    CSRF_ENABLED = False
-
+class RHPurrConnectDataJson(RHManageEventBase):
     def _process(self):
 
-        current_plugin.logger.info(request.json)
+        # current_plugin.logger.info(request.json)
 
         connection = PurrConnection(**request.json.get("connection"))
 
@@ -56,14 +54,19 @@ class RHPurrConnectPage(RHManageEventBase):
             booktitle_long=settings.get("booktitle_long"),
             series=settings.get("series"),
             series_number=settings.get("series_number"),
+            pre_print=settings.get("pre_print"),
             location=settings.get("location"),
             host_info=settings.get("host_info"),
             editorial_board=settings.get("editorial_board"),
-            doi_base_url=settings.get("doi_base_url"),
+            editorial_json=settings.get("editorial_json"),
+            doi_protocol=settings.get("doi_protocol"),
+            doi_domain=settings.get("doi_domain"),
+            doi_context=settings.get("doi_context"),
+            doi_organization=settings.get("doi_organization"),
+            doi_conference=settings.get("doi_conference"),
             doi_user=settings.get("doi_user"),
             doi_password=settings.get("doi_password"),
             primary_color=settings.get("primary_color"),
-            site_base_url=settings.get("site_base_url")
         )
 
         errors = purr_settings.validate()

@@ -7,7 +7,7 @@ from indico_purr.services.final_proceedings_exporter import PurrFinalProceedings
 from indico_purr.utils import get_purr_settings
 
 
-class RHPurrContributionsDataJson(RHManageEventBase, PurrFinalProceedingsExporter):
+class RHPurrFinalProceedingsContributionsDataJson(RHManageEventBase, PurrFinalProceedingsExporter):
     def _process(self):
         session_block_id = int(request.view_args["session_block_id"])
         settings = get_purr_settings(self.event)
