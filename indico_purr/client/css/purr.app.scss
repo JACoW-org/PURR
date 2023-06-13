@@ -176,17 +176,19 @@ a.purr-btn.disabled {
 
 .fp-panel.ui.modal {
   > .content {
+    min-height: 50vh;
     display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    flex-flow: row nowrap;
     gap: 1em;
   
     > .operations {
-      width: 40%;
-      position: sticky;
-      top: 0;
+      flex: 1 1 40%;
     }
   
     > .logs {
-      width: 60%;
+      flex: 1 1 60%;
     }
   }
 

@@ -266,7 +266,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
   }, [downloadProceedings]);
 
   return (
-    <Modal open={open} size="small" className="fp-panel">
+    <Modal open={open} className="fp-panel">
       <Modal.Header>Generating final proceedings</Modal.Header>
       <Modal.Content>
         <div className="operations">
@@ -290,21 +290,12 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
       <Modal.Actions>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           {prePressProcessing || finalProcProcessing ? (
-            <Button negative onClick={onAbort}>
+            <Button size="mini" negative onClick={onAbort}>
               Abort
             </Button>
           ) : (
-            <Button onClick={onClose}>Close</Button>
+            <Button size="mini" onClick={onClose}>Close</Button>
           )}
-        </div>
-        <div>
-          <Button
-            disabled={finalProcProcessing}
-            loading={prePressProcessing}
-            onClick={() => setPrePressProcessing(true)}
-          >
-            Pre press
-          </Button>
         </div>
         <div>
           <Button
