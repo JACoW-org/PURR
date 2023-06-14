@@ -1,13 +1,13 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {Button, Card, Icon, Modal, Label, Table} from 'semantic-ui-react';
-import {of, forkJoin, throwError} from 'rxjs';
-import {size, map, isNil} from 'lodash';
-import {concatMap} from 'rxjs/operators';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, Card, Icon, Modal, Label, Table } from 'semantic-ui-react';
+import { of, forkJoin, throwError } from 'rxjs';
+import { size, map, isNil } from 'lodash';
+import { concatMap } from 'rxjs/operators';
 
-import {openSocket, fetchJson, runPhase} from './purr.lib';
+import { openSocket, fetchJson, runPhase } from './purr.lib';
 import { PurrErrorAlert } from './purr.error.alert';
 
-export const PurrPapersChecks = ({settings, settingsValid, processing, setProcessing}) => {
+export const PurrPapersChecks = ({ settings, settingsValid, processing, setProcessing }) => {
   const [errors, setErrors] = useState(() => undefined);
   const [loading, setLoading] = useState(() => false);
   const [progress, setProgress] = useState(() => 'Processing...');
@@ -23,7 +23,7 @@ export const PurrPapersChecks = ({settings, settingsValid, processing, setProces
 
   useEffect(() => {
     setProcessing(loading);
-    return () => {}
+    return () => { }
   }, [loading])
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export const PurrPapersChecks = ({settings, settingsValid, processing, setProces
       };
 
       socket.subscribe({
-        next: ({head, body}) => runPhase(head, body, actions, socket),
+        next: ({ head, body }) => runPhase(head, body, actions, socket),
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
@@ -59,7 +59,7 @@ export const PurrPapersChecks = ({settings, settingsValid, processing, setProces
         },
       });
 
-      const context = {params: {}};
+      const context = { params: {} };
 
       of(null)
         .pipe(
@@ -69,7 +69,7 @@ export const PurrPapersChecks = ({settings, settingsValid, processing, setProces
             })
           ),
 
-          concatMap(({event}) => {
+          concatMap(({ event }) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -98,7 +98,7 @@ export const PurrPapersChecks = ({settings, settingsValid, processing, setProces
         .subscribe();
     }
 
-    return () => {};
+    return () => { };
   }, [settings, loading]);
 
   return (
@@ -124,17 +124,19 @@ export const PurrPapersChecks = ({settings, settingsValid, processing, setProces
             )}
           </div>
           <div className="ui right">
-            <Button
-              onClick={onCheck}
-              loading={loading}
-              disabled={processing || !settingsValid}
-              primary
-              compact
-              size="mini"
-              labelPosition="right"
-              icon="right chevron"
-              content="Check"
-            />
+            <Button.Group size='mini'>
+              <Button
+                onClick={onCheck}
+                loading={loading}
+                disabled={processing || !settingsValid}
+                primary
+                compact
+                size="mini"
+                labelPosition="right"
+                icon="bug"
+                content="Validate"
+              />
+            </Button.Group>
           </div>
         </Card.Content>
       </Card>

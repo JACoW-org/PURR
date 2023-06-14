@@ -45,7 +45,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
 
   useEffect(() => {
     setProcessing(loading || fpPanelOpening || doiPanelOpening);
-    return () => {};
+    return () => { };
   }, [loading, fpPanelOpening, doiPanelOpening])
 
   useEffect(() => {
@@ -54,94 +54,88 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
 
     if (settings) {
 
-      if (downloadProceedings) {
+      if (draftDoi || deleteDoi || hideDoi || publishDoi) {
 
-        downloadByUrl
-
-      } else
-
-        if (draftDoi || deleteDoi || hideDoi || publishDoi || compressProceedings) {
-
-          const method = (
-            draftDoi ? `event_doi_draft` : (
-              deleteDoi ? `event_doi_delete` : (
-                hideDoi ? `event_doi_hide` : (
-                  publishDoi ? `event_doi_publish` : (
-                    compressProceedings ? `event_compress_proceedings` : (
-                      undefined
-                    )
-                  )
+        const method = (
+          draftDoi ? `event_doi_draft` : (
+            deleteDoi ? `event_doi_delete` : (
+              hideDoi ? `event_doi_hide` : (
+                publishDoi ? `event_doi_publish` : (
+                  undefined
                 )
               )
             )
           )
+        )
 
-          console.log(`useEffect --> method: ${method}`)
+        console.log(`useEffect --> method: ${method}`)
 
-          const [task_id, socket] = openSocket(settings);
+        const [task_id, socket] = openSocket(settings);
 
-          const actions = {
-            'task:progress': (head, body) => console.log(head, body),
-            'task:result': (head, body) => console.log(head, body),
-          };
+        const actions = {
+          'task:progress': (head, body) => console.log(head, body),
+          'task:result': (head, body) => console.log(head, body),
+        };
 
-          socket.subscribe({
-            next: ({ head, body }) => runPhase(head, body, actions, socket),
-            complete: () => onFinishTask(),
-            error: err => {
-              console.error(err);
-              setErrorMessage('Error while generating the abstract booklet.');
-              setShowError(true);
-              onFinishTask();
-            },
-          });
+        socket.subscribe({
+          next: ({ head, body }) => runPhase(head, body, actions, socket),
+          complete: () => onFinishTask(),
+          error: err => {
+            console.error(err);
+            setErrorMessage('Error while generating the abstract booklet.');
+            setShowError(true);
+            onFinishTask();
+          },
+        });
 
-          const context = { params: {} };
+        const context = { params: {} };
 
-          of(null)
-            .pipe(
-              concatMap(() =>
-                forkJoin({
-                  event: fetchJson('settings-and-event-data'),
-                })
-              ),
-
-              concatMap(({ event }) => {
-                if (event.error) {
-                  return throwError(() => new Error('error'));
-                }
-
-                context.params = {
-                  ...context.params,
-                  event: event.result.event,
-                  cookies: event.result.cookies,
-                  settings: event.result.settings,
-                };
-
-                socket.next({
-                  head: {
-                    code: `task:exec`,
-                    uuid: task_id,
-                  },
-                  body: {
-                    method: method,
-                    params: context.params,
-                  },
-                });
-
-                return of(null);
+        of(null)
+          .pipe(
+            concatMap(() =>
+              forkJoin({
+                event: fetchJson('settings-and-event-data'),
               })
-            )
-            .subscribe();
-        }
+            ),
+
+            concatMap(({ event }) => {
+              if (event.error) {
+                return throwError(() => new Error('error'));
+              }
+
+              context.params = {
+                ...context.params,
+                event: event.result.event,
+                cookies: event.result.cookies,
+                settings: event.result.settings,
+              };
+
+              socket.next({
+                head: {
+                  code: `task:exec`,
+                  uuid: task_id,
+                },
+                body: {
+                  method: method,
+                  params: context.params,
+                },
+              });
+
+              return of(null);
+            })
+          )
+          .subscribe();
+
+      }
 
       return () => { };
     }
 
-  }, [settings, draftDoi, deleteDoi, hideDoi, publishDoi, compressProceedings, downloadProceedings]);
+  }, [settings, draftDoi, deleteDoi, hideDoi, publishDoi]);
 
   // useEffect info API when opening FP or DOI panels
   useEffect(() => {
+
     if (fpPanelOpening || doiPanelOpening) {
 
       const sub$ = of(null).pipe(
@@ -154,7 +148,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
         filter(result => !!result),
         tap(result => {
           setFPInfo(result.info);
-          
+
           if (fpPanelOpening) {
             setFPPanelOpening(false);
             setOpenFPPanel(true);
@@ -171,7 +165,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
       return () => sub$.unsubscribe();
     }
 
-    return () => {};
+    return () => { };
   }, [fpPanelOpening, doiPanelOpening])
 
   return (
@@ -215,9 +209,16 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
             <Button icon title='download' onClick={onDownloadProceedings} disabled={!settingsValid} primary size='mini'>
               <Icon name='download' />
             </Button> */}
-            <Button icon onClick={onFPPanelOpening} disabled={!settingsValid || processing} primary size='mini'>
-              <Icon name='book' />
-            </Button>
+            
+
+            
+
+            <Button.Group size='mini'>
+              <Button title='Digital Object Identifier' labelPosition='left' icon="globe" content="DOI" onClick={onFPPanelOpening} disabled={true} color='facebook' />
+              <Button.Or />
+              <Button title='Final Proceedings' labelPosition='right' content="Site" icon='sitemap' onClick={onFPPanelOpening} disabled={!settingsValid || processing} color='blue' />
+            </Button.Group>
+
           </div>
         </Card.Content>
       </Card>

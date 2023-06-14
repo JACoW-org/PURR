@@ -1,12 +1,12 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {Button, Card, Icon} from 'semantic-ui-react';
-import {of, forkJoin, throwError} from 'rxjs';
-import {concatMap} from 'rxjs/operators';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, Card, Icon } from 'semantic-ui-react';
+import { of, forkJoin, throwError } from 'rxjs';
+import { concatMap } from 'rxjs/operators';
 
-import {download, openSocket, fetchJson, runPhase} from './purr.lib';
-import {PurrErrorAlert} from './purr.error.alert';
+import { download, openSocket, fetchJson, runPhase } from './purr.lib';
+import { PurrErrorAlert } from './purr.error.alert';
 
-export const PurrAbstractBooklet = ({settings, settingsValid, processing, setProcessing}) => {
+export const PurrAbstractBooklet = ({ settings, settingsValid, processing, setProcessing }) => {
   const [loading, setLoading] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showError, setShowError] = useState(false);
@@ -15,7 +15,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid, processing, setPro
 
   useEffect(() => {
     setProcessing(loading);
-    return () => {};
+    return () => { };
   }, [loading]);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid, processing, setPro
       };
 
       socket.subscribe({
-        next: ({head, body}) => runPhase(head, body, actions, socket),
+        next: ({ head, body }) => runPhase(head, body, actions, socket),
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
@@ -38,7 +38,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid, processing, setPro
         },
       });
 
-      const context = {params: {}};
+      const context = { params: {} };
 
       of(null)
         .pipe(
@@ -48,7 +48,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid, processing, setPro
             })
           ),
 
-          concatMap(({event}) => {
+          concatMap(({ event }) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -77,7 +77,7 @@ export const PurrAbstractBooklet = ({settings, settingsValid, processing, setPro
         .subscribe();
     }
 
-    return () => {};
+    return () => { };
   }, [settings, loading]);
 
   return (
@@ -103,16 +103,19 @@ export const PurrAbstractBooklet = ({settings, settingsValid, processing, setPro
             )}
           </div>
           <div className="ui right">
-            <Button
-              onClick={onDownload}
-              loading={loading}
-              disabled={processing || !settingsValid}
-              primary
-              compact
-              size="mini"
-            >
-              <Icon name="download" />
-            </Button>
+            <Button.Group size='mini'>
+              <Button
+                onClick={onDownload}
+                loading={loading}
+                disabled={processing || !settingsValid}
+                primary
+                compact
+                size="mini"
+                labelPosition="right"
+                icon="cloud download"
+                content="Download"
+              />
+            </Button.Group>
           </div>
         </Card.Content>
       </Card>
