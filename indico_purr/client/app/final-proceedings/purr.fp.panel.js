@@ -48,6 +48,10 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
   // set task count based on the selected event
   useEffect(() => {
 
+    if (compressProceedings) {
+      setTaskCount(2)
+    }
+
     if (prePressProcessing) {
       setTaskCount(17)
     }
@@ -58,7 +62,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
     return () => { }
 
-  }, [prePressProcessing, finalProcProcessing])
+  }, [compressProceedings, prePressProcessing, finalProcProcessing])
 
   useEffect(() => {
     setProcessing(
@@ -178,7 +182,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
       if (socket) {
         socket.complete();
 
-        setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text }))]);
+        setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text })), { text: '' }]);
       }
     };
   }, [prePressProcessing, finalProcProcessing]);
@@ -186,6 +190,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
   // compress proceedings
   useEffect(() => {
     if (compressProceedings) {
+
       const method = 'event_compress_proceedings';
 
       const [task_id, socket] = openSocket(settings);
@@ -268,7 +273,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
         if (socket) {
           socket.complete();
 
-          setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text }))]);
+          setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text })), { text: '' }]);
         }
       };
     }
@@ -310,13 +315,13 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
       <Modal.Description>
         <div className="info">
           <Progress color='blue' disabled={!ops?.length}
-            value={ops?.length} total={taskCount} progress='ratio' />
+            value={ops?.length - 1} total={taskCount} progress='ratio' />
         </div>
       </Modal.Description>
 
       <Modal.Actions>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          {prePressProcessing || finalProcProcessing ? (
+          {compressProceedings || prePressProcessing || finalProcProcessing ? (
             <Button size="mini" negative onClick={onAbort}>
               Abort
             </Button>
