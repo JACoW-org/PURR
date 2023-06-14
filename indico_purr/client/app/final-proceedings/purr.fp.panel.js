@@ -56,7 +56,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
       setTaskCount(18)
     }
 
-    return () => {}
+    return () => { }
 
   }, [prePressProcessing, finalProcProcessing])
 
@@ -87,6 +87,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
       // empty logs
       setLogs([]);
+      setOps([]);
 
       // references to open web socket
       [task_id, socket] = openSocket(settings);
@@ -324,55 +325,60 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
           )}
         </div>
         <div>
-          <Button
-            disabled={processing}
-            loading={prePressProcessing}
-            onClick={() => setPrePressProcessing(true)}
-            size="mini"
-            className='pre-press-btn'
-          >
-            Pre Press
-          </Button>
-          <Button
-            disabled={processing}
-            loading={finalProcProcessing}
-            onClick={() => setFinalProcProcessing(true)}
-            size="mini"
-            color='green'
-          >
-            Final Proceedings
-          </Button>
-          <Button
-            icon
-            title="Compress final proceedings"
-            onClick={onCompressProceedings}
-            loading={compressProceedings}
-            disabled={processing}
-            primary
-            size="mini"
-          >
-            <Icon name="compress" />
-          </Button>
-          <Button
-            icon
-            title="Download final proceedings' ZIP"
-            onClick={onDownloadProceedings}
-            disabled={processing}
-            primary
-            size="mini"
-          >
-            <Icon name="download" />
-          </Button>
-          <Button
-            icon
-            title="Visit static website"
-            onClick={onVisitProceedings}
-            disabled={processing}
-            primary
-            size="mini"
-          >
-            <Icon name="external alternate" />
-          </Button>
+          <Button.Group size='mini'>
+            <Button
+              icon="compress"
+              content="Compress"
+              title="Compress final proceedings"
+              onClick={onCompressProceedings}
+              loading={compressProceedings}
+              disabled={processing}
+              color='violet'
+              size="mini"
+            />
+            <Button
+              icon="download"
+              content="Download"
+              title="Download final proceedings' ZIP"
+              onClick={onDownloadProceedings}
+              disabled={processing}
+              color='purple'
+              size="mini"
+            />
+            <Button
+              icon="external alternate"
+              content="Open"
+              title="Visit static website"
+              onClick={onVisitProceedings}
+              disabled={processing}
+              color='brown'
+              size="mini"
+            />
+          </Button.Group>
+        </div>
+        <div>
+          <Button.Group size='mini'>
+            <Button
+              disabled={processing}
+              loading={prePressProcessing}
+              onClick={() => setPrePressProcessing(true)}
+              icon='cog'
+              content='Pre Press'
+              labelPosition='left'
+              className='pre-press-btn'
+            />
+            <Button.Or />
+            <Button
+              disabled={processing}
+              loading={finalProcProcessing}
+              onClick={() => setFinalProcProcessing(true)}
+              icon='cogs'
+              content='Final Proceedings'
+              labelPosition='right'
+              color='green'
+            />
+          </Button.Group>
+
         </div>
       </Modal.Actions>
     </Modal>
