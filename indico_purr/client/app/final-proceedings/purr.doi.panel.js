@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Button, List, Modal, Progress } from 'semantic-ui-react';
-import { fetchJson, openSocket, runPhase } from '../purr.lib';
-import { concatMap, forkJoin, of, tap, throwError } from 'rxjs';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Button, List, Modal, Progress} from 'semantic-ui-react';
+import {fetchJson, openSocket, runPhase} from '../purr.lib';
+import {concatMap, forkJoin, of, tap, throwError} from 'rxjs';
 
-const DoiPanel = ({ open, setOpen, settings }) => {
+const DoiPanel = ({open, setOpen, settings}) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -13,14 +13,16 @@ const DoiPanel = ({ open, setOpen, settings }) => {
   const [partials, setPartials] = useState(() => []);
   const [total, setTotal] = useState(() => 0);
 
-  const onClose = useCallback(() => setOpen(false), []);
-  const onAbort = useCallback(() => { }, []); // TODO
+  const anchorRef = useRef(null);
 
-  const onFetch = useCallback(() => { }); // TODO
+  const onClose = useCallback(() => setOpen(false), []);
+  const onAbort = useCallback(() => {}, []); // TODO
+
+  const onFetch = useCallback(() => {}); // TODO
   const onCreate = useCallback(() => setCreating(true), []); // TODO
-  const onDelete = useCallback(() => { }, []); // TODO
-  const onPublish = useCallback(() => { }, []); // TODO
-  const onHide = useCallback(() => { }, []); // TODO
+  const onDelete = useCallback(() => {}, []); // TODO
+  const onPublish = useCallback(() => {}, []); // TODO
+  const onHide = useCallback(() => {}, []); // TODO
 
   useEffect(() => setProcessing(fetching || creating || deleting || publishing || hiding), [
     fetching,
@@ -39,7 +41,7 @@ const DoiPanel = ({ open, setOpen, settings }) => {
       const [task_id, socket] = openSocket(settings);
 
       socket.subscribe({
-        next: ({ head, body }) => runPhase(head, body, actions, socket),
+        next: ({head, body}) => runPhase(head, body, actions, socket),
         complete: stopTasks,
         error: error => {
           console.log(error);
@@ -54,7 +56,7 @@ const DoiPanel = ({ open, setOpen, settings }) => {
               event: fetchJson('settings-and-event-data'), // TODO serve ?!?!
             })
           ),
-          concatMap(({ event }) => {
+          concatMap(({event}) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -91,11 +93,17 @@ const DoiPanel = ({ open, setOpen, settings }) => {
     }
   }, [fetching, creating, deleting, publishing, hiding]);
 
+  // scrolling handler
+  useEffect(() => {
+    if (anchorRef.current) {
+      anchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [partials]);
+
   const buildActions = () => {
     return {
       'task:progress': (head, body) => {
-
-        console.log(body)
+        console.log(body);
 
         if (!body.params || body.params.phase !== 'doi_result') {
           return;
@@ -104,18 +112,18 @@ const DoiPanel = ({ open, setOpen, settings }) => {
         const doi = body.params.result.doi;
         const total = body.params.result.total;
 
-        setTotal(total)
+        setTotal(total);
 
         if (!doi) {
           return;
         }
 
-        console.log(doi)
+        console.log(doi);
 
         if (fetching) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiStatusItem doi={doi} index={doi.id} key={doi.id} />
+            <DoiStatusItem doi={doi} index={doi.id} key={doi.id} />,
           ]);
         }
 
@@ -148,7 +156,6 @@ const DoiPanel = ({ open, setOpen, settings }) => {
         }
       },
       'task:result': (head, body) => {
-
         if (!body.params || body.params.phase !== 'doi_result') {
           return;
         }
@@ -159,12 +166,12 @@ const DoiPanel = ({ open, setOpen, settings }) => {
           return;
         }
 
-        console.log(doi)
+        console.log(doi);
 
         if (fetching) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiStatusItem doi={doi} index={doi.id} key={doi.id} />
+            <DoiStatusItem doi={doi} index={doi.id} key={doi.id} />,
           ]);
         }
 
@@ -216,13 +223,20 @@ const DoiPanel = ({ open, setOpen, settings }) => {
   };
 
   return (
-    <Modal open={open} className="doi-panel" sc>
+    <Modal open={open} className="doi-panel">
       <Modal.Header>Digital Objects Identifiers Management</Modal.Header>
       <Modal.Content scrolling>
         <List>{partials}</List>
+        <div ref={anchorRef} />
       </Modal.Content>
       <Modal.Content>
-        <Progress color="blue" active={processing} progress="ratio" value={partials.length} total={total} />
+        <Progress
+          color="blue"
+          active={processing}
+          progress="ratio"
+          value={partials.length}
+          total={total}
+        />
       </Modal.Content>
       <Modal.Actions>
         {processing ? (
@@ -273,20 +287,20 @@ const DoiPanel = ({ open, setOpen, settings }) => {
   );
 };
 
-const DoiStatusItem = ({ doi, index }) => {
-  console.log(doi, index)
+const DoiStatusItem = ({doi, index}) => {
+  console.log(doi, index);
   return (
-    <List.Item className='doi-status' key={index}>
+    <List.Item className="doi-status" key={index}>
       <div>{doi.id}</div>
       <div>{doi.status}</div>
     </List.Item>
   );
 };
 
-const DoiProgressItem = ({ doi, update, index }) => {
-  console.log(doi, update, index)
+const DoiProgressItem = ({doi, update, index}) => {
+  console.log(doi, update, index);
   return (
-    <List.Item className='doi-progress' key={index}>
+    <List.Item className="doi-progress" key={index}>
       {doi.id}...{update}!
     </List.Item>
   );
