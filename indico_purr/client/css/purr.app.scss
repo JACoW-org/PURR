@@ -233,9 +233,33 @@ a.purr-btn.disabled {
     display: flex;
     justify-content: space-between;
   }
+
+  > .content {
+
+    padding-top: 0;
+
+    > .list-header {
+      display: flex;
+      position: sticky;
+      top: 0;
+      left: 0;
+      padding-top: 1.5rem;
+      background-color: white;
+
+      > h3 {
+        flex-basis: 50%;
+        margin-top: 0;
+      }
+    }
+  }
 }
 
 .doi-status {
-  display: flex;
+  display: flex !important;
   justify-content: space-between;
+
+  > div,
+  h3 {
+    flex-basis: 50%;
+  }
 }
