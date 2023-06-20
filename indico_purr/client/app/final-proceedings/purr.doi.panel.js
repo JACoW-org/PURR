@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Button, List, Modal, Progress} from 'semantic-ui-react';
-import {fetchJson, openSocket, runPhase} from '../purr.lib';
-import {concatMap, forkJoin, of, tap, throwError} from 'rxjs';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, List, Modal, Progress } from 'semantic-ui-react';
+import { fetchJson, openSocket, runPhase } from '../purr.lib';
+import { concatMap, forkJoin, of, tap, throwError } from 'rxjs';
 
-const DoiPanel = ({open, setOpen, settings}) => {
+const DoiPanel = ({ open, setOpen, settings }) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -14,13 +14,13 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const [total, setTotal] = useState(() => 0);
 
   const onClose = useCallback(() => setOpen(false), []);
-  const onAbort = useCallback(() => {}, []); // TODO
+  const onAbort = useCallback(() => { }, []); // TODO
 
-  const onFetch = useCallback(() => {}); // TODO
+  const onFetch = useCallback(() => { }); // TODO
   const onCreate = useCallback(() => setCreating(true), []); // TODO
-  const onDelete = useCallback(() => {}, []); // TODO
-  const onPublish = useCallback(() => {}, []); // TODO
-  const onHide = useCallback(() => {}, []); // TODO
+  const onDelete = useCallback(() => { }, []); // TODO
+  const onPublish = useCallback(() => { }, []); // TODO
+  const onHide = useCallback(() => { }, []); // TODO
 
   useEffect(() => setProcessing(fetching || creating || deleting || publishing || hiding), [
     fetching,
@@ -39,7 +39,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
       const [task_id, socket] = openSocket(settings);
 
       socket.subscribe({
-        next: ({head, body}) => runPhase(head, body, actions, socket),
+        next: ({ head, body }) => runPhase(head, body, actions, socket),
         complete: stopTasks,
         error: error => {
           console.log(error);
@@ -54,7 +54,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
               event: fetchJson('settings-and-event-data'), // TODO serve ?!?!
             })
           ),
-          concatMap(({event}) => {
+          concatMap(({ event }) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -94,12 +94,15 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const buildActions = () => {
     return {
       'task:progress': (head, body) => {
-        if (!body.params) {
+
+        console.log(body)
+
+        if (!body.params || body.params.phase) {
           return;
         }
 
         if (fetching) {
-          setPartials(prevPartials => [...prevPartials, <DoiStatusItem item={body.params} />]);
+          setPartials(prevPartials => [...prevPartials, <DoiStatusItem item={body.params} index={prevPartials.length}  />]);
         }
 
         if (creating) {
@@ -115,21 +118,21 @@ const DoiPanel = ({open, setOpen, settings}) => {
         if (deleting) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem item={body.params} update="Deleted" />,
+            <DoiProgressItem item={body.params} update="Deleted" index={prevPartials.length}  />,
           ]);
         }
 
         if (publishing) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem item={body.params} update="Published" />,
+            <DoiProgressItem item={body.params} update="Published" index={prevPartials.length}  />,
           ]);
         }
 
         if (hiding) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem item={body.params} update="Hidden" />,
+            <DoiProgressItem item={body.params} update="Hidden" index={prevPartials.length}  />,
           ]);
         }
       },
@@ -139,7 +142,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
         }
 
         if (fetching) {
-          setPartials(prevPartials => [...prevPartials, <DoiStatusItem item={body.params} />]);
+          setPartials(prevPartials => [...prevPartials, <DoiStatusItem item={body.params} index={prevPartials.length} />]);
         }
 
         if (creating) {
@@ -152,21 +155,21 @@ const DoiPanel = ({open, setOpen, settings}) => {
         if (deleting) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem item={body.params} update="Deleted" />,
+            <DoiProgressItem item={body.params} update="Deleted" index={prevPartials.length} />,
           ]);
         }
 
         if (publishing) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem item={body.params} update="Published" />,
+            <DoiProgressItem item={body.params} update="Published" index={prevPartials.length} />,
           ]);
         }
 
         if (hiding) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem item={body.params} update="Hidden" />,
+            <DoiProgressItem item={body.params} update="Hidden" index={prevPartials.length} />,
           ]);
         }
       },
@@ -247,9 +250,9 @@ const DoiPanel = ({open, setOpen, settings}) => {
   );
 };
 
-const DoiStatusItem = doi => {
+const DoiStatusItem = (doi, index) => {
   return (
-    <List.Item className='doi-status'>
+    <List.Item className='doi-status' key={index}>
       <div>{doi.id}</div>
       <div>{doi.status}</div>
     </List.Item>
@@ -257,6 +260,7 @@ const DoiStatusItem = doi => {
 };
 
 const DoiProgressItem = (doi, update, index) => {
+  console.log(doi, update, index)
   return (
     <List.Item className='doi-progress' key={index}>
       {doi.id}...{update}!
