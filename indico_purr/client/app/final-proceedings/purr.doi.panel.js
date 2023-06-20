@@ -57,7 +57,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
         .pipe(
           concatMap(() =>
             forkJoin({
-              event: fetchJson('settings-and-event-data'), // TODO serve ?!?!
+              event: fetchJson('settings-and-event-data'),
             })
           ),
           concatMap(({event}) => {
@@ -67,6 +67,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
             return of(event);
           }),
           tap(event => {
+
             setPartials([]);
 
             const params = {
@@ -77,7 +78,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
             socket.next({
               head: {
-                text: 'task:exec',
+                code: 'task:exec',
                 uuid: task_id,
               },
               body: {
@@ -142,10 +143,10 @@ const DoiPanel = ({open, setOpen, settings}) => {
           ]);
         }
 
-        if (publishing) {
+        if (publishing && code) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Published" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={`Doi for contribution ${code}`} update="Published" key={code} />,
           ]);
         }
 
@@ -163,9 +164,9 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
         const doi = body.params.result.doi;
 
-        if (!doi) {
-          return;
-        }
+        // if (!doi) {
+        //   return;
+        // }
 
         console.log(doi);
 
@@ -179,21 +180,21 @@ const DoiPanel = ({open, setOpen, settings}) => {
         if (creating) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Created" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Created" key={doi.id} />,
           ]);
         }
 
         if (deleting) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={text} update="Deleted" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={`Doi for contribution ${code}`} update="Deleted" key={code} />,
           ]);
         }
 
         if (publishing) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Published" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={`Doi for contribution ${code}`} update="Published" key={code} />,
           ]);
         }
 
