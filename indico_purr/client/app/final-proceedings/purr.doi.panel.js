@@ -19,10 +19,10 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const onAbort = useCallback(() => {}, []); // TODO
 
   const onFetch = useCallback(() => {}); // TODO
-  const onCreate = useCallback(() => setCreating(true), []); // TODO
-  const onDelete = useCallback(() => {}, []); // TODO
-  const onPublish = useCallback(() => {}, []); // TODO
-  const onHide = useCallback(() => {}, []); // TODO
+  const onCreate = useCallback(() => setCreating(true), []);
+  const onDelete = useCallback(() => setDeleting(true), []);
+  const onPublish = useCallback(() => setPublishing(true), []);
+  const onHide = useCallback(() => setHiding(true), []);
 
   useEffect(() => setProcessing(fetching || creating || deleting || publishing || hiding), [
     fetching,
@@ -34,6 +34,10 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
   useEffect(() => {
     if (fetching || creating || deleting || publishing || hiding) {
+
+      // reset params
+      setTotal(0);
+
       const method = resolveMethod();
 
       const actions = buildActions();
@@ -73,7 +77,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
             socket.next({
               head: {
-                code: 'task:exec',
+                text: 'task:exec',
                 uuid: task_id,
               },
               body: {
@@ -96,7 +100,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
   // scrolling handler
   useEffect(() => {
     if (anchorRef.current) {
-      anchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      anchorRef.current.scrollIntoView({behavior: 'smooth', block: 'end'});
     }
   }, [partials]);
 
@@ -110,13 +114,10 @@ const DoiPanel = ({open, setOpen, settings}) => {
         }
 
         const doi = body.params.result.doi;
+        const code = body.params.result.text;
         const total = body.params.result.total;
 
         setTotal(total);
-
-        if (!doi) {
-          return;
-        }
 
         console.log(doi);
 
@@ -127,31 +128,31 @@ const DoiPanel = ({open, setOpen, settings}) => {
           ]);
         }
 
-        if (creating) {
+        if (creating && doi) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Created" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Created" key={doi.id} />,
           ]);
         }
 
-        if (deleting) {
+        if (deleting && code) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Deleted" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={`Doi for contribution ${code}`} update="Deleted" key={code} />,
           ]);
         }
 
         if (publishing) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Published" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Published" index={doi.id} key={doi.id} />,
           ]);
         }
 
         if (hiding) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Hidden" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Hidden" index={doi.id} key={doi.id} />,
           ]);
         }
       },
@@ -178,28 +179,28 @@ const DoiPanel = ({open, setOpen, settings}) => {
         if (creating) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Created" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Created" index={doi.id} key={doi.id} />,
           ]);
         }
 
         if (deleting) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Deleted" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={text} update="Deleted" index={doi.id} key={doi.id} />,
           ]);
         }
 
         if (publishing) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Published" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Published" index={doi.id} key={doi.id} />,
           ]);
         }
 
         if (hiding) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem doi={doi} update="Hidden" index={doi.id} key={doi.id} />,
+            <DoiProgressItem text={doi.id} update="Hidden" index={doi.id} key={doi.id} />,
           ]);
         }
       },
@@ -297,11 +298,10 @@ const DoiStatusItem = ({doi, index}) => {
   );
 };
 
-const DoiProgressItem = ({doi, update, index}) => {
-  console.log(doi, update, index);
+const DoiProgressItem = ({text, update}) => {
   return (
-    <List.Item className="doi-progress" key={index}>
-      {doi.id}...{update}!
+    <List.Item className="doi-progress">
+      {text}...{update}!
     </List.Item>
   );
 };
