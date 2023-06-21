@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Button, List, Modal, Progress} from 'semantic-ui-react';
+import {Button, Divider, List, Modal, Progress} from 'semantic-ui-react';
 import {fetchJson, openSocket, runPhase} from '../purr.lib';
 import {concatMap, forkJoin, of, tap, throwError} from 'rxjs';
 
@@ -18,7 +18,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const onClose = useCallback(() => setOpen(false), []);
   const onAbort = useCallback(() => {}, []); // TODO
 
-  const onFetch = useCallback(() => {}); // TODO
+  const onFetch = useCallback(() => setFetching(true));
   const onCreate = useCallback(() => setCreating(true), []);
   const onDelete = useCallback(() => setDeleting(true), []);
   const onPublish = useCallback(() => setPublishing(true), []);
@@ -34,7 +34,6 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
   useEffect(() => {
     if (fetching || creating || deleting || publishing || hiding) {
-
       // reset params
       setTotal(0);
 
@@ -67,7 +66,6 @@ const DoiPanel = ({open, setOpen, settings}) => {
             return of(event);
           }),
           tap(event => {
-
             setPartials([]);
 
             const params = {
@@ -98,6 +96,14 @@ const DoiPanel = ({open, setOpen, settings}) => {
     }
   }, [fetching, creating, deleting, publishing, hiding]);
 
+  useEffect(() => {
+    if (open) {
+      setFetching(true);
+    } else {
+      setPartials([]);
+    }
+  }, [open]);
+  
   // scrolling handler
   useEffect(() => {
     if (anchorRef.current) {
@@ -120,40 +126,35 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
         setTotal(total);
 
-        console.log(doi);
-
-        if (fetching) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiStatusItem doi={doi} index={doi.id} key={doi.id} />,
-          ]);
+        if (fetching && doi) {
+          setPartials(prevPartials => [...prevPartials, <DoiStatusItem doi={doi} key={doi.id} />]);
         }
 
-        if (creating && doi) {
+        if (creating) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Created" key={doi.id} />,
+            <DoiStatusItem doi={doi} code={code} newStatus="Created" key={doi ? doi.id : code} />,
           ]);
         }
 
         if (deleting && code) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={`Doi for contribution ${code}`} update="Deleted" key={code} />,
+            <DoiStatusItem doi={doi} code={code} newStatus="Deleted" key={doi ? doi.id : code} />,
           ]);
         }
 
-        if (publishing && code) {
+        if (publishing && doi) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={`Doi for contribution ${code}`} update="Published" key={code} />,
+            <DoiStatusItem doi={doi} code={code} newStatus="Published" key={doi ? doi.id : code} />,
           ]);
         }
 
         if (hiding) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Hidden" index={doi.id} key={doi.id} />,
+            <DoiStatusItem doi={doi} code={code} newStatus="Hidden" key={doi ? doi.id : code} />,
           ]);
         }
       },
@@ -171,10 +172,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
         console.log(doi);
 
         if (fetching) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiStatusItem doi={doi} index={doi.id} key={doi.id} />,
-          ]);
+          setPartials(prevPartials => [...prevPartials, <DoiStatusItem doi={doi} key={doi.id} />]);
         }
 
         if (creating) {
@@ -209,7 +207,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
   };
 
   const resolveMethod = () => {
-    if (fetching) return 'event_doi_fetch';
+    if (fetching) return 'event_doi_info';
     if (creating) return 'event_doi_draft';
     if (deleting) return 'event_doi_delete';
     if (publishing) return 'event_doi_publish';
@@ -228,6 +226,11 @@ const DoiPanel = ({open, setOpen, settings}) => {
     <Modal open={open} className="doi-panel">
       <Modal.Header>Digital Objects Identifiers Management</Modal.Header>
       <Modal.Content scrolling>
+        <div className="list-header">
+          <h3>Item</h3>
+          <h3>Status</h3>
+          <Divider />
+        </div>
         <List>{partials}</List>
         <div ref={anchorRef} />
       </Modal.Content>
@@ -235,7 +238,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
         <Progress
           color="blue"
           active={processing}
-          progress="ratio"
+          progress={partials.length > 0 ? 'ratio' : false}
           value={partials.length}
           total={total}
         />
@@ -247,6 +250,15 @@ const DoiPanel = ({open, setOpen, settings}) => {
           <Button size="mini" content="Close" onClick={onClose} />
         )}
         <Button.Group size="mini">
+          <Button
+            content="Refresh"
+            title="Refresh conference DOIs"
+            onClick={onFetch}
+            disabled={processing}
+            loading={fetching}
+            icon="refresh"
+            color="pink"
+          />
           <Button
             content="Create"
             title="Create conference DOIs in draft state"
@@ -289,14 +301,24 @@ const DoiPanel = ({open, setOpen, settings}) => {
   );
 };
 
-const DoiStatusItem = ({doi, index}) => {
-  console.log(doi, index);
+const DoiStatusItem = ({doi, code, newStatus = null}) => {
   return (
-    <List.Item className="doi-status" key={index}>
-      <div>{doi.id}</div>
-      <div>{doi.status}</div>
+    <List.Item className="doi-status">
+      <div>{doi ? doi.id : code}</div>
+      {/* <div>{doi.attributes.state === 'findable' ? 'published' : doi.attributes.state}</div> */}
+      <div>
+        <DoiState state={newStatus ? newStatus : doi?.attributes?.state} />
+      </div>
     </List.Item>
   );
+};
+
+const DoiState = ({state}) => {
+  if (state === 'findable') {
+    return 'published';
+  }
+
+  return state;
 };
 
 const DoiProgressItem = ({text, update}) => {
