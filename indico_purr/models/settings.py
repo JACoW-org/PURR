@@ -24,7 +24,8 @@ class PurrSettings:
     host_info: str = field(default='')
     editorial_board: str = field(default='')
     editorial_json: str = field(default='')
-    doi_protocol: str = field(default='')
+    doi_env: str = field(default='')
+    doi_proto: str = field(default='')
     doi_domain: str = field(default='')
     doi_context: str = field(default='')
     doi_organization: str = field(default='')
@@ -128,7 +129,8 @@ class PurrSettings:
         self._required_validator('editorial_json', self.editorial_json, errors)
 
     def _validate_doi(self, errors):
-        self._required_validator('doi_protocol', self.doi_protocol, errors)
+        self._required_validator('doi_env', self.doi_env, errors)
+        self._required_validator('doi_proto', self.doi_proto, errors)
         self._required_validator('doi_domain', self.doi_domain, errors)
         self._required_validator('doi_context', self.doi_context, errors)
         self._required_validator('doi_organization', self.doi_organization, errors)
