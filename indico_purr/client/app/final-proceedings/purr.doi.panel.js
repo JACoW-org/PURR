@@ -1,9 +1,9 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Button, Divider, List, Modal, Progress} from 'semantic-ui-react';
-import {fetchJson, openSocket, runPhase} from '../purr.lib';
-import {concatMap, forkJoin, of, tap, throwError} from 'rxjs';
+import { Button, Table, Modal, Progress, Label } from 'semantic-ui-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { concatMap, forkJoin, of, tap, throwError } from 'rxjs';
+import { fetchJson, openSocket, runPhase } from '../purr.lib';
 
-const DoiPanel = ({open, setOpen, settings}) => {
+const DoiPanel = ({ open, setOpen, settings }) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -16,7 +16,31 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const anchorRef = useRef(null);
 
   const onClose = useCallback(() => setOpen(false), []);
-  const onAbort = useCallback(() => {}, []); // TODO
+  const onAbort = useCallback(() => {
+
+    // console.log('onAbort', prePressProcessing, finalProcProcessing)
+
+    if (fetching) {
+      setFetching(false);
+    }
+
+    if (creating) {
+      setCreating(false);
+    }
+
+    if (deleting) {
+      setDeleting(false);
+    }
+
+    if (publishing) {
+      setPublishing(false);
+    }
+
+    if (hiding) {
+      setHiding(false);
+    }
+
+  }, [fetching, creating, deleting, publishing, hiding]);
 
   const onFetch = useCallback(() => setFetching(true));
   const onCreate = useCallback(() => setCreating(true), []);
@@ -24,18 +48,14 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const onPublish = useCallback(() => setPublishing(true), []);
   const onHide = useCallback(() => setHiding(true), []);
 
-  useEffect(() => setProcessing(fetching || creating || deleting || publishing || hiding), [
-    fetching,
-    creating,
-    deleting,
-    publishing,
-    hiding,
-  ]);
+  useEffect(() => {
+    setProcessing(fetching || creating || deleting || publishing || hiding)
+  }, [fetching, creating, deleting, publishing, hiding]);
 
   useEffect(() => {
     if (fetching || creating || deleting || publishing || hiding) {
-      // reset params
-      setTotal(0);
+
+      setTotal(0); // reset params
 
       const method = resolveMethod();
 
@@ -44,7 +64,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
       const [task_id, socket] = openSocket(settings);
 
       socket.subscribe({
-        next: ({head, body}) => runPhase(head, body, actions, socket),
+        next: ({ head, body }) => runPhase(head, body, actions, socket),
         complete: stopTasks,
         error: error => {
           console.log(error);
@@ -59,7 +79,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
               event: fetchJson('settings-and-event-data'),
             })
           ),
-          concatMap(({event}) => {
+          concatMap(({ event }) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -103,11 +123,11 @@ const DoiPanel = ({open, setOpen, settings}) => {
       setPartials([]);
     }
   }, [open]);
-  
+
   // scrolling handler
   useEffect(() => {
     if (anchorRef.current) {
-      anchorRef.current.scrollIntoView({behavior: 'smooth', block: 'end'});
+      anchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }, [partials]);
 
@@ -133,28 +153,28 @@ const DoiPanel = ({open, setOpen, settings}) => {
         if (creating) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} newStatus="Created" key={doi ? doi.id : code} />,
+            <DoiStatusItem doi={doi} code={code} key={doi ? doi.id : code} />,
           ]);
         }
 
         if (deleting && code) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} newStatus="Deleted" key={doi ? doi.id : code} />,
+            <DoiStatusItem doi={doi} code={code} newStatus="deleted" key={doi ? doi.id : code} />,
           ]);
         }
 
         if (publishing && doi) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} newStatus="Published" key={doi ? doi.id : code} />,
+            <DoiStatusItem doi={doi} code={code} key={doi ? doi.id : code} />,
           ]);
         }
 
         if (hiding) {
           setPartials(prevPartials => [
             ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} newStatus="Hidden" key={doi ? doi.id : code} />,
+            <DoiStatusItem doi={doi} code={code} key={doi ? doi.id : code} />,
           ]);
         }
       },
@@ -226,12 +246,28 @@ const DoiPanel = ({open, setOpen, settings}) => {
     <Modal open={open} className="doi-panel">
       <Modal.Header>Digital Objects Identifiers Management</Modal.Header>
       <Modal.Content scrolling>
-        <div className="list-header">
-          <h3>Item</h3>
-          <h3>Status</h3>
-          <Divider />
-        </div>
-        <List>{partials}</List>
+        <Table celled striped compact>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Prefix</Table.HeaderCell>
+              <Table.HeaderCell>Suffix</Table.HeaderCell>
+              <Table.HeaderCell>Status</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {partials}
+          </Table.Body>
+          {/*
+            <Table.Footer>
+              <Table.Row>
+                <Table.HeaderCell>3 People</Table.HeaderCell>
+                <Table.HeaderCell>2 Approved</Table.HeaderCell>
+                <Table.HeaderCell>2 Approved</Table.HeaderCell>
+              </Table.Row>
+            </Table.Footer>
+          */}
+        </Table>
+
         <div ref={anchorRef} />
       </Modal.Content>
       <Modal.Content>
@@ -301,32 +337,25 @@ const DoiPanel = ({open, setOpen, settings}) => {
   );
 };
 
-const DoiStatusItem = ({doi, code, newStatus = null}) => {
+const DoiStatusItem = ({ doi, code, newStatus = null }) => {
   return (
-    <List.Item className="doi-status">
-      <div>{doi ? doi.id : code}</div>
-      {/* <div>{doi.attributes.state === 'findable' ? 'published' : doi.attributes.state}</div> */}
-      <div>
+    <Table.Row>
+      <Table.Cell>
+        {doi?.attributes?.prefix}
+      </Table.Cell>
+      <Table.Cell>
+        {doi?.attributes?.suffix}
+      </Table.Cell>
+      <Table.Cell>
         <DoiState state={newStatus ? newStatus : doi?.attributes?.state} />
-      </div>
-    </List.Item>
+      </Table.Cell>
+    </Table.Row>
   );
 };
 
-const DoiState = ({state}) => {
-  if (state === 'findable') {
-    return 'published';
-  }
-
-  return state;
-};
-
-const DoiProgressItem = ({text, update}) => {
-  return (
-    <List.Item className="doi-progress">
-      {text}...{update}!
-    </List.Item>
-  );
+const DoiState = ({ state }) => {
+  const label = (state === 'findable') ? 'published' : state;
+  return (<Label color='red' horizontal>{label}</Label>);
 };
 
 export default DoiPanel;

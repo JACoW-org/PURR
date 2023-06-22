@@ -24,15 +24,15 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
   const onAbort = useCallback(() => {
 
-    // console.log('onClose', prePressProcessing, finalProcProcessing)
+    // console.log('onAbort', prePressProcessing, finalProcProcessing)
 
     if (prePressProcessing) {
-      // console.log('onClose - prePressProcessing')
+      // console.log('onAbort - prePressProcessing')
       setPrePressProcessing(false);
     }
 
     if (finalProcProcessing) {
-      // console.log('onClose - finalProcProcessing')
+      // console.log('onAbort - finalProcProcessing')
       setFinalProcProcessing(false);
     }
   }, [prePressProcessing, finalProcProcessing]);
