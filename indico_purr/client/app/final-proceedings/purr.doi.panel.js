@@ -1,9 +1,10 @@
-import { Button, Table, Modal, Progress, Label } from 'semantic-ui-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { concatMap, forkJoin, of, tap, throwError } from 'rxjs';
-import { fetchJson, openSocket, runPhase } from '../purr.lib';
+import {Button, Table, Modal, Progress, Label} from 'semantic-ui-react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {concatMap, forkJoin, of, tap, throwError} from 'rxjs';
+import {fetchJson, openSocket, runPhase} from '../purr.lib';
+import {sortedIndexBy} from 'lodash';
 
-const DoiPanel = ({ open, setOpen, settings }) => {
+const DoiPanel = ({open, setOpen, settings}) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -17,7 +18,6 @@ const DoiPanel = ({ open, setOpen, settings }) => {
 
   const onClose = useCallback(() => setOpen(false), []);
   const onAbort = useCallback(() => {
-
     // console.log('onAbort', prePressProcessing, finalProcProcessing)
 
     if (fetching) {
@@ -39,7 +39,6 @@ const DoiPanel = ({ open, setOpen, settings }) => {
     if (hiding) {
       setHiding(false);
     }
-
   }, [fetching, creating, deleting, publishing, hiding]);
 
   const onFetch = useCallback(() => setFetching(true));
@@ -49,12 +48,11 @@ const DoiPanel = ({ open, setOpen, settings }) => {
   const onHide = useCallback(() => setHiding(true), []);
 
   useEffect(() => {
-    setProcessing(fetching || creating || deleting || publishing || hiding)
+    setProcessing(fetching || creating || deleting || publishing || hiding);
   }, [fetching, creating, deleting, publishing, hiding]);
 
   useEffect(() => {
     if (fetching || creating || deleting || publishing || hiding) {
-
       setTotal(0); // reset params
 
       const method = resolveMethod();
@@ -64,7 +62,7 @@ const DoiPanel = ({ open, setOpen, settings }) => {
       const [task_id, socket] = openSocket(settings);
 
       socket.subscribe({
-        next: ({ head, body }) => runPhase(head, body, actions, socket),
+        next: ({head, body}) => runPhase(head, body, actions, socket),
         complete: stopTasks,
         error: error => {
           console.log(error);
@@ -79,7 +77,7 @@ const DoiPanel = ({ open, setOpen, settings }) => {
               event: fetchJson('settings-and-event-data'),
             })
           ),
-          concatMap(({ event }) => {
+          concatMap(({event}) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -127,7 +125,7 @@ const DoiPanel = ({ open, setOpen, settings }) => {
   // scrolling handler
   useEffect(() => {
     if (anchorRef.current) {
-      anchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      anchorRef.current.scrollIntoView({behavior: 'smooth', block: 'end'});
     }
   }, [partials]);
 
@@ -143,39 +141,39 @@ const DoiPanel = ({ open, setOpen, settings }) => {
         const doi = body.params.result.doi;
         const code = body.params.result.text;
         const total = body.params.result.total;
+        const identifier = body.params.result.id;
+        const error = body.params.result.error;
 
         setTotal(total);
 
-        if (fetching && doi) {
-          setPartials(prevPartials => [...prevPartials, <DoiStatusItem doi={doi} key={doi.id} />]);
+        if (fetching) {
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
         if (creating) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} key={doi ? doi.id : code} />,
-          ]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
-        if (deleting && code) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} newStatus="deleted" key={doi ? doi.id : code} />,
-          ]);
+        if (deleting) {
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
-        if (publishing && doi) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} key={doi ? doi.id : code} />,
-          ]);
+        if (publishing) {
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
         if (hiding) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiStatusItem doi={doi} code={code} key={doi ? doi.id : code} />,
-          ]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
       },
       'task:result': (head, body) => {
@@ -192,38 +190,45 @@ const DoiPanel = ({ open, setOpen, settings }) => {
         console.log(doi);
 
         if (fetching) {
-          setPartials(prevPartials => [...prevPartials, <DoiStatusItem doi={doi} key={doi.id} />]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
         if (creating) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Created" key={doi.id} />,
-          ]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
         if (deleting) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiProgressItem text={`Doi for contribution ${code}`} update="Deleted" key={code} />,
-          ]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
         if (publishing) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiProgressItem text={`Doi for contribution ${code}`} update="Published" key={code} />,
-          ]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
 
         if (hiding) {
-          setPartials(prevPartials => [
-            ...prevPartials,
-            <DoiProgressItem text={doi.id} update="Hidden" index={doi.id} key={doi.id} />,
-          ]);
+          setPartials(prevPartials =>
+            insertPartialInSortedArray(prevPartials, identifier, doi, error)
+          );
         }
       },
     };
+  };
+
+  const insertPartialInSortedArray = (partials, identifier, doi, error) => {
+    const newIndex = sortedIndexBy(partials, {key: identifier}, 'key');
+    const newPartial = {
+      key: identifier,
+      jsx: <DoiStatusItem id={identifier} key={identifier} doi={doi} error={error} />,
+    };
+    return [...partials.slice(0, newIndex), newPartial, ...partials.slice(newIndex)];
   };
 
   const resolveMethod = () => {
@@ -246,17 +251,16 @@ const DoiPanel = ({ open, setOpen, settings }) => {
     <Modal open={open} className="doi-panel">
       <Modal.Header>Digital Objects Identifiers Management</Modal.Header>
       <Modal.Content scrolling>
-        <Table celled striped compact>
+        <Table celled striped compact textAlign="center" fixed>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Prefix</Table.HeaderCell>
-              <Table.HeaderCell>Suffix</Table.HeaderCell>
+              {/* <Table.HeaderCell>Prefix</Table.HeaderCell>
+              <Table.HeaderCell>Suffix</Table.HeaderCell> */}
+              <Table.HeaderCell>Identifier</Table.HeaderCell>
               <Table.HeaderCell>Status</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
-          <Table.Body>
-            {partials}
-          </Table.Body>
+          <Table.Body>{partials?.map(partial => partial.jsx)}</Table.Body>
           {/*
             <Table.Footer>
               <Table.Row>
@@ -323,7 +327,7 @@ const DoiPanel = ({ open, setOpen, settings }) => {
             color="green"
           />
           <Button
-            content="Hiding"
+            content="Hide"
             title="Hide conference DOIs"
             onClick={onHide}
             disabled={processing}
@@ -337,25 +341,91 @@ const DoiPanel = ({ open, setOpen, settings }) => {
   );
 };
 
-const DoiStatusItem = ({ doi, code, newStatus = null }) => {
+const DoiStatusItem = ({id, doi, code, error, newStatus = null}) => {
   return (
-    <Table.Row>
-      <Table.Cell>
+    <Table.Row negative={!!error}>
+      {/* <Table.Cell>
         {doi?.attributes?.prefix}
       </Table.Cell>
       <Table.Cell>
         {doi?.attributes?.suffix}
-      </Table.Cell>
+      </Table.Cell> */}
+      <Table.Cell>{id}</Table.Cell>
       <Table.Cell>
-        <DoiState state={newStatus ? newStatus : doi?.attributes?.state} />
+        {error ? (
+          <DoiError error={error} />
+        ) : (
+          <DoiState state={newStatus ? newStatus : doi?.attributes?.state} />
+        )}
       </Table.Cell>
     </Table.Row>
   );
 };
 
-const DoiState = ({ state }) => {
-  const label = (state === 'findable') ? 'published' : state;
-  return (<Label color='red' horizontal>{label}</Label>);
+const DoiState = ({state}) => {
+  const label = state === 'findable' ? 'published' : state;
+
+  let color;
+  switch (label) {
+    case 'published':
+      color = 'green';
+      break;
+    case 'registered':
+      color = 'violet';
+      break;
+    case 'draft':
+      color = 'blue';
+      break;
+    default:
+      color = 'pink';
+  }
+
+  return (
+    <Label color={color} horizontal>
+      {/* Capitalize first letter */}
+      {label.replace(/^\w/, char => char.toUpperCase())}
+    </Label>
+  );
+};
+
+const DoiError = ({error}) => {
+  let errorMessage;
+  switch (error) {
+    case 400:
+      errorMessage = 'Bad request. Contact administrator.';
+      break;
+    case 401:
+      errorMessage = 'Unauthorized - Check your credentials in the settings.';
+      break;
+    case 403:
+      errorMessage =
+        'Forbidden - Check your credentials in the settings or validate that you are updating a DOI/prefix/repository you have permissions for.';
+    case 404:
+      errorMessage =
+        'Not Found - The resource is not found. Check that final proceedings have been generated correctly.';
+      break;
+    case 405:
+      errorMessage = 'This operation is not allowed.';
+      break;
+    case 422:
+      errorMessage =
+        'Check the contents of your request, the system understood but it was unable to process it. For a DOI update this might be invalid URL or metadata is invalid.';
+      break;
+    case 500:
+      errorMessage = 'Contact administrator.';
+      break;
+    case 502:
+      errorMessage = 'Most likely a temporary issue, try again.';
+      break;
+    case 503:
+    case 504:
+      errorMessage = 'Check service status in status.datacite.org';
+      break;
+    default:
+      errorMessage = error;
+  }
+
+  return <p>{errorMessage}</p>;
 };
 
 export default DoiPanel;
