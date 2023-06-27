@@ -8,14 +8,16 @@ import {PurrPapersChecks} from './purr.pc';
 import {PurrFinalProceedings} from './purr.fp';
 import {catchError, concatMap, of, tap} from 'rxjs';
 import {fetchSettings} from './api/purr.api';
-import {getEventId} from './purr.lib';
+import {getEventId, getEventTitle} from './purr.lib';
 
 document.addEventListener('DOMContentLoaded', () => {
   const purrSpa = document.getElementById('purr-spa');
   if (purrSpa) {
     const eventId = getEventId();
+    const eventTitle = getEventTitle();
 
     console.log('eventId -->', eventId);
+    console.log('eventTitle -->', eventTitle);
 
     const PurrHome = () => {
       const [settings, setSettings] = useState();
@@ -81,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     />
                     <PurrFinalProceedings
                       eventId={eventId}
+                      eventTitle={eventTitle}
                       settings={settings}
                       settingsValid={settingsValid}
                       processing={processing}

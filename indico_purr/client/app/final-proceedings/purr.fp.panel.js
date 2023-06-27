@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Modal, Button, Icon, Progress } from 'semantic-ui-react';
-import { concatMap, forkJoin, of, throwError } from 'rxjs';
+import { catchError, concatMap, forkJoin, of, throwError } from 'rxjs';
 import { downloadByUrl, fetchJson, openSocket, runPhase } from '../purr.lib';
 import Logger from './purr.fp.logger';
+import { PurrErrorAlert } from '../purr.error.alert';
 
-const FinalProcPanel = ({ open, setOpen, info, settings }) => {
+const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
   const [processing, setProcessing] = useState(() => false);
   const [prePressProcessing, setPrePressProcessing] = useState(false);
   const [finalProcProcessing, setFinalProcProcessing] = useState(false);
@@ -15,6 +16,8 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
   const [logs, setLogs] = useState(() => []);
   const [compressProceedings, setCompressProceedings] = useState(() => false);
   const [downloadProceedings, setDownloadProceedings] = useState(() => false);
+  const [showError, setShowError] = useState(() => false);
+  const [errorMessage, setErrorMessage] = useState(() => null);
 
   const onClose = useCallback(() => {
     setOpen(false);
@@ -49,15 +52,15 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
   useEffect(() => {
 
     if (compressProceedings) {
-      setTaskCount(2)
+      setTaskCount(2);
     }
 
     if (prePressProcessing) {
-      setTaskCount(17)
+      setTaskCount(17);
     }
 
     if (finalProcProcessing) {
-      setTaskCount(18)
+      setTaskCount(19);
     }
 
     return () => { }
@@ -129,9 +132,10 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
         },
         error: err => {
           console.error(err);
-          // TODO based on the error, build a map of error messages to display
-          // setErrorMessage('Error while generating final proceedings.');
-          // setShowError(true);
+          
+          setErrorMessage('Failed to start task. Check connection with MEOW.');
+          setShowError(true);
+
           setPrePressProcessing(false);
           setFinalProcProcessing(false);
         },
@@ -173,6 +177,14 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
             });
 
             return of(null);
+          }),
+          catchError(error => {
+            console.log(error);
+
+            setErrorMessage('Failed to fetch settings and data for this event. Retry or contact an admin.');
+            setShowError(true);
+
+            throw error;
           })
         )
         .subscribe();
@@ -214,6 +226,21 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
           setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text }))]);
         },
+        'task:error': (head, body) => {
+          console.log(head, body);
+  
+          if (!body.params) {
+            return;
+          }
+  
+          const errorMessage = body.params.message;
+  
+          // show error message
+          setErrorMessage(errorMessage);
+          setShowError(true);
+  
+          return socket.complete();
+        }
       };
 
       // subscription to the socket
@@ -291,7 +318,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
   return (
     <Modal open={open} className="fp-panel">
-      <Modal.Header>Generating final proceedings</Modal.Header>
+      <Modal.Header>{eventTitle} - Final proceedings generation panel</Modal.Header>
       <Modal.Content>
 
         <div className="operations">
@@ -386,6 +413,12 @@ const FinalProcPanel = ({ open, setOpen, info, settings }) => {
 
         </div>
       </Modal.Actions>
+
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
     </Modal>
   );
 };

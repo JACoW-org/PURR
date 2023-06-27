@@ -6,7 +6,16 @@ import { fromFetch } from 'rxjs/fetch';
 export function getEventId() {
   try {
     return JSON.parse(document.querySelector('#purr-event-id').textContent);
-  } catch (e) {
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+}
+
+export function getEventTitle() {
+  try {
+    return JSON.parse(document.querySelector('#purr-event-title').textContent);
+  } catch (err) {
     console.error(err);
     return undefined;
   }
@@ -88,16 +97,16 @@ export function fetchJson(url) {
 export function runPhase(head, body, actions, socket) {
   // console.log(head, body);
 
+  if (head.code in actions) {
+    return actions[head.code](head, body);
+  }
+  
   if (head.code === 'task:end') {
     return socket.complete();
   }
 
   if (head.code === 'task:error') {
     return socket.complete();
-  }
-
-  if (head.code in actions) {
-    return actions[head.code](head, body);
   }
 }
 

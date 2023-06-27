@@ -12,6 +12,7 @@ import DoiPanel from './final-proceedings/purr.doi.panel';
 
 export const PurrFinalProceedings = ({
   eventId,
+  eventTitle,
   settings,
   settingsValid,
   processing,
@@ -189,25 +190,6 @@ export const PurrFinalProceedings = ({
             )}
           </div>
           <div className="ui right">
-            {/* <Button icon title='draft doi' onClick={onDraftDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='hide doi' onClick={onHideDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='delete doi' onClick={onDeleteDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='publish doi' onClick={onPublishDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='compress' onClick={onCompressProceedings} disabled={!settingsValid} primary size='mini'>
-              <Icon name='compress' />
-            </Button>
-            <Button icon title='download' onClick={onDownloadProceedings} disabled={!settingsValid} primary size='mini'>
-              <Icon name='download' />
-            </Button> */}
-
             <Button.Group size="mini">
               <Button
                 title="Digital Object Identifier"
@@ -242,8 +224,14 @@ export const PurrFinalProceedings = ({
         setOpen={setOpenFPPanel}
         info={fpInfo}
         settings={settings}
+        eventTitle={eventTitle}
       />
-      <DoiPanel open={openDOIPanel} setOpen={setOpenDOIPanel} settings={settings} />
+      <DoiPanel
+        open={openDOIPanel}
+        setOpen={setOpenDOIPanel}
+        settings={settings}
+        eventTitle={eventTitle}
+      />
     </>
   );
 };

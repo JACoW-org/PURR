@@ -1,10 +1,11 @@
 import {Button, Table, Modal, Progress, Label} from 'semantic-ui-react';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {concatMap, forkJoin, of, tap, throwError} from 'rxjs';
+import {catchError, concatMap, forkJoin, of, tap, throwError} from 'rxjs';
 import {fetchJson, openSocket, runPhase} from '../purr.lib';
 import {sortedIndexBy} from 'lodash';
+import { PurrErrorAlert } from '../purr.error.alert';
 
-const DoiPanel = ({open, setOpen, settings}) => {
+const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -13,6 +14,9 @@ const DoiPanel = ({open, setOpen, settings}) => {
   const [hiding, setHiding] = useState(() => false);
   const [partials, setPartials] = useState(() => []);
   const [total, setTotal] = useState(() => 0);
+
+  const [showError, setShowError] = useState(() => false);
+  const [errorMessage, setErrorMessage] = useState(() => null);
 
   const anchorRef = useRef(null);
 
@@ -57,15 +61,19 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
       const method = resolveMethod();
 
-      const actions = buildActions();
-
       const [task_id, socket] = openSocket(settings);
+
+      const actions = buildActions(socket);
 
       socket.subscribe({
         next: ({head, body}) => runPhase(head, body, actions, socket),
         complete: stopTasks,
         error: error => {
           console.log(error);
+          
+          setErrorMessage('Failed to start task. Check connection with MEOW.');
+          setShowError(true);
+
           stopTasks();
         },
       });
@@ -82,6 +90,16 @@ const DoiPanel = ({open, setOpen, settings}) => {
               return throwError(() => new Error('error'));
             }
             return of(event);
+          }),
+          catchError(error => {
+
+            console.log(error);
+
+            setErrorMessage('Failed to fetch settings and data for this event. Retry or contact an admin.');
+            setShowError(true);
+            stopTasks();
+
+            throw error;
           }),
           tap(event => {
             setPartials([]);
@@ -129,7 +147,7 @@ const DoiPanel = ({open, setOpen, settings}) => {
     }
   }, [partials]);
 
-  const buildActions = () => {
+  const buildActions = (socket) => {
     return {
       'task:progress': (head, body) => {
         console.log(body);
@@ -139,38 +157,13 @@ const DoiPanel = ({open, setOpen, settings}) => {
         }
 
         const doi = body.params.result.doi;
-        const code = body.params.result.text;
         const total = body.params.result.total;
         const identifier = body.params.result.id;
         const error = body.params.result.error;
 
         setTotal(total);
 
-        if (fetching) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (creating) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (deleting) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (publishing) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (hiding) {
+        if (fetching || creating || deleting || publishing || hiding) {
           setPartials(prevPartials =>
             insertPartialInSortedArray(prevPartials, identifier, doi, error)
           );
@@ -182,43 +175,30 @@ const DoiPanel = ({open, setOpen, settings}) => {
         }
 
         const doi = body.params.result.doi;
+        const identifier = body.params.result.id;
+        const error = body.params.result.error;
 
-        // if (!doi) {
-        //   return;
-        // }
-
-        console.log(doi);
-
-        if (fetching) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (creating) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (deleting) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (publishing) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
-
-        if (hiding) {
+        if (fetching || creating || deleting || publishing || hiding) {
           setPartials(prevPartials =>
             insertPartialInSortedArray(prevPartials, identifier, doi, error)
           );
         }
       },
+      'task:error': (head, body) => {
+        console.log(head, body);
+
+        if (!body.params) {
+          return;
+        }
+
+        const errorMessage = body.params.message;
+
+        // show error message
+        setErrorMessage(errorMessage);
+        setShowError(true);
+
+        return socket.complete();
+      }
     };
   };
 
@@ -249,27 +229,16 @@ const DoiPanel = ({open, setOpen, settings}) => {
 
   return (
     <Modal open={open} className="doi-panel">
-      <Modal.Header>Digital Objects Identifiers Management</Modal.Header>
+      <Modal.Header>{eventTitle} - Digital Objects Identifiers Management</Modal.Header>
       <Modal.Content scrolling>
         <Table celled striped compact textAlign="center" fixed>
           <Table.Header>
             <Table.Row>
-              {/* <Table.HeaderCell>Prefix</Table.HeaderCell>
-              <Table.HeaderCell>Suffix</Table.HeaderCell> */}
               <Table.HeaderCell>Identifier</Table.HeaderCell>
               <Table.HeaderCell>Status</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>{partials?.map(partial => partial.jsx)}</Table.Body>
-          {/*
-            <Table.Footer>
-              <Table.Row>
-                <Table.HeaderCell>3 People</Table.HeaderCell>
-                <Table.HeaderCell>2 Approved</Table.HeaderCell>
-                <Table.HeaderCell>2 Approved</Table.HeaderCell>
-              </Table.Row>
-            </Table.Footer>
-          */}
         </Table>
 
         <div ref={anchorRef} />
@@ -337,6 +306,12 @@ const DoiPanel = ({open, setOpen, settings}) => {
           />
         </Button.Group>
       </Modal.Actions>
+
+      <PurrErrorAlert
+        message={errorMessage}
+        open={showError}
+        setOpen={setShowError}
+      ></PurrErrorAlert>
     </Modal>
   );
 };
@@ -344,12 +319,6 @@ const DoiPanel = ({open, setOpen, settings}) => {
 const DoiStatusItem = ({id, doi, code, error, newStatus = null}) => {
   return (
     <Table.Row negative={!!error}>
-      {/* <Table.Cell>
-        {doi?.attributes?.prefix}
-      </Table.Cell>
-      <Table.Cell>
-        {doi?.attributes?.suffix}
-      </Table.Cell> */}
       <Table.Cell>{id}</Table.Cell>
       <Table.Cell>
         {error ? (
