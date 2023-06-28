@@ -6,7 +6,7 @@ from indico.modules.logs import EventLogRealm, LogKind
 # from indico.web.util import jsonify_data, jsonify_form
 # from flask_pluginengine import current_plugin
 
-from indico_purr import _
+# from indico_purr import _
 # from indico_purr.forms import PurrConnectForm
 from indico_purr.utils import get_purr_settings, set_purr_settings
 

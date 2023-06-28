@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
@@ -7,7 +7,7 @@ from indico_purr.services.abstract_booklet_exporter import PurrAbstractBookletEx
 from indico_purr.utils import get_purr_settings
 
 
-class RHPurrSessionsDataJson(RHManageEventBase, PurrAbstractBookletExporter):
+class RHPurrAbstractBookletSessionsDataJson(RHManageEventBase, PurrAbstractBookletExporter):
     def _process(self):
         settings = get_purr_settings(self.event)
         if not settings["connected"]:

@@ -7,7 +7,7 @@ from indico_purr.services.final_proceedings_exporter import PurrFinalProceedings
 from indico_purr.utils import get_purr_settings
 
 
-class RHPurrSessionsDataJson(RHManageEventBase, PurrFinalProceedingsExporter):
+class RHPurrFinalProceedingsSessionsDataJson(RHManageEventBase, PurrFinalProceedingsExporter):
     def _process(self):
         settings = get_purr_settings(self.event)
         if not settings["connected"]:
