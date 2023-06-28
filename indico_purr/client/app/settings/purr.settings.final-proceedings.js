@@ -192,12 +192,22 @@ export function FinalProceedingsSettings({
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 3}>
             <Form.Group widths="equal">
-              <Form.Field error={hasError('doi_protocol')}>
+            <Form.Field error={hasError('doi_env')}>
+                <label>DOI API ENV</label>
+                <Input
+                  fluid
+                  name="doi_env"
+                  value={finalProcSettings.doi_env || ''}
+                  placeholder="Insert DOI API ENV"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('doi_proto')}>
                 <label>DOI URL Protocol</label>
                 <Input
                   fluid
-                  name="doi_protocol"
-                  value={finalProcSettings.doi_protocol || ''}
+                  name="doi_proto"
+                  value={finalProcSettings.doi_proto || ''}
                   placeholder="Insert DOI URL protocol"
                   onChange={onFieldChange}
                 />

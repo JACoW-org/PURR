@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Card, Icon } from 'semantic-ui-react';
-import { of, forkJoin, throwError } from 'rxjs';
-import { catchError, concatMap, filter, finalize, switchMap, tap } from 'rxjs/operators';
+import React, {useState, useEffect, useCallback} from 'react';
+import {Button, Card, Icon} from 'semantic-ui-react';
+import {of, forkJoin, throwError} from 'rxjs';
+import {catchError, concatMap, filter, finalize, switchMap, tap} from 'rxjs/operators';
 
-import { downloadByUrl, openSocket, fetchJson, runPhase } from './purr.lib';
-import { PurrErrorAlert } from './purr.error.alert';
+import {downloadByUrl, openSocket, fetchJson, runPhase} from './purr.lib';
+import {PurrErrorAlert} from './purr.error.alert';
 import FinalProcPanel from './final-proceedings/purr.fp.panel';
-import { fetchInfo } from './api/purr.api';
-import { isNil, result } from 'lodash';
+import {fetchInfo} from './api/purr.api';
+import {isNil, result} from 'lodash';
+import DoiPanel from './final-proceedings/purr.doi.panel';
 
-export const PurrFinalProceedings = ({ eventId, settings, settingsValid, processing, setProcessing }) => {
-
+export const PurrFinalProceedings = ({
+  eventId,
+  eventTitle,
+  settings,
+  settingsValid,
+  processing,
+  setProcessing,
+}) => {
   const [loading, setLoading] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showError, setShowError] = useState(() => false);
@@ -28,6 +35,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
   const [downloadProceedings, setDownloadProceedings] = useState(() => false);
 
   const onFPPanelOpening = useCallback(() => setFPPanelOpening(true), [eventId, settings]);
+  const onDOIPanelOpening = useCallback(() => setDOIPanelOpening(true), [eventId, settings]);
 
   const onDraftDoi = useCallback(() => setDraftDoi(true), []);
   const onDeleteDoi = useCallback(() => setDeleteDoi(true), []);
@@ -35,40 +43,33 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
   const onPublishDoi = useCallback(() => setPublishDoi(true), []);
 
   const onFinishTask = useCallback(() => {
-
     setDraftDoi(false);
     setDeleteDoi(false);
     setHideDoi(false);
     setPublishDoi(false);
-
   }, []);
 
   useEffect(() => {
     setProcessing(loading || fpPanelOpening || doiPanelOpening);
-    return () => { };
-  }, [loading, fpPanelOpening, doiPanelOpening])
+    return () => {};
+  }, [loading, fpPanelOpening, doiPanelOpening]);
 
   useEffect(() => {
-
-    console.log(`useEffect -->`)
+    console.log(`useEffect -->`);
 
     if (settings) {
-
       if (draftDoi || deleteDoi || hideDoi || publishDoi) {
+        const method = draftDoi
+          ? `event_doi_draft`
+          : deleteDoi
+          ? `event_doi_delete`
+          : hideDoi
+          ? `event_doi_hide`
+          : publishDoi
+          ? `event_doi_publish`
+          : undefined;
 
-        const method = (
-          draftDoi ? `event_doi_draft` : (
-            deleteDoi ? `event_doi_delete` : (
-              hideDoi ? `event_doi_hide` : (
-                publishDoi ? `event_doi_publish` : (
-                  undefined
-                )
-              )
-            )
-          )
-        )
-
-        console.log(`useEffect --> method: ${method}`)
+        console.log(`useEffect --> method: ${method}`);
 
         const [task_id, socket] = openSocket(settings);
 
@@ -78,7 +79,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
         };
 
         socket.subscribe({
-          next: ({ head, body }) => runPhase(head, body, actions, socket),
+          next: ({head, body}) => runPhase(head, body, actions, socket),
           complete: () => onFinishTask(),
           error: err => {
             console.error(err);
@@ -88,7 +89,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
           },
         });
 
-        const context = { params: {} };
+        const context = {params: {}};
 
         of(null)
           .pipe(
@@ -98,7 +99,7 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
               })
             ),
 
-            concatMap(({ event }) => {
+            concatMap(({event}) => {
               if (event.error) {
                 return throwError(() => new Error('error'));
               }
@@ -125,48 +126,46 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
             })
           )
           .subscribe();
-
       }
 
-      return () => { };
+      return () => {};
     }
-
   }, [settings, draftDoi, deleteDoi, hideDoi, publishDoi]);
 
   // useEffect info API when opening FP or DOI panels
   useEffect(() => {
-
     if (fpPanelOpening || doiPanelOpening) {
+      const sub$ = of(null)
+        .pipe(
+          tap(() => setLoading(true)),
+          switchMap(() => fetchInfo(settings.api_url, eventId, settings.api_key)),
+          catchError(error => {
+            // TODO display error
+            return of(null);
+          }),
+          filter(result => !!result),
+          tap(result => {
+            setFPInfo(result.info);
 
-      const sub$ = of(null).pipe(
-        tap(() => setLoading(true)),
-        switchMap(() => fetchInfo(settings.api_url, eventId, settings.api_key)),
-        catchError(error => {
-          // TODO display error
-          return of(null);
-        }),
-        filter(result => !!result),
-        tap(result => {
-          setFPInfo(result.info);
+            if (fpPanelOpening) {
+              setFPPanelOpening(false);
+              setOpenFPPanel(true);
+            }
 
-          if (fpPanelOpening) {
-            setFPPanelOpening(false);
-            setOpenFPPanel(true);
-          }
-
-          if (doiPanelOpening) {
-            setDOIPanelOpening(false);
-            setOpenDOIPanel(true);
-          }
-        }),
-        finalize(() => setLoading(false))
-      ).subscribe();
+            if (doiPanelOpening) {
+              setDOIPanelOpening(false);
+              setOpenDOIPanel(true);
+            }
+          }),
+          finalize(() => setLoading(false))
+        )
+        .subscribe();
 
       return () => sub$.unsubscribe();
     }
 
-    return () => { };
-  }, [fpPanelOpening, doiPanelOpening])
+    return () => {};
+  }, [fpPanelOpening, doiPanelOpening]);
 
   return (
     <>
@@ -191,34 +190,27 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
             )}
           </div>
           <div className="ui right">
-            {/* <Button icon title='draft doi' onClick={onDraftDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='hide doi' onClick={onHideDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='delete doi' onClick={onDeleteDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='publish doi' onClick={onPublishDoi} disabled={!settingsValid} primary size='mini'>
-              <Icon name='server' />
-            </Button>
-            <Button icon title='compress' onClick={onCompressProceedings} disabled={!settingsValid} primary size='mini'>
-              <Icon name='compress' />
-            </Button>
-            <Button icon title='download' onClick={onDownloadProceedings} disabled={!settingsValid} primary size='mini'>
-              <Icon name='download' />
-            </Button> */}
-            
-
-            
-
-            <Button.Group size='mini'>
-              <Button title='Digital Object Identifier' labelPosition='left' icon="globe" content="DOI" onClick={onFPPanelOpening} disabled={true} color='facebook' />
+            <Button.Group size="mini">
+              <Button
+                title="Digital Object Identifier"
+                labelPosition="left"
+                icon="globe"
+                content="DOI"
+                onClick={onDOIPanelOpening}
+                disabled={!settingsValid || processing}
+                color="facebook"
+              />
               <Button.Or />
-              <Button title='Final Proceedings' labelPosition='right' content="Site" icon='sitemap' onClick={onFPPanelOpening} disabled={!settingsValid || processing} color='blue' />
+              <Button
+                title="Final Proceedings"
+                labelPosition="right"
+                content="Site"
+                icon="sitemap"
+                onClick={onFPPanelOpening}
+                disabled={!settingsValid || processing}
+                color="blue"
+              />
             </Button.Group>
-
           </div>
         </Card.Content>
       </Card>
@@ -227,7 +219,19 @@ export const PurrFinalProceedings = ({ eventId, settings, settingsValid, process
         open={showError}
         setOpen={setShowError}
       ></PurrErrorAlert>
-      <FinalProcPanel open={openFPPanel} setOpen={setOpenFPPanel} info={fpInfo} settings={settings} />
+      <FinalProcPanel
+        open={openFPPanel}
+        setOpen={setOpenFPPanel}
+        info={fpInfo}
+        settings={settings}
+        eventTitle={eventTitle}
+      />
+      <DoiPanel
+        open={openDOIPanel}
+        setOpen={setOpenDOIPanel}
+        settings={settings}
+        eventTitle={eventTitle}
+      />
     </>
   );
 };

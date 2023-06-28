@@ -9,6 +9,7 @@
 
     {% if connected %}
         <script id="purr-event-id" type="application/json">{{ event.id | tojson }}</script>
+        <script id="purr-event-title" type="application/json">{{ event.title | tojson }}</script>
     {% endif %}
 
     <div id="purr-spa"></div>
