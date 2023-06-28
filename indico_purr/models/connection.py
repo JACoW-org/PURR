@@ -20,7 +20,7 @@ class PurrConnection:
         return errors
 
     def _required_validator(self, key, value, errors: dict):
-        if value is None or value == '':
+        if not value:
             errors[key] = 'error:required'
 
     def _validate_api_url(self, errors: dict):

@@ -65,7 +65,7 @@ class PurrSettings:
         return errors
 
     def _required_validator(self, key, value, errors):
-        if value is None or value == '':
+        if not value:
             errors[key] = 'error:required'
 
     def _format_validator(self, key, value, regex):
