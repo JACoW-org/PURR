@@ -1,28 +1,27 @@
-from indico_purr.controllers.json.abstract_booklet.sessions_data \
-    import RHPurrSessionsDataJson
-from indico_purr.controllers.json.abstract_booklet.contributions_data \
-    import RHPurrAbstractBookletContributionsDataJson
-from indico_purr.controllers.json.abstract_booklet \
-    import RHPurrAbstractBookletJson
+from indico_purr.controllers.json.abstract_booklet.sessions_data import (
+    RHPurrAbstractBookletSessionsDataJson)
+from indico_purr.controllers.json.abstract_booklet.contributions_data import (
+    RHPurrAbstractBookletContributionsDataJson)
+from indico_purr.controllers.json.abstract_booklet import (
+    RHPurrAbstractBookletJson)
 
-from indico_purr.controllers.json.common.event_data \
-    import RHPurrSettingsAndEventDataJson
-from indico_purr.controllers.json.common.settings_data \
-    import RHPurrSettingsDataJson
-from indico_purr.controllers.json.common.connect_data \
-    import RHPurrConnectDataJson
-from indico_purr.controllers.json.common.disconnect_data \
-    import RHPurrDisconnectDataJson
+from indico_purr.controllers.json.common.event_data import (
+    RHPurrSettingsAndEventDataJson)
+from indico_purr.controllers.json.common.settings_data import (
+    RHPurrSettingsDataJson)
+from indico_purr.controllers.json.common.connect_data import (
+    RHPurrConnectDataJson)
+from indico_purr.controllers.json.common.disconnect_data import (
+    RHPurrDisconnectDataJson)
 
-from indico_purr.controllers.json.final_proceedings.attachments_data \
-    import RHPurrAttachmentsDataJson
-from indico_purr.controllers.json.final_proceedings.sessions_data \
-    import RHPurrSessionsDataJson
-from indico_purr.controllers.json.final_proceedings.contributions_data \
-    import RHPurrFinalProceedingsContributionsDataJson
-from indico_purr.controllers.json.final_proceedings \
-    import RHPurrFinalProceedingsJson
-
+from indico_purr.controllers.json.final_proceedings.attachments_data import (
+    RHPurrAttachmentsDataJson)
+from indico_purr.controllers.json.final_proceedings.sessions_data import (
+    RHPurrFinalProceedingsSessionsDataJson)
+from indico_purr.controllers.json.final_proceedings.contributions_data import (
+    RHPurrFinalProceedingsContributionsDataJson)
+from indico_purr.controllers.json.final_proceedings import (
+    RHPurrFinalProceedingsJson)
 from indico_purr.controllers.html.home_page import RHPurrHomePage
 
 from indico.core.plugins import IndicoPluginBlueprint
@@ -88,7 +87,7 @@ blueprint.add_url_rule(
 blueprint.add_url_rule(
     "/abstract-booklet-sessions-data",
     "abstract_booklet_sessions_data",
-    RHPurrSessionsDataJson,
+    RHPurrAbstractBookletSessionsDataJson,
 )
 # endregion
 
@@ -108,7 +107,7 @@ blueprint.add_url_rule(
 blueprint.add_url_rule(
     "/final-proceedings-sessions-data",
     "final_proceedings_sessions_data",
-    RHPurrSessionsDataJson,
+    RHPurrFinalProceedingsSessionsDataJson,
 )
 
 blueprint.add_url_rule(

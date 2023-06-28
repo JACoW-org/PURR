@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
