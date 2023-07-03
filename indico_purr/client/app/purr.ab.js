@@ -25,6 +25,20 @@ export const PurrAbstractBooklet = ({ settings, settingsValid, processing, setPr
       const actions = {
         'task:progress': (head, body) => console.log(head, body),
         'task:result': (head, body) => download(body),
+        'task:error': (head, body) => {
+          console.log(head, body);
+
+          if (!body.params) {
+            return;
+          }
+
+          const errorMessage = body.params.message;
+
+          setErrorMessage(errorMessage);
+          setShowError(true);
+
+          return socket.complete();
+        }
       };
 
       socket.subscribe({

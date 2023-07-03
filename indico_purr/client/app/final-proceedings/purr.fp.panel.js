@@ -121,6 +121,20 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
 
           setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text }))]);
         },
+        'task:error': (head, body) => {
+          console.log(head, body);
+
+          if (!body.params) {
+            return;
+          }
+
+          const errorMessage = body.params.message;
+
+          setErrorMessage(errorMessage);
+          setShowError(true);
+
+          return socket.complete();
+        }
       };
 
       // subscription to the socket

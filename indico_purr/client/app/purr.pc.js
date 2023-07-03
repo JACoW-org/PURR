@@ -46,6 +46,20 @@ export const PurrPapersChecks = ({ settings, settingsValid, processing, setProce
             setErrors([]);
           }
         },
+        'task:error': (head, body) => {
+          console.log(head, body);
+
+          if (!body.params) {
+            return;
+          }
+
+          const errorMessage = body.params.message;
+
+          setErrorMessage(errorMessage);
+          setShowError(true);
+
+          return socket.complete();
+        }
       };
 
       socket.subscribe({
