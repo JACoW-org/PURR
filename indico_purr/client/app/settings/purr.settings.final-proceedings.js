@@ -1,6 +1,16 @@
-import React, { useCallback, useState } from 'react';
-import { Accordion, Divider, Form, Grid, Icon, Input, Tab, TextArea } from 'semantic-ui-react';
-import { capitalize, has, isEmpty, isNil, map } from 'lodash';
+import React, {useCallback, useState} from 'react';
+import {
+  Accordion,
+  Divider,
+  Dropdown,
+  Form,
+  Grid,
+  Icon,
+  Input,
+  Tab,
+  TextArea,
+} from 'semantic-ui-react';
+import {capitalize, has, isEmpty, isNil, map} from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -8,11 +18,17 @@ export function FinalProceedingsSettings({
   attachments,
   errors,
 }) {
+  const tocOptions = [
+    {key: 'track_group', text: 'Track Group', value: 'track_group'},
+    {key: 'track', text: 'Track', value: 'track'},
+    {key: 'contribution', text: 'Contribution', value: 'contribution'},
+  ];
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onClick = useCallback(
     (e, titleProps) => {
-      const { index } = titleProps;
+      const {index} = titleProps;
       setActiveIndex(activeIndex === index ? -1 : index);
     },
     [activeIndex]
@@ -192,7 +208,7 @@ export function FinalProceedingsSettings({
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 3}>
             <Form.Group widths="equal">
-            <Form.Field error={hasError('doi_env')}>
+              <Form.Field error={hasError('doi_env')}>
                 <label>DOI API ENV</label>
                 <Input
                   fluid
@@ -317,13 +333,33 @@ export function FinalProceedingsSettings({
               </>
             )}
           </Accordion.Content>
+
+          <Accordion.Title active={activeIndex === 5} index={5} onClick={onClick}>
+            <Icon name="dropdown" />
+            Table of contents
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === 5}>
+            <Form.Field>
+              <label>Group by</label>
+              <Dropdown
+                name="toc_grouping"
+                value={finalProcSettings.toc_grouping || []}
+                onChange={onFieldChange}
+                placeholder="Select one or more options"
+                fluid
+                multiple
+                selection
+                options={tocOptions}
+              />
+            </Form.Field>
+          </Accordion.Content>
         </Accordion>
       </Form>
     </Tab.Pane>
   );
 }
 
-function Section({ sectionKey, section }) {
+function Section({sectionKey, section}) {
   // console.log({sectionKey, section})
 
   return isNil(section) ? (

@@ -44,7 +44,7 @@ class PurrPlugin(IndicoPlugin):
         'doi_user': '',
         'doi_password': '',
         'date': '',
-
+        'toc_grouping': ['contribution'],
         'primary_color': '#F39433'
     }
 

@@ -63,6 +63,7 @@ export function SettingsDialog({
     'doi_user',
     'doi_password',
     'date',
+    'toc_grouping'
   ]);
 
   const [abSettings, setABSettings] = useState(() => defaultABSettings);

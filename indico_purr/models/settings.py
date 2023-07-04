@@ -33,6 +33,7 @@ class PurrSettings:
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')
+    toc_grouping: list = field(default_factory=list)
 
     def as_dict(self):
         return asdict(self)
@@ -61,6 +62,7 @@ class PurrSettings:
         self._validate_doi_user(errors)
         self._validate_doi_password(errors)
         self._validate_primary_color(errors)
+        self._validate_toc_grouping(errors)
 
         return errors
 
@@ -144,3 +146,7 @@ class PurrSettings:
 
     def _validate_primary_color(self, errors):
         self._required_validator('primary_color', self.primary_color, errors)
+
+    def _validate_toc_grouping(self, errors):
+        if len(self.toc_grouping) == 0:
+            errors['toc_grouping'] = 'error:required'

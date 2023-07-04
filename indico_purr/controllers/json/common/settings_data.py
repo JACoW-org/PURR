@@ -84,6 +84,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             doi_user=settings.get("doi_user"),
             doi_password=settings.get("doi_password"),
             primary_color=settings.get("primary_color"),
+            toc_grouping=settings.get('toc_grouping')
         )
 
         errors = purr_settings.validate()
