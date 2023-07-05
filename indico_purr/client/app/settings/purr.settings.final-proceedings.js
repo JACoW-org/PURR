@@ -19,8 +19,7 @@ export function FinalProceedingsSettings({
   errors,
 }) {
   const tocOptions = [
-    {key: 'track_group', text: 'Track Group', value: 'track_group'},
-    {key: 'track', text: 'Track', value: 'track'},
+    {key: 'session', text: 'Session', value: 'session'},
     {key: 'contribution', text: 'Contribution', value: 'contribution'},
   ];
 
