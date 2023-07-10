@@ -5,7 +5,7 @@ import {fetchJson, openSocket, runPhase} from '../purr.lib';
 import {sortedIndexBy} from 'lodash';
 import { PurrErrorAlert } from '../purr.error.alert';
 
-const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
+const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -22,7 +22,6 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
 
   const onClose = useCallback(() => setOpen(false), []);
   const onAbort = useCallback(() => {
-    // console.log('onAbort', prePressProcessing, finalProcProcessing)
 
     if (fetching) {
       setFetching(false);
@@ -134,10 +133,18 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
 
   useEffect(() => {
     if (open) {
+      if (!fpInfo.datacite_json) {
+        setErrorMessage('MEOW could not retrieve any info. Please make sure that final proceedings have been correctly generated.');
+        setShowError(true);
+        
+        return () => {};
+      }
       setFetching(true);
     } else {
       setPartials([]);
     }
+
+    return () => {};
   }, [open]);
 
   // scrolling handler
