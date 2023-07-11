@@ -18,6 +18,7 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
   const [downloadProceedings, setDownloadProceedings] = useState(() => false);
   const [showError, setShowError] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(() => null);
+  const [progressStatus, setProgressStatus] = useState(() => null);   // 'success' || 'error' || 'active' || 'aborted'
 
   const onClose = useCallback(() => {
     setOpen(false);
@@ -27,6 +28,8 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
 
   const onAbort = useCallback(() => {
     // console.log('onAbort', prePressProcessing, finalProcProcessing)
+
+    setProgressStatus('aborted');
 
     if (prePressProcessing) {
       // console.log('onAbort - prePressProcessing')
@@ -68,6 +71,8 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
     setProcessing(
       prePressProcessing || finalProcProcessing || compressProceedings || downloadProceedings
     );
+
+    return () => {};
   }, [prePressProcessing, finalProcProcessing, compressProceedings, downloadProceedings]);
 
   // open
@@ -86,6 +91,9 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
     let [task_id, socket] = [];
 
     if (prePressProcessing || finalProcProcessing) {
+
+      setProgressStatus('active');
+
       const method = finalProcProcessing ? 'event_final_proceedings' : 'event_pre_press';
 
       // empty logs
@@ -94,8 +102,6 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
 
       // references to open web socket
       [task_id, socket] = openSocket(settings);
-
-      // setSocket(socket)
 
       // actions
       const actions = {
@@ -116,6 +122,16 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
           console.log(head, body);
 
           setOps(prevOps => [...prevOps.map(o => ({icon: 'check', text: o.text}))]);
+
+          setProgressStatus('success');
+
+          setFPInfo(prev => ({
+            ...prev,
+            final_proceedings: finalProcProcessing,
+            pre_press: prePressProcessing,
+            proceedings_archive: false,
+            datacite_json: finalProcProcessing,
+          }));
         },
         'task:error': (head, body) => {
           console.log(head, body);
@@ -128,8 +144,9 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
 
           setErrorMessage(errorMessage);
           setShowError(true);
+          setProgressStatus('error');
 
-          return socket.complete();
+          return socket.complete(head);
         },
       };
 
@@ -137,15 +154,9 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
       socket.subscribe({
         next: ({head, body}) => runPhase(head, body, actions, socket),
         complete: () => {
-          setFPInfo(prev => ({
-            ...prev,
-            final_proceedings: finalProcProcessing,
-            pre_press: prePressProcessing,
-            proceedings_archive: false,
-            datacite_json: finalProcProcessing,
-          }));
           setPrePressProcessing(false);
           setFinalProcProcessing(false);
+          setProgressStatus(current => current === 'active' ? 'error' : current);
         },
         error: err => {
           console.error(err);
@@ -155,6 +166,8 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
 
           setPrePressProcessing(false);
           setFinalProcProcessing(false);
+
+          setProgressStatus('error');
         },
       });
 
@@ -221,6 +234,9 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
   // compress proceedings
   useEffect(() => {
     if (compressProceedings) {
+
+      setProgressStatus('active');
+
       const method = 'event_compress_proceedings';
 
       const [task_id, socket] = openSocket(settings);
@@ -243,6 +259,9 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
           console.log(head, body);
 
           setOps(prevOps => [...prevOps.map(o => ({icon: 'check', text: o.text}))]);
+
+          setProgressStatus('success');
+          setFPInfo(prev => ({...prev, proceedings_archive: true}));
         },
         'task:error': (head, body) => {
           console.log(head, body);
@@ -256,6 +275,7 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
           // show error message
           setErrorMessage(errorMessage);
           setShowError(true);
+          setProgressStatus('error');
 
           return socket.complete();
         },
@@ -265,15 +285,16 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
       socket.subscribe({
         next: ({head, body}) => runPhase(head, body, actions, socket),
         complete: () => {
-          setCompressProceedings(false);
-          setFPInfo(prev => ({...prev, proceedings_archive: true}));
+          setCompressProceedings(false);          
+          setProgressStatus(current => current === 'active' ? 'error' : current);
         },
         error: err => {
           console.error(err);
-          // TODO based on the error, build a map of error messages to display
-          // setErrorMessage('Error while generating final proceedings.');
-          // setShowError(true);
+
+          setErrorMessage('Failed to start task. Check connection with MEOW.');
+          setShowError(true);
           setCompressProceedings(false);
+          setProgressStatus('error');
         },
       });
 
@@ -371,6 +392,10 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
             value={ops?.length - 1}
             total={taskCount}
             progress="ratio"
+            active={progressStatus === 'active'}
+            success={progressStatus === 'success'}
+            error={progressStatus === 'error'}
+            warning={progressStatus === 'aborted'}
           />
         </div>
       </Modal.Description>
