@@ -39,7 +39,7 @@ export const PurrFinalProceedings = ({
         return of(null);
       }),
       filter(result => !!result),
-      tap(result => setFPInfo(result.info.value)),
+      tap(result => setFPInfo(result.info)),
       finalize(() => setLoading(false))
     );
   };
