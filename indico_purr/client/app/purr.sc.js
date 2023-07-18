@@ -6,7 +6,6 @@ import {connect, disconnect, fetchSettingsAndAttachements, saveSettings} from '.
 import {ConnectDialog} from './connect/purr.connect.dialog';
 
 import {SettingsDialog} from './settings/purr.settings.dialog';
-import {buildAttachments} from './utils/purr.utils';
 import {PurrErrorAlert} from './purr.error.alert';
 
 export const PurrSettingsCard = ({
@@ -23,7 +22,7 @@ export const PurrSettingsCard = ({
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(() => false);
   const [open, setOpen] = useState(() => false);
-  const [attachments, setAttachments] = useState(null);
+  const [materials, setMaterials] = useState(null);
   const [connection, setConnection] = useState({});
   const [connDialogOpen, setConnDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState(() => {});
@@ -109,7 +108,7 @@ export const PurrSettingsCard = ({
           filter(result => !isNil(result)),
           tap(result => {
             setSettings(result.settings);
-            setAttachments(buildAttachments(result.attachments));
+            setMaterials(result.attachments);
             setOpen(true);
           }),
           finalize(() => setSettingsLoading(false))
@@ -229,7 +228,7 @@ export const PurrSettingsCard = ({
       </Card>
       <SettingsDialog
         settings={settings}
-        attachments={attachments}
+        materials={materials}
         open={open}
         setOpen={setOpen}
         onClose={onClose}

@@ -1,21 +1,24 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Accordion,
-  Divider,
+  Button,
   Dropdown,
   Form,
-  Grid,
   Icon,
   Input,
+  Message,
+  Modal,
+  Select,
   Tab,
+  Table,
   TextArea,
 } from 'semantic-ui-react';
-import {capitalize, has, isEmpty, isNil, map} from 'lodash';
+import { has } from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
-  updateFinalProcSetting,
-  attachments,
+  updateFinalProcSettings,
+  materials,
   errors,
 }) {
   const tocOptions = [
@@ -33,7 +36,7 @@ export function FinalProceedingsSettings({
     [activeIndex]
   );
 
-  const onFieldChange = (e, field) => updateFinalProcSetting(field.name, field.value);
+  const onFieldChange = (e, field) => updateFinalProcSettings(field.name, field.value);
 
   const hasError = useCallback(fieldName => has(errors, fieldName), [errors]);
 
@@ -300,37 +303,11 @@ export function FinalProceedingsSettings({
             Materials
           </Accordion.Title>
           <Accordion.Content active={activeIndex === 4}>
-            <Grid divided="vertically">
-              {/* HEADER */}
-              <Grid.Row columns={3}>
-                <Grid.Column>
-                  <h3>Title</h3>
-                </Grid.Column>
-                <Grid.Column>
-                  <h3>Filename</h3>
-                </Grid.Column>
-                <Grid.Column>
-                  <h3>Section</h3>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
-            {isEmpty(attachments) ? (
-              <p>No file has been attached to this event.</p>
-            ) : (
-              <>
-                <Section key="logo" sectionKey="logo" section={attachments.logo} />
-                <Divider />
-                <Section key="poster" sectionKey="poster" section={attachments.poster} />
-                <Divider />
-                <Section key="volumes" sectionKey="volumes" section={attachments.volumes} />
-                <Divider />
-                <Section
-                  key="attachments"
-                  sectionKey="attachments"
-                  section={attachments.attachments}
-                />
-              </>
-            )}
+            <Materials
+              materials={materials}
+              finalProcSettings={finalProcSettings}
+              updateFinalProcSettings={updateFinalProcSettings}
+            />
           </Accordion.Content>
 
           <Accordion.Title active={activeIndex === 5} index={5} onClick={onClick}>
@@ -358,28 +335,351 @@ export function FinalProceedingsSettings({
   );
 }
 
-function Section({sectionKey, section}) {
-  // console.log({sectionKey, section})
+export function Materials({materials, finalProcSettings, updateFinalProcSettings}) {
+  const [materialsMap, setMaterialsMap] = useState(
+    () => new Map([['logo', []], ['poster', []], ['volumes', []], ['attachments', []]])
+  );
+  const [isEmpty, setIsEmpty] = useState(() => true);
+  const [open, setOpen] = useState(() => false);
+  const [addFormState, setAddFormState] = useState(() => ({
+    controls: {
+      fileID: {value: null, valid: false, dirty: false},
+      section: {value: null, valid: false, dirty: false},
+    },
+    valid: false,
+    dirty: false,
+    errorMessage: null,
+  }));
 
-  return isNil(section) ? (
-    <p>No material found for {sectionKey}.</p>
-  ) : (
-    <Grid>
-      {map(section, attachment => {
-        return (
-          <Grid.Row columns={3} key={attachment.filename}>
-            <Grid.Column>
-              <span>{attachment.title}</span>
-            </Grid.Column>
-            <Grid.Column>
-              <span>{attachment.filename}</span>
-            </Grid.Column>
-            <Grid.Column>
-              <span>{capitalize(attachment.section)}</span>
-            </Grid.Column>
-          </Grid.Row>
-        );
-      })}
-    </Grid>
+  const resetFormState = useCallback(
+    () =>
+      setAddFormState({
+        controls: {
+          fileID: {value: null, valid: false, dirty: false},
+          section: {value: null, valid: false, dirty: false},
+        },
+        valid: false,
+        dirty: false,
+        errorMessage: null,
+      }),
+    []
+  );
+
+  const onDelete = useCallback(
+    fileID => {
+      updateFinalProcSettings(
+        'materials',
+        finalProcSettings.materials.filter(material => material.id !== fileID)
+      );
+    },
+    [finalProcSettings]
+  );
+
+  const onMoveUp = useCallback(
+    (section, index) => {
+      const newIndex = index - 1;
+
+      updateFinalProcSettings(
+        'materials',
+        finalProcSettings.materials.map(material => {
+          if (material.section === section) {
+            if (material.index === index) {
+              material.index = newIndex;
+            } else if (material.index === newIndex) {
+              material.index = index;
+            }
+          }
+          return material;
+        })
+      );
+    },
+    [finalProcSettings]
+  );
+
+  const onMoveDown = useCallback(
+    (section, index) => {
+      const newIndex = index + 1;
+
+      updateFinalProcSettings(
+        'materials',
+        finalProcSettings.materials.map(material => {
+          if (material.section === section) {
+            if (material.index === index) {
+              material.index = newIndex;
+            } else if (material.index === newIndex) {
+              material.index = index;
+            }
+          }
+          return material;
+        })
+      );
+    },
+    [finalProcSettings]
+  );
+
+  const onAddNew = useCallback(() => {
+    const fileID = addFormState.controls.fileID.value;
+    const section = addFormState.controls.section.value;
+
+    // validation ==> logo and poster can have at most one file
+    if (section === 'logo' || section === 'poster') {
+      if (materialsMap.get(section).length !== 0) {
+        const message = `Cannot add more materials to section ${section}`;
+        setAddFormState(prevState => ({...prevState, valid: false, errorMessage: message}));
+
+        return;
+      }
+    }
+
+    const sectionNextIndex = materialsMap.get(section).length;
+
+    updateFinalProcSettings('materials', [
+      ...finalProcSettings.materials,
+      {id: fileID, section: section, index: sectionNextIndex},
+    ]);
+
+    setOpen(false);
+  }, [materials, finalProcSettings.materials, addFormState]);
+
+  useEffect(() => {
+    // const map = new Map([['logo', []], ['poster', []], ['volumes', []], ['attachments', []]]);
+
+    setIsEmpty(finalProcSettings.materials.length === 0);
+
+    const map = finalProcSettings.materials
+      .map(material => ({
+        ...materials.find(_material => _material.id === material.id),
+        section: material.section,
+        index: material.index,
+      })) // map to object with all properties
+      .filter(material => !!material) // filter undefined
+      .reduce((acc, material) => {
+        if (acc.has(material.section)) {
+          acc.get(material.section).push(material);
+        }
+        return acc;
+      }, new Map([['logo', []], ['poster', []], ['volumes', []], ['attachments', []]])); // produce a Map object for fast access
+
+    setMaterialsMap(map);
+
+    return () => {};
+  }, [finalProcSettings.materials, materials]);
+
+  useEffect(() => {
+    if (!open) {
+      resetFormState();
+    }
+
+    return () => {};
+  }, [open]);
+
+  return (
+    <>
+      <Table celled structured striped>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Section</Table.HeaderCell>
+            <Table.HeaderCell>Title</Table.HeaderCell>
+            <Table.HeaderCell>Actions</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+
+        <Table.Body>
+          {/* Logo */}
+          {materialsMap.get('logo').length > 0 ? (
+            <Table.Row>
+              <Table.Cell>Logo</Table.Cell>
+              <Table.Cell>{materialsMap.get('logo')[0].title}</Table.Cell>
+              <Table.Cell>
+                <Button icon onClick={() => onDelete(materialsMap.get('logo')[0].id)}>
+                  <Icon name="delete" />
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          ) : null}
+
+          {/* Poster */}
+          {materialsMap.get('poster').length > 0 ? (
+            <Table.Row>
+              <Table.Cell>Poster</Table.Cell>
+              <Table.Cell>{materialsMap.get('poster')[0].title}</Table.Cell>
+              <Table.Cell>
+                <Button icon onClick={() => onDelete(materialsMap.get('poster')[0].id)}>
+                  <Icon name="delete" />
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          ) : null}
+
+          {/* Volumes */}
+          {materialsMap
+            .get('volumes')
+            .sort((a, b) => a.index - b.index)
+            .map((volume, index, array) => (
+              <Table.Row key={`volumes${index}`}>
+                {index === 0 ? <Table.Cell rowSpan={array.length}>Volumes</Table.Cell> : null}
+                <Table.Cell>{volume.title}</Table.Cell>
+                <Table.Cell>
+                  {index < (array.length - 1) ? (
+                    <Button icon onClick={() => onMoveDown('volumes', index)}>
+                      <Icon name="arrow alternate circle down outline" />
+                    </Button>
+                  ) : null}
+                  {index > 0 ? (
+                    <Button icon onClick={() => onMoveUp('volumes', index)}>
+                      <Icon name="arrow alternate circle up outline" />
+                    </Button>
+                  ) : null}
+                  <Button icon onClick={() => onDelete(volume.id)}>
+                    <Icon name="delete" />
+                  </Button>
+                </Table.Cell>
+              </Table.Row>
+            ))}
+
+          {/* Attachments */}
+          {materialsMap
+            .get('attachments')
+            .sort((a, b) => a.index - b.index)
+            .map((attachment, index, array) => (
+              <Table.Row key={`attachments${index}`}>
+                {index === 0 ? <Table.Cell rowSpan={array.length}>Attachments</Table.Cell> : null}
+                <Table.Cell>{attachment.title}</Table.Cell>
+                <Table.Cell>
+                  {index < (array.length - 1) ? (
+                    <Button icon onClick={() => onMoveDown('attachments', index)}>
+                      <Icon name="arrow alternate circle down outline" />
+                    </Button>
+                  ) : null}
+                  {index > 0 ? (
+                    <Button icon onClick={() => onMoveUp('attachments', index)}>
+                      <Icon name="arrow alternate circle up outline" />
+                    </Button>
+                  ) : null}
+                  <Button icon onClick={() => onDelete(attachment.id)}>
+                    <Icon name="delete" />
+                  </Button>
+                </Table.Cell>
+              </Table.Row>
+            ))}
+
+          {isEmpty ? (
+            <Table.Row>
+              <Table.Cell colSpan="3" textAlign="center">
+                No materials found
+              </Table.Cell>
+            </Table.Row>
+          ) : null}
+        </Table.Body>
+
+        <Table.Footer fullWidth>
+          <Table.Row>
+            <Table.HeaderCell colSpan="3">
+              <Button icon labelPosition="left" primary size="small" onClick={() => setOpen(true)}>
+                <Icon name="add" />
+                Add
+              </Button>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer>
+      </Table>
+      <Modal open={open} onClose={() => setOpen(false)} size="large">
+        <Modal.Header>Add material</Modal.Header>
+        <Modal.Content scrolling>
+          <AddMaterialForm
+            materials={materials}
+            formState={addFormState}
+            setFormState={setAddFormState}
+          />
+        </Modal.Content>
+        <Modal.Actions>
+          <Button icon size="small" onClick={() => setOpen(false)}>
+            <Icon name="close" />
+            Close
+          </Button>
+          <Button
+            icon
+            positive
+            size="small"
+            disabled={!addFormState.valid || !addFormState.dirty}
+            onClick={onAddNew}
+          >
+            <Icon name="add" />
+            Add
+          </Button>
+        </Modal.Actions>
+      </Modal>
+    </>
+  );
+}
+
+export function AddMaterialForm({materials, formState, setFormState}) {
+  const [sections] = useState(() => [
+    {value: 'logo', text: 'Logo'},
+    {value: 'poster', text: 'Poster'},
+    {value: 'volumes', text: 'Volumes'},
+    {value: 'attachments', text: 'Attachments'},
+  ]);
+
+  const onChange = useCallback(
+    (e, field) => {
+      setFormState(prevState => {
+        prevState.controls[field.name].value = field.value;
+        prevState.controls[field.name].dirty = true;
+        prevState.controls[field.name].valid = !!field.value; // every field is required
+
+        const updatedControls = {
+          ...prevState.controls,
+          [field.name]: {
+            ...prevState.controls[field.name],
+            value: field.value,
+            dirty: true,
+            valid: !!field.value,
+          },
+        };
+
+        const updatedState = {
+          ...prevState,
+          controls: updatedControls,
+          valid: Object.values(prevState.controls).every(control => control.valid),
+          dirty: Object.values(prevState.controls).some(control => control.dirty),
+        };
+
+        return updatedState;
+      });
+    },
+    [formState]
+  );
+
+  return (
+    <Form error={!formState.valid && !!formState.errorMessage}>
+      <Form.Field>
+        <label>File</label>
+        <Select
+          placeholder="Select a file"
+          options={materials.map(material => ({
+            key: `file${material.id}`,
+            value: material.id,
+            text: material.title,
+          }))}
+          value={formState.controls.fileID.value}
+          error={!formState.controls.fileID.valid && formState.controls.fileID.dirty}
+          name="fileID"
+          onChange={onChange}
+        />
+      </Form.Field>
+      <Form.Field>
+        <label>Section</label>
+        <Select
+          placeholder="Select section"
+          options={sections.map((section, index) => ({key: `section${index}`, ...section}))}
+          value={formState.controls.section.value}
+          error={!formState.controls.section.valid && formState.controls.section.dirty}
+          name="section"
+          onChange={onChange}
+        />
+      </Form.Field>
+      <Message error header="Error" content={formState.errorMessage} />
+    </Form>
   );
 }

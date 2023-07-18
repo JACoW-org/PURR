@@ -45,13 +45,15 @@ class PurrPlugin(IndicoPlugin):
         'doi_password': '',
         'date': '',
         'toc_grouping': ['contribution'],
-        'primary_color': '#F39433'
+        'primary_color': '#F39433',
+        'materials': []
     }
 
     def init(self):
         super(PurrPlugin, self).init()
         self.register_assets()
-        self.connect(signals.menu.items, self.purr_sidemenu_items, sender='event-management-sidemenu')
+        self.connect(signals.menu.items, self.purr_sidemenu_items,
+                     sender='event-management-sidemenu')
 
     def purr_sidemenu_items(self, sender, event, **kwargs):
         if event.can_manage(session.user):

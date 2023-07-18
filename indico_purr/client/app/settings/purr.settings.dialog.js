@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {useState} from 'react';
 import {Button, Icon, Modal, Tab} from 'semantic-ui-react';
 import {isEmpty, pick} from 'lodash';
@@ -10,7 +10,7 @@ import {PurrErrorAlert} from '../purr.error.alert';
 
 export function SettingsDialog({
   settings,
-  attachments,
+  materials,
   errors,
   open,
   setOpen,
@@ -21,7 +21,6 @@ export function SettingsDialog({
   const [showError, setShowError] = useState(false);
 
   useEffect(() => {
-
     if (isEmpty(errorMessage)) {
       // no error --> don't display any error
       return;
@@ -63,7 +62,8 @@ export function SettingsDialog({
     'doi_user',
     'doi_password',
     'date',
-    'toc_grouping'
+    'toc_grouping',
+    'materials',
   ]);
 
   const [abSettings, setABSettings] = useState(() => defaultABSettings);
@@ -73,7 +73,7 @@ export function SettingsDialog({
   const updateABSetting = (key, value) => setABSettings({...abSettings, [key]: value});
   const updatePDFCheckSetting = (key, value) =>
     setPDFCheckSettings({...pdfCheckSettings, [key]: value});
-  const updateFinalProcSetting = (key, value) =>
+  const updateFinalProcSettings = (key, value) =>
     setFinalProcSettings({...finalProcSettings, [key]: value});
 
   const onFormSubmit = () => {
@@ -116,8 +116,8 @@ export function SettingsDialog({
       render: () => (
         <FinalProceedingsSettings
           finalProcSettings={finalProcSettings}
-          updateFinalProcSetting={updateFinalProcSetting}
-          attachments={attachments}
+          updateFinalProcSettings={updateFinalProcSettings}
+          materials={materials}
           errors={errors}
         />
       ),
