@@ -27,10 +27,8 @@ from indico_purr.controllers.html.home_page import RHPurrHomePage
 from indico.core.plugins import IndicoPluginBlueprint
 
 
-blueprint = IndicoPluginBlueprint(
-    "purr", __name__,
-    url_prefix="/event/<int:event_id>/manage/purr"
-)
+blueprint = IndicoPluginBlueprint("purr", __name__,
+                                  url_prefix="/event/<int:event_id>/manage/purr")
 
 # region PAGES
 blueprint.add_url_rule(

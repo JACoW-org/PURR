@@ -2,7 +2,7 @@ from dataclasses import dataclass, field, asdict
 
 
 @dataclass
-class   PurrSettings:
+class PurrSettings:
     """DTO dataclass for PURR settings"""
 
     ab_session_h1: str = field(default='')

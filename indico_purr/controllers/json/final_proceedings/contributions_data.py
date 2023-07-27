@@ -11,10 +11,10 @@ class RHPurrFinalProceedingsContributionsDataJson(RHManageEventBase, PurrFinalPr
     def _process(self):
         if not request.view_args:
             raise BadRequest
-        
+
         session_block_id = int(request.view_args["session_block_id"])
         settings = get_purr_settings(self.event)
-        
+
         if not settings["connected"]:
             raise BadRequest
 
