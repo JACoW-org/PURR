@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div>
               <Card.Group>
                 <PurrSettingsCard
+                  eventId={eventId}
                   settings={settings}
                   setSettings={setSettings}
                   connected={connected}

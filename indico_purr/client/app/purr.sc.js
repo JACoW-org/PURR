@@ -1,14 +1,15 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {isNil} from 'lodash';
 import {catchError, filter, finalize, of, switchMap, tap} from 'rxjs';
-import {Button, Card, Icon} from 'semantic-ui-react';
-import {connect, disconnect, fetchSettingsAndAttachements, saveSettings} from './api/purr.api';
+import {Button, Card, Icon, Modal} from 'semantic-ui-react';
+import {clearFolders, connect, disconnect, fetchSettingsAndAttachements, saveSettings} from './api/purr.api';
 import {ConnectDialog} from './connect/purr.connect.dialog';
 
 import {SettingsDialog} from './settings/purr.settings.dialog';
 import {PurrErrorAlert} from './purr.error.alert';
 
 export const PurrSettingsCard = ({
+  eventId,
   settings,
   setSettings,
   connected,
@@ -30,6 +31,8 @@ export const PurrSettingsCard = ({
   const [connErrorMessage, setConnErrorMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showError, setShowError] = useState(false);
+  const [clearDialogOpen, setClearDialogOpen] = useState(() => false);
+  const [clearing, setClearing] = useState(() => false);
 
   const onClose = useCallback(() => setOpen(false), []);
   const onDialogOpen = useCallback(() => setSettingsLoading(true));
@@ -39,6 +42,7 @@ export const PurrSettingsCard = ({
   }, []);
   const onConnect = useCallback(() => setConnecting(true), [connection]);
   const onDisconnect = useCallback(() => setDisconnecting(true), []);
+  const onClear = useCallback(() => setClearDialogOpen(true), []);
 
   // update value of processing
   useEffect(() => {
@@ -130,7 +134,7 @@ export const PurrSettingsCard = ({
           tap(() => setSettingsErrorMessage(null)),
           switchMap(() => saveSettings(body)),
           catchError(error => {
-            setSettingsErrorMessage('Something occured while attempting to save the settings!');
+            setSettingsErrorMessage('An error occured while attempting to save the settings!');
             return of(null);
           }),
           filter(result => !isNil(result)),
@@ -153,6 +157,33 @@ export const PurrSettingsCard = ({
 
     return () => {};
   }, [connecting, disconnecting, settingsLoading, submitLoading]);
+
+  useEffect(() => {
+    if (clearing) {
+      const sub$ = of(null)
+        .pipe(
+          switchMap(() => clearFolders(settings.api_url, eventId, settings.api_key)),
+          catchError(error => {
+            setClearDialogOpen(false);
+            setSettingsErrorMessage('An error occured while attempting to clear MEOW folders');
+            return of(null);
+          }),
+          filter(result => !!result),
+          tap(result => {
+            if (result.status === 'success') {
+              setClearDialogOpen(false);
+              // TODO success card
+            }
+          }),
+          finalize(() => setClearing(false))
+        )
+        .subscribe();
+
+      return () => sub$.unsubscribe();
+    }
+
+    return () => {};
+  }, [clearing])
 
   return (
     <>
@@ -183,15 +214,28 @@ export const PurrSettingsCard = ({
                 <Button
                   onClick={onDialogOpen}
                   loading={settingsLoading}
-                  disabled={processing}
+                  disabled={processing || clearing}
                   primary
                   compact
                   size="mini"
+                  title='Manage settings'
                 >
                   <Icon name="settings" />
                 </Button>
                 <Button
+                  onClick={onClear}
+                  loading={clearing}
                   disabled={processing}
+                  primary
+                  compact
+                  size="mini"
+                  title='Clear MEOW folders'
+                  negative
+                >
+                  <Icon name="erase" />
+                </Button>
+                <Button
+                  disabled={processing || clearing}
                   onClick={onDisconnect}
                   negative
                   compact
@@ -242,6 +286,20 @@ export const PurrSettingsCard = ({
         open={showError}
         setOpen={setShowError}
       ></PurrErrorAlert>
+      <Modal open={clearDialogOpen} onClose={() => setClearDialogOpen(false)}>
+              <Modal.Header>Clear MEOW folders</Modal.Header>
+              <Modal.Content>
+                <p>Are you really sure to clear all the folders for this event in MEOW?</p>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button color='grey' onClick={() => setClearDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button color='red' onClick={() => setClearing(true)}>
+                  Clear
+                </Button>
+              </Modal.Actions>
+      </Modal>
     </>
   );
 };

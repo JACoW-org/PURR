@@ -86,3 +86,17 @@ export function fetchInfo(apiUrl, eventId, apiKey) {
     })
   );
 }
+
+export function clearFolders(apiUrl, eventId, apiKey) {
+  const url = new URL(`/api/clear/${eventId}/${apiKey}`, apiUrl);
+
+  return fetchJson(url).pipe(
+    concatMap(response => {
+      if (response.error) {
+        throw new Error('error fetching MEOW info');
+      }
+
+      return of(response.result);
+    })
+  );
+}
