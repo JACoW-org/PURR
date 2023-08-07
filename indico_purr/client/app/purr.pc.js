@@ -67,7 +67,7 @@ export const PurrPapersChecks = ({ settings, settingsValid, processing, setProce
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
-          setErrorMessage('Error while generating final proceedings.');
+          setErrorMessage(`Error while checking conference's PDF files.`);
           setShowError(true);
           setLoading(false);
         },
