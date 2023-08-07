@@ -64,6 +64,8 @@ export function SettingsDialog({
     'date',
     'toc_grouping',
     'materials',
+    'duplicate_of_alias',
+    'cat_publish_alias'
   ]);
 
   const [abSettings, setABSettings] = useState(() => defaultABSettings);
@@ -119,6 +121,7 @@ export function SettingsDialog({
           updateFinalProcSettings={updateFinalProcSettings}
           materials={materials}
           errors={errors}
+          contributionFields={settings?.contribution_fields}
         />
       ),
     },

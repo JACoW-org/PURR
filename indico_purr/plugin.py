@@ -46,7 +46,9 @@ class PurrPlugin(IndicoPlugin):
         'date': '',
         'toc_grouping': ['contribution'],
         'primary_color': '#F39433',
-        'materials': []
+        'materials': [],
+        'duplicate_of_alias': 'duplicate_of',
+        'cat_publish_alias': 'CAT_publish'
     }
 
     def init(self):

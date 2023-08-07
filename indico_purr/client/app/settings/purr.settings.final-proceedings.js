@@ -13,20 +13,22 @@ import {
   Table,
   TextArea,
 } from 'semantic-ui-react';
-import { has } from 'lodash';
+import {has} from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
   updateFinalProcSettings,
   materials,
   errors,
+  contributionFields
 }) {
   const tocOptions = [
     {key: 'session', text: 'Session', value: 'session'},
     {key: 'contribution', text: 'Contribution', value: 'contribution'},
   ];
 
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(() => 0);
+  const [contribFields, setContribFields] = useState(() => []);
 
   const onClick = useCallback(
     (e, titleProps) => {
@@ -39,6 +41,20 @@ export function FinalProceedingsSettings({
   const onFieldChange = (e, field) => updateFinalProcSettings(field.name, field.value);
 
   const hasError = useCallback(fieldName => has(errors, fieldName), [errors]);
+
+  useEffect(() => {
+    if (contributionFields) {
+      setContribFields(
+        contributionFields.map((field, index) => ({
+          key: `field-${index}`,
+          value: field.title,
+          text: field.title,
+        }))
+      );
+    }
+
+    return () => {};
+  }, [contributionFields]);
 
   return (
     <Tab.Pane>
@@ -175,6 +191,28 @@ export function FinalProceedingsSettings({
                 You have to use <b>JSON</b>.
               </div>
             </Form.Field>
+            <Form.Group widths="equal">
+              <Form.Field>
+                <label>duplicate_of alias</label>
+                <Select
+                  placeholder="Select the alias for 'duplicate_of' field contribution field"
+                  options={contribFields}
+                  value={finalProcSettings?.duplicate_of_alias || ''}
+                  name="duplicate_of_alias"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field>
+                <label>CAT_publish alias</label>
+                <Select
+                  placeholder="Select the alias for 'CAT_publish' field contribution field"
+                  options={contribFields}
+                  value={finalProcSettings?.cat_publish_alias || ''}
+                  name="cat_publish_alias"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
           </Accordion.Content>
 
           <Accordion.Title active={activeIndex === 2} index={2} onClick={onClick}>
@@ -442,8 +480,6 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
   }, [materials, finalProcSettings.materials, addFormState]);
 
   useEffect(() => {
-    // const map = new Map([['logo', []], ['poster', []], ['volumes', []], ['attachments', []]]);
-
     setIsEmpty(finalProcSettings.materials.length === 0);
 
     const map = finalProcSettings.materials
@@ -520,7 +556,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
                 {index === 0 ? <Table.Cell rowSpan={array.length}>Volumes</Table.Cell> : null}
                 <Table.Cell>{volume.title}</Table.Cell>
                 <Table.Cell>
-                  {index < (array.length - 1) ? (
+                  {index < array.length - 1 ? (
                     <Button icon onClick={() => onMoveDown('volumes', index)}>
                       <Icon name="arrow alternate circle down outline" />
                     </Button>
@@ -546,7 +582,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
                 {index === 0 ? <Table.Cell rowSpan={array.length}>Attachments</Table.Cell> : null}
                 <Table.Cell>{attachment.title}</Table.Cell>
                 <Table.Cell>
-                  {index < (array.length - 1) ? (
+                  {index < array.length - 1 ? (
                     <Button icon onClick={() => onMoveDown('attachments', index)}>
                       <Icon name="arrow alternate circle down outline" />
                     </Button>

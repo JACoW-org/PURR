@@ -1,10 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Modal, Button, Icon, Progress} from 'semantic-ui-react';
-import {catchError, concatMap, forkJoin, of, switchMap, tap, throwError} from 'rxjs';
+import {catchError, concatMap, forkJoin, of, throwError} from 'rxjs';
 import {downloadByUrl, fetchJson, openSocket, runPhase} from '../purr.lib';
 import Logger from './purr.fp.logger';
 import {PurrErrorAlert} from '../purr.error.alert';
-import {fetchInfo} from '../api/purr.api';
 
 const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setFPInfo}) => {
   const [processing, setProcessing] = useState(() => false);

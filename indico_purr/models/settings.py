@@ -35,6 +35,8 @@ class PurrSettings:
     primary_color: str = field(default='#F39433')
     toc_grouping: list = field(default_factory=list)
     materials: list[dict] = field(default_factory=list)
+    duplicate_of_alias: str = field(default='')
+    cat_publish_alias: str = field(default='')
 
     def as_dict(self):
         return asdict(self)
@@ -65,6 +67,8 @@ class PurrSettings:
         self._validate_primary_color(errors)
         self._validate_toc_grouping(errors)
         self._validate_materials(errors)
+        self._validate_duplicate_of_alias(errors)
+        self._validate_cat_publish_alias(errors)
 
         return errors
 
@@ -169,3 +173,9 @@ class PurrSettings:
                 count_posters += 1
         if count_logos > 1 or count_posters > 1:
             errors['materials'] = 'error:bad-data'
+
+    def _validate_duplicate_of_alias(self, errors):
+        self._required_validator('duplicate_of_alias', self.duplicate_of_alias, errors)
+
+    def _validate_cat_publish_alias(self, errors):
+        self._required_validator('cat_publish_alias', self.cat_publish_alias, errors)
