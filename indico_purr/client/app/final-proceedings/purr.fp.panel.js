@@ -389,7 +389,7 @@ const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setF
           <h3>Tasks</h3>
           {ops.length > 0 ? (
             ops.map((op, key) => (
-              <div key={key}>
+              <div key={key} className={key > currentTaskIndex ? 'pending' : null}>
                 <Icon loading={op.running} name={op.icon} />
                 <span>{op.text}</span>
               </div>
