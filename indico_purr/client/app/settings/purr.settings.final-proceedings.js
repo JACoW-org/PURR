@@ -20,8 +20,12 @@ export function FinalProceedingsSettings({
   updateFinalProcSettings,
   materials,
   errors,
-  contributionFields
+  contributionFields,
 }) {
+  const doiApiEnvOptions = [
+    {key: 'test', text: 'Test', value: 'test'},
+    {key: 'prod', text: 'Production', value: 'prod'},
+  ];
   const tocOptions = [
     {key: 'session', text: 'Session', value: 'session'},
     {key: 'contribution', text: 'Contribution', value: 'contribution'},
@@ -250,11 +254,12 @@ export function FinalProceedingsSettings({
             <Form.Group widths="equal">
               <Form.Field error={hasError('doi_env')}>
                 <label>DOI API ENV</label>
-                <Input
+                <Select
                   fluid
-                  name="doi_env"
+                  placeholder="Select an API environment"
+                  options={doiApiEnvOptions}
                   value={finalProcSettings.doi_env || ''}
-                  placeholder="Insert DOI API ENV"
+                  name="doi_env"
                   onChange={onFieldChange}
                 />
               </Form.Field>
