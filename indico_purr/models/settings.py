@@ -33,6 +33,10 @@ class PurrSettings:
     doi_user: str = field(default='')
     doi_password: str = field(default='')
     primary_color: str = field(default='#F39433')
+    toc_grouping: list = field(default_factory=list)
+    materials: list[dict] = field(default_factory=list)
+    duplicate_of_alias: str = field(default='')
+    cat_publish_alias: str = field(default='')
 
     def as_dict(self):
         return asdict(self)
@@ -61,6 +65,10 @@ class PurrSettings:
         self._validate_doi_user(errors)
         self._validate_doi_password(errors)
         self._validate_primary_color(errors)
+        self._validate_toc_grouping(errors)
+        self._validate_materials(errors)
+        self._validate_duplicate_of_alias(errors)
+        self._validate_cat_publish_alias(errors)
 
         return errors
 
@@ -78,13 +86,16 @@ class PurrSettings:
         self._required_validator('ab_session_h2', self.ab_session_h2, errors)
 
     def _validate_ab_contribution_h1(self, errors):
-        self._required_validator('ab_contribution_h1', self.ab_contribution_h1, errors)
+        self._required_validator('ab_contribution_h1',
+                                 self.ab_contribution_h1, errors)
 
     def _validate_ab_contribution_h2(self, errors):
-        self._required_validator('ab_contribution_h2', self.ab_contribution_h2, errors)
+        self._required_validator('ab_contribution_h2',
+                                 self.ab_contribution_h2, errors)
 
     def _validate_pdf_page_height(self, errors):
-        self._required_validator('pdf_page_height', self.pdf_page_height, errors)
+        self._required_validator(
+            'pdf_page_height', self.pdf_page_height, errors)
 
     def _validate_pdf_page_width(self, errors):
         self._required_validator('pdf_page_width', self.pdf_page_width, errors)
@@ -102,7 +113,8 @@ class PurrSettings:
         #     errors['issn'] = 'error:issn-format'
 
     def _validate_booktitle_short(self, errors):
-        self._required_validator('booktitle_short', self.booktitle_short, errors)
+        self._required_validator(
+            'booktitle_short', self.booktitle_short, errors)
 
     def _validate_booktitle_long(self, errors):
         self._required_validator('booktitle_long', self.booktitle_long, errors)
@@ -123,7 +135,8 @@ class PurrSettings:
         self._required_validator('host_info', self.host_info, errors)
 
     def _validate_editorial_board(self, errors):
-        self._required_validator('editorial_board', self.editorial_board, errors)
+        self._required_validator(
+            'editorial_board', self.editorial_board, errors)
 
     def _validate_editorial_json(self, errors):
         self._required_validator('editorial_json', self.editorial_json, errors)
@@ -133,7 +146,8 @@ class PurrSettings:
         self._required_validator('doi_proto', self.doi_proto, errors)
         self._required_validator('doi_domain', self.doi_domain, errors)
         self._required_validator('doi_context', self.doi_context, errors)
-        self._required_validator('doi_organization', self.doi_organization, errors)
+        self._required_validator(
+            'doi_organization', self.doi_organization, errors)
         self._required_validator('doi_conference', self.doi_conference, errors)
 
     def _validate_doi_user(self, errors):
@@ -144,3 +158,24 @@ class PurrSettings:
 
     def _validate_primary_color(self, errors):
         self._required_validator('primary_color', self.primary_color, errors)
+
+    def _validate_toc_grouping(self, errors):
+        if len(self.toc_grouping) == 0:
+            errors['toc_grouping'] = 'error:required'
+
+    def _validate_materials(self, errors):
+        count_logos = 0
+        count_posters = 0
+        for material in self.materials:
+            if material.get('section') == 'logo':
+                count_logos += 1
+            if material.get('section') == 'poster':
+                count_posters += 1
+        if count_logos > 1 or count_posters > 1:
+            errors['materials'] = 'error:bad-data'
+
+    def _validate_duplicate_of_alias(self, errors):
+        self._required_validator('duplicate_of_alias', self.duplicate_of_alias, errors)
+
+    def _validate_cat_publish_alias(self, errors):
+        self._required_validator('cat_publish_alias', self.cat_publish_alias, errors)

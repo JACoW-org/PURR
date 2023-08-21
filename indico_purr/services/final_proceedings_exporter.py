@@ -23,6 +23,7 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
         for attachment in attachments:
             attachments_data.append(
                 dict(
+                    id=attachment.id,
                     md5sum=attachment.file.md5,
                     filename=attachment.file.filename,
                     content_type=attachment.file.content_type,
@@ -62,7 +63,8 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
         data["contributions"] = []
 
         for contribution in contributions:
-            serialized_contrib = self._serialize_contribution(event, contribution)
+            serialized_contrib = self._serialize_contribution(
+                event, contribution)
             data["contributions"].append(serialized_contrib)
 
         data["sessions"] = []

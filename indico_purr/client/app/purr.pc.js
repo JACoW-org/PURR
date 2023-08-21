@@ -46,6 +46,20 @@ export const PurrPapersChecks = ({ settings, settingsValid, processing, setProce
             setErrors([]);
           }
         },
+        'task:error': (head, body) => {
+          console.log(head, body);
+
+          if (!body.params) {
+            return;
+          }
+
+          const errorMessage = body.params.message;
+
+          setErrorMessage(errorMessage);
+          setShowError(true);
+
+          return socket.complete();
+        }
       };
 
       socket.subscribe({
@@ -53,7 +67,7 @@ export const PurrPapersChecks = ({ settings, settingsValid, processing, setProce
         complete: () => setLoading(false),
         error: err => {
           console.error(err);
-          setErrorMessage('Error while generating final proceedings.');
+          setErrorMessage(`Error while checking conference's PDF files.`);
           setShowError(true);
           setLoading(false);
         },

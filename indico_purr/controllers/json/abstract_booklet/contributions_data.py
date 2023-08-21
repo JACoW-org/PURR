@@ -21,7 +21,6 @@ class RHPurrAbstractBookletContributionsDataJson(RHManageEventBase, PurrAbstract
         return jsonify(
             {
                 "contributions": self._export_event_contributions_data(
-                    self.event, session_block_id
-                )
+                    self.event, session_block_id)
             }
         )

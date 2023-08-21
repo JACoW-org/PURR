@@ -3,9 +3,9 @@ import {Button, Modal} from 'semantic-ui-react';
 
 export const PurrErrorAlert = ({message, open, setOpen}) => {
   return (
-    <Modal className='error-alert' open={open} onClose={() => setOpen(false)}>
+    <Modal size='mini' className='error-alert' open={open} onClose={() => setOpen(false)}>
       <Modal.Header>Error message</Modal.Header>
-      <Modal.Content>
+      <Modal.Content scrolling>
         <Modal.Description>{message}</Modal.Description>
       </Modal.Content>
       <Modal.Actions>

@@ -3,9 +3,9 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {catchError, concatMap, forkJoin, of, tap, throwError} from 'rxjs';
 import {fetchJson, openSocket, runPhase} from '../purr.lib';
 import {sortedIndexBy} from 'lodash';
-import { PurrErrorAlert } from '../purr.error.alert';
+import {PurrErrorAlert} from '../purr.error.alert';
 
-const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
+const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
   const [processing, setProcessing] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
@@ -14,6 +14,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
   const [hiding, setHiding] = useState(() => false);
   const [partials, setPartials] = useState(() => []);
   const [total, setTotal] = useState(() => 0);
+  const [progressStatus, setProgressStatus] = useState(() => null); // 'success' || 'error' || 'active' || 'aborted'
 
   const [showError, setShowError] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(() => null);
@@ -22,7 +23,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
 
   const onClose = useCallback(() => setOpen(false), []);
   const onAbort = useCallback(() => {
-    // console.log('onAbort', prePressProcessing, finalProcProcessing)
+    setProgressStatus('aborted');
 
     if (fetching) {
       setFetching(false);
@@ -59,6 +60,8 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
     if (fetching || creating || deleting || publishing || hiding) {
       setTotal(0); // reset params
 
+      setProgressStatus('active');
+
       const method = resolveMethod();
 
       const [task_id, socket] = openSocket(settings);
@@ -67,12 +70,16 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
 
       socket.subscribe({
         next: ({head, body}) => runPhase(head, body, actions, socket),
-        complete: stopTasks,
+        complete: () => {
+          stopTasks();
+          setProgressStatus(current => current === 'active' ? 'error' : current);
+        },
         error: error => {
           console.log(error);
-          
+
           setErrorMessage('Failed to start task. Check connection with MEOW.');
           setShowError(true);
+          setProgressStatus('error');
 
           stopTasks();
         },
@@ -92,12 +99,14 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
             return of(event);
           }),
           catchError(error => {
-
             console.log(error);
 
-            setErrorMessage('Failed to fetch settings and data for this event. Retry or contact an admin.');
+            setErrorMessage(
+              'Failed to fetch settings and data for this event. Retry or contact an admin.'
+            );
             setShowError(true);
             stopTasks();
+            setProgressStatus('error');
 
             throw error;
           }),
@@ -134,10 +143,20 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
 
   useEffect(() => {
     if (open) {
+      if (!fpInfo.datacite_json) {
+        setErrorMessage(
+          'MEOW could not retrieve any info. Please make sure that final proceedings have been correctly generated.'
+        );
+        setShowError(true);
+
+        return () => {};
+      }
       setFetching(true);
     } else {
       setPartials([]);
     }
+
+    return () => {};
   }, [open]);
 
   // scrolling handler
@@ -147,7 +166,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
     }
   }, [partials]);
 
-  const buildActions = (socket) => {
+  const buildActions = socket => {
     return {
       'task:progress': (head, body) => {
         console.log(body);
@@ -170,19 +189,22 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
         }
       },
       'task:result': (head, body) => {
-        if (!body.params || body.params.phase !== 'doi_result') {
-          return;
-        }
 
-        const doi = body.params.result.doi;
-        const identifier = body.params.result.id;
-        const error = body.params.result.error;
+        setProgressStatus('success');
 
-        if (fetching || creating || deleting || publishing || hiding) {
-          setPartials(prevPartials =>
-            insertPartialInSortedArray(prevPartials, identifier, doi, error)
-          );
-        }
+        // if (!body.params || body.params.phase !== 'doi_result') {
+        //   return;
+        // }
+
+        // const doi = body.params.result.doi;
+        // const identifier = body.params.result.id;
+        // const error = body.params.result.error;
+
+        // if (fetching || creating || deleting || publishing || hiding) {
+        //   setPartials(prevPartials =>
+        //     insertPartialInSortedArray(prevPartials, identifier, doi, error)
+        //   );
+        // }
       },
       'task:error': (head, body) => {
         console.log(head, body);
@@ -196,9 +218,10 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
         // show error message
         setErrorMessage(errorMessage);
         setShowError(true);
+        setProgressStatus('error');
 
         return socket.complete();
-      }
+      },
     };
   };
 
@@ -246,10 +269,13 @@ const DoiPanel = ({open, setOpen, settings, eventTitle}) => {
       <Modal.Content>
         <Progress
           color="blue"
-          active={processing}
           progress={partials.length > 0 ? 'ratio' : false}
           value={partials.length}
           total={total}
+          active={progressStatus === 'active'}
+          success={progressStatus === 'success'}
+          error={progressStatus === 'error'}
+          warning={progressStatus === 'aborted'}
         />
       </Modal.Content>
       <Modal.Actions>

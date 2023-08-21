@@ -1,41 +1,42 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Modal, Button, Icon, Progress } from 'semantic-ui-react';
-import { catchError, concatMap, forkJoin, of, throwError } from 'rxjs';
-import { downloadByUrl, fetchJson, openSocket, runPhase } from '../purr.lib';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Modal, Button, Icon, Progress} from 'semantic-ui-react';
+import {catchError, concatMap, forkJoin, of, throwError} from 'rxjs';
+import {downloadByUrl, fetchJson, openSocket, runPhase} from '../purr.lib';
 import Logger from './purr.fp.logger';
-import { PurrErrorAlert } from '../purr.error.alert';
+import {PurrErrorAlert} from '../purr.error.alert';
 
-const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
+const FinalProcPanel = ({open, setOpen, info, settings, eventTitle, fpInfo, setFPInfo}) => {
   const [processing, setProcessing] = useState(() => false);
-  const [prePressProcessing, setPrePressProcessing] = useState(false);
-  const [finalProcProcessing, setFinalProcProcessing] = useState(false);
+  const [prePressProcessing, setPrePressProcessing] = useState(() => false);
+  const [finalProcProcessing, setFinalProcProcessing] = useState(() => false);
+  const [currentTaskIndex, setCurrentTaskIndex] = useState(() => 0);
   const [taskCount, setTaskCount] = useState(() => 0);
-  // const [aborting, setAborting] = useState(() => false);
-  // const [socket, setSocket] = useState(() => undefined);
+
   const [ops, setOps] = useState(() => []);
   const [logs, setLogs] = useState(() => []);
   const [compressProceedings, setCompressProceedings] = useState(() => false);
   const [downloadProceedings, setDownloadProceedings] = useState(() => false);
   const [showError, setShowError] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(() => null);
+  const [progressStatus, setProgressStatus] = useState(() => null); // 'success' || 'error' || 'active' || 'aborted'
 
   const onClose = useCallback(() => {
     setOpen(false);
     setLogs([]);
     setOps([]);
-  }, [])
+  }, []);
 
   const onAbort = useCallback(() => {
-
-    // console.log('onAbort', prePressProcessing, finalProcProcessing)
+    setProgressStatus('aborted');
+    setOps(tasks =>
+      tasks.map(task => (task.running ? {...task, running: false, icon: 'close'} : task))
+    );
 
     if (prePressProcessing) {
-      // console.log('onAbort - prePressProcessing')
       setPrePressProcessing(false);
     }
 
     if (finalProcProcessing) {
-      // console.log('onAbort - finalProcProcessing')
       setFinalProcProcessing(false);
     }
   }, [prePressProcessing, finalProcProcessing]);
@@ -48,29 +49,12 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
     window.open(url, '_blank');
   }, [info, settings]);
 
-  // set task count based on the selected event
-  useEffect(() => {
-
-    if (compressProceedings) {
-      setTaskCount(2);
-    }
-
-    if (prePressProcessing) {
-      setTaskCount(17);
-    }
-
-    if (finalProcProcessing) {
-      setTaskCount(19);
-    }
-
-    return () => { }
-
-  }, [compressProceedings, prePressProcessing, finalProcProcessing])
-
   useEffect(() => {
     setProcessing(
       prePressProcessing || finalProcProcessing || compressProceedings || downloadProceedings
     );
+
+    return () => {};
   }, [prePressProcessing, finalProcProcessing, compressProceedings, downloadProceedings]);
 
   // open
@@ -82,13 +66,14 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
       setLogs([]);
     }
 
-    return () => { };
+    return () => {};
   }, [open]);
 
   useEffect(() => {
     let [task_id, socket] = [];
 
     if (prePressProcessing || finalProcProcessing) {
+      setProgressStatus('active');
 
       const method = finalProcProcessing ? 'event_final_proceedings' : 'event_pre_press';
 
@@ -99,16 +84,33 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
       // references to open web socket
       [task_id, socket] = openSocket(settings);
 
-      // setSocket(socket)
-
       // actions
       const actions = {
         'task:progress': (head, body) => {
-          if (body?.params?.text) {
-            setOps(prevOps => [
-              ...prevOps.map(o => ({ icon: 'check', text: o.text })),
-              { last: true, icon: 'spinner', text: `${body.params.text}` },
-            ]);
+          if (body?.params?.phase === 'init_tasks_list') {
+            setTaskCount(body?.params?.tasks.length);
+            setOps(
+              body?.params?.tasks.map(task => ({
+                icon: '',
+                text: task.text,
+                code: task.code,
+                running: false,
+              }))
+            );
+          } else if (body?.params?.text) {
+            setOps(ops => {
+              const newTaskIndex = ops.findIndex(task => task.code === body.params.phase);
+              if (newTaskIndex > -1) {
+                ops[newTaskIndex].icon = 'spinner';
+                ops[newTaskIndex].running = true;
+                setCurrentTaskIndex(newTaskIndex);
+                if (newTaskIndex > 0) {
+                  ops[newTaskIndex - 1].icon = 'check';
+                  ops[newTaskIndex - 1].running = false;
+                }
+              }
+              return ops;
+            });
           }
         },
         'task:log': (head, body) => {
@@ -117,31 +119,61 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
           }
         },
         'task:result': (head, body) => {
+
+          setOps(prevOps => {
+            setCurrentTaskIndex(prevOps.length);
+            return [...prevOps.map(o => ({...o, icon: 'check', running: false}))];
+          });
+
+          setProgressStatus('success');
+
+          setFPInfo(prev => ({
+            ...prev,
+            final_proceedings: finalProcProcessing,
+            pre_press: prePressProcessing,
+            proceedings_archive: false,
+            datacite_json: finalProcProcessing,
+          }));
+        },
+        'task:error': (head, body) => {
           console.log(head, body);
 
-          setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text }))]);
+          if (!body.params) {
+            return;
+          }
+
+          const errorMessage = body.params.message;
+
+          setErrorMessage(errorMessage);
+          setShowError(true);
+          setProgressStatus('error');
+
+          return socket.complete(head);
         },
       };
 
       // subscription to the socket
       socket.subscribe({
-        next: ({ head, body }) => runPhase(head, body, actions, socket),
+        next: ({head, body}) => runPhase(head, body, actions, socket),
         complete: () => {
           setPrePressProcessing(false);
           setFinalProcProcessing(false);
+          setProgressStatus(current => (current === 'active' ? 'error' : current));
         },
         error: err => {
           console.error(err);
-          
+
           setErrorMessage('Failed to start task. Check connection with MEOW.');
           setShowError(true);
 
           setPrePressProcessing(false);
           setFinalProcProcessing(false);
+
+          setProgressStatus('error');
         },
       });
 
-      const context = { params: {} };
+      const context = {params: {}};
 
       of(null)
         .pipe(
@@ -151,7 +183,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
             })
           ),
 
-          concatMap(({ event }) => {
+          concatMap(({event}) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -181,7 +213,9 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
           catchError(error => {
             console.log(error);
 
-            setErrorMessage('Failed to fetch settings and data for this event. Retry or contact an admin.');
+            setErrorMessage(
+              'Failed to fetch settings and data for this event. Retry or contact an admin.'
+            );
             setShowError(true);
 
             throw error;
@@ -194,7 +228,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
       if (socket) {
         socket.complete();
 
-        setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text })), { text: '' }]);
+        // setOps(prevOps => [...prevOps.map(o => ({...o, icon: 'check', running: false}))]);
       }
     };
   }, [prePressProcessing, finalProcProcessing]);
@@ -202,6 +236,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
   // compress proceedings
   useEffect(() => {
     if (compressProceedings) {
+      setProgressStatus('active');
 
       const method = 'event_compress_proceedings';
 
@@ -209,11 +244,30 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
 
       const actions = {
         'task:progress': (head, body) => {
-          if (body?.params?.text) {
-            setOps(prevOps => [
-              ...prevOps.map(o => ({ icon: 'check', text: o.text })),
-              { last: true, icon: 'spinner', text: `${body.params.text}` },
-            ]);
+          if (body?.params?.phase === 'init_tasks_list') {
+            setTaskCount(body?.params?.tasks.length);
+            setOps(
+              body?.params?.tasks.map(task => ({
+                icon: '',
+                text: task.text,
+                code: task.code,
+                running: false,
+              }))
+            );
+          } else if (body?.params?.text) {
+            setOps(ops => {
+              const newTaskIndex = ops.findIndex(task => task.code === body.params.phase);
+              if (newTaskIndex > -1) {
+                ops[newTaskIndex].icon = 'spinner';
+                ops[newTaskIndex].running = true;
+                setCurrentTaskIndex(newTaskIndex);
+                if (newTaskIndex > 0) {
+                  ops[newTaskIndex - 1].icon = 'check';
+                  ops[newTaskIndex - 1].running = false;
+                }
+              }
+              return ops;
+            });
           }
         },
         'task:log': (head, body) => {
@@ -224,39 +278,50 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
         'task:result': (head, body) => {
           console.log(head, body);
 
-          setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text }))]);
+          setOps(prevOps => {
+            setCurrentTaskIndex(prevOps.length);
+            return [...prevOps.map(o => ({...o, icon: 'check', running: false}))];
+          });
+
+          setProgressStatus('success');
+          setFPInfo(prev => ({...prev, proceedings_archive: true}));
         },
         'task:error': (head, body) => {
           console.log(head, body);
-  
+
           if (!body.params) {
             return;
           }
-  
+
           const errorMessage = body.params.message;
-  
+
           // show error message
           setErrorMessage(errorMessage);
           setShowError(true);
-  
+          setProgressStatus('error');
+
           return socket.complete();
-        }
+        },
       };
 
       // subscription to the socket
-      const sub$ = socket.subscribe({
-        next: ({ head, body }) => runPhase(head, body, actions, socket),
-        complete: () => setCompressProceedings(false),
+      socket.subscribe({
+        next: ({head, body}) => runPhase(head, body, actions, socket),
+        complete: () => {
+          setCompressProceedings(false);
+          setProgressStatus(current => (current === 'active' ? 'error' : current));
+        },
         error: err => {
           console.error(err);
-          // TODO based on the error, build a map of error messages to display
-          // setErrorMessage('Error while generating final proceedings.');
-          // setShowError(true);
+
+          setErrorMessage('Failed to start task. Check connection with MEOW.');
+          setShowError(true);
           setCompressProceedings(false);
+          setProgressStatus('error');
         },
       });
 
-      const context = { params: {} };
+      const context = {params: {}};
 
       of(null)
         .pipe(
@@ -266,7 +331,7 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
             })
           ),
 
-          concatMap(({ event }) => {
+          concatMap(({event}) => {
             if (event.error) {
               return throwError(() => new Error('error'));
             }
@@ -299,8 +364,6 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
       return () => {
         if (socket) {
           socket.complete();
-
-          setOps(prevOps => [...prevOps.map(o => ({ icon: 'check', text: o.text })), { text: '' }]);
         }
       };
     }
@@ -314,23 +377,26 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
       downloadByUrl(url);
       setDownloadProceedings(false);
     }
+
+    return () => {};
   }, [downloadProceedings]);
 
   return (
     <Modal open={open} className="fp-panel">
       <Modal.Header>{eventTitle} - Final proceedings generation panel</Modal.Header>
       <Modal.Content>
-
         <div className="operations">
           <h3>Tasks</h3>
           {ops.length > 0 ? (
             ops.map((op, key) => (
-              <div key={key}>
-                <Icon loading={!!op.last} name={op.icon} />
+              <div key={key} className={key > currentTaskIndex ? 'pending' : null}>
+                <Icon loading={op.running} name={op.icon} />
                 <span>{op.text}</span>
               </div>
             ))
-          ) : (<span>-</span>)}
+          ) : (
+            <span>-</span>
+          )}
         </div>
 
         <div className="logs">
@@ -341,31 +407,42 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
 
       <Modal.Description>
         <div className="info">
-          <Progress color='blue' disabled={!ops?.length}
-            value={ops?.length - 1} total={taskCount} progress='ratio' />
+          <Progress
+            color="blue"
+            disabled={!ops?.length}
+            value={currentTaskIndex}
+            total={taskCount}
+            progress="ratio"
+            active={progressStatus === 'active'}
+            success={progressStatus === 'success'}
+            error={progressStatus === 'error'}
+            warning={progressStatus === 'aborted'}
+          />
         </div>
       </Modal.Description>
 
       <Modal.Actions>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
           {compressProceedings || prePressProcessing || finalProcProcessing ? (
             <Button size="mini" negative onClick={onAbort}>
               Abort
             </Button>
           ) : (
-            <Button size="mini" onClick={onClose}>Close</Button>
+            <Button size="mini" onClick={onClose}>
+              Close
+            </Button>
           )}
         </div>
         <div>
-          <Button.Group size='mini'>
+          <Button.Group size="mini">
             <Button
               icon="compress"
               content="Compress"
               title="Compress final proceedings"
               onClick={onCompressProceedings}
               loading={compressProceedings}
-              disabled={processing}
-              color='violet'
+              disabled={processing || !(fpInfo?.pre_press || fpInfo?.final_proceedings)}
+              color="violet"
               size="mini"
             />
             <Button
@@ -373,8 +450,8 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
               content="Download"
               title="Download final proceedings' ZIP"
               onClick={onDownloadProceedings}
-              disabled={processing}
-              color='purple'
+              disabled={processing || !fpInfo?.proceedings_archive}
+              color="purple"
               size="mini"
             />
             <Button
@@ -382,35 +459,34 @@ const FinalProcPanel = ({ open, setOpen, info, settings, eventTitle }) => {
               content="Open"
               title="Visit static website"
               onClick={onVisitProceedings}
-              disabled={processing}
-              color='brown'
+              disabled={processing || !(fpInfo?.pre_press || fpInfo?.final_proceedings)}
+              color="brown"
               size="mini"
             />
           </Button.Group>
         </div>
         <div>
-          <Button.Group size='mini'>
+          <Button.Group size="mini">
             <Button
               disabled={processing}
               loading={prePressProcessing}
               onClick={() => setPrePressProcessing(true)}
-              icon='cog'
-              content='Pre Press'
-              labelPosition='left'
-              className='pre-press-btn'
+              icon="cog"
+              content="Pre Press"
+              labelPosition="left"
+              className="pre-press-btn"
             />
             <Button.Or />
             <Button
               disabled={processing}
               loading={finalProcProcessing}
               onClick={() => setFinalProcProcessing(true)}
-              icon='cogs'
-              content='Final Proceedings'
-              labelPosition='right'
-              color='green'
+              icon="cogs"
+              content="Final Proceedings"
+              labelPosition="right"
+              color="green"
             />
           </Button.Group>
-
         </div>
       </Modal.Actions>
 

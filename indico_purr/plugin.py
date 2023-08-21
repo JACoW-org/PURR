@@ -44,18 +44,23 @@ class PurrPlugin(IndicoPlugin):
         'doi_user': '',
         'doi_password': '',
         'date': '',
-
-        'primary_color': '#F39433'
+        'toc_grouping': ['contribution'],
+        'primary_color': '#F39433',
+        'materials': [],
+        'duplicate_of_alias': 'duplicate_of',
+        'cat_publish_alias': 'CAT_publish'
     }
 
     def init(self):
         super(PurrPlugin, self).init()
         self.register_assets()
-        self.connect(signals.menu.items, self.purr_sidemenu_items, sender='event-management-sidemenu')
+        self.connect(signals.menu.items, self.purr_sidemenu_items,
+                     sender='event-management-sidemenu')
 
     def purr_sidemenu_items(self, sender, event, **kwargs):
         if event.can_manage(session.user):
-            yield SideMenuItem('purr', _('PURR'), url_for_plugin('purr.purr_home', event),
+            yield SideMenuItem('purr', _('PURR'),
+                               url_for_plugin('purr.purr_home', event),
                                0, section='workflows', icon='pdf')
 
     def get_blueprints(self):
