@@ -197,9 +197,9 @@ export function FinalProceedingsSettings({
             </Form.Field>
             <Form.Group widths="equal">
               <Form.Field>
-                <label>duplicate_of alias</label>
+                <label>Custom field for contribution duplicates</label>
                 <Select
-                  placeholder="Select the alias for 'duplicate_of' field contribution field"
+                  placeholder="Select the custom field for contribution duplicates"
                   options={contribFields}
                   value={finalProcSettings?.duplicate_of_alias || ''}
                   name="duplicate_of_alias"
@@ -207,9 +207,9 @@ export function FinalProceedingsSettings({
                 />
               </Form.Field>
               <Form.Field>
-                <label>CAT_publish alias</label>
+                <label>Custom field for contributions not to publish</label>
                 <Select
-                  placeholder="Select the alias for 'CAT_publish' field contribution field"
+                  placeholder="Select the custom field for contributions not to publish"
                   options={contribFields}
                   value={finalProcSettings?.cat_publish_alias || ''}
                   name="cat_publish_alias"
