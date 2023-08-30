@@ -380,7 +380,15 @@ export function FinalProceedingsSettings({
 
 export function Materials({materials, finalProcSettings, updateFinalProcSettings}) {
   const [materialsMap, setMaterialsMap] = useState(
-    () => new Map([['logo', []], ['poster', []], ['volumes', []], ['attachments', []]])
+    () =>
+      new Map([
+        ['logo', []],
+        ['poster', []],
+        ['final-proceedings-cover', []],
+        ['at-a-glance-cover', []],
+        ['volumes', []],
+        ['attachments', []],
+      ])
   );
   const [isEmpty, setIsEmpty] = useState(() => true);
   const [open, setOpen] = useState(() => false);
@@ -465,9 +473,24 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
     const section = addFormState.controls.section.value;
 
     // validation ==> logo and poster can have at most one file
-    if (section === 'logo' || section === 'poster') {
+    if (
+      section === 'logo' ||
+      section === 'poster' ||
+      section === 'final-proceedings-cover' ||
+      section === 'at-a-glance-cover'
+    ) {
       if (materialsMap.get(section).length !== 0) {
         const message = `Cannot add more materials to section ${section}`;
+        setAddFormState(prevState => ({...prevState, valid: false, errorMessage: message}));
+
+        return;
+      }
+    }
+
+    // check duplicate
+    for (const material of materialsMap.get(section)) {
+      if (material.id === fileID) {
+        const message = `Impossible to add this material again in section ${section}`;
         setAddFormState(prevState => ({...prevState, valid: false, errorMessage: message}));
 
         return;
@@ -499,7 +522,14 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
           acc.get(material.section).push(material);
         }
         return acc;
-      }, new Map([['logo', []], ['poster', []], ['volumes', []], ['attachments', []]])); // produce a Map object for fast access
+      }, new Map([
+        ['logo', []],
+        ['poster', []],
+        ['final-proceedings-cover', []],
+        ['at-a-glance-cover', []],
+        ['volumes', []],
+        ['attachments', []]
+      ])); // produce a Map object for fast access
 
     setMaterialsMap(map);
 
@@ -546,6 +576,35 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
               <Table.Cell>{materialsMap.get('poster')[0].title}</Table.Cell>
               <Table.Cell>
                 <Button icon onClick={() => onDelete(materialsMap.get('poster')[0].id)}>
+                  <Icon name="delete" />
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          ) : null}
+
+          {/* Final Proceedings Cover */}
+          {materialsMap.get('final-proceedings-cover').length > 0 ? (
+            <Table.Row>
+              <Table.Cell>Final Proceedings Volume Cover</Table.Cell>
+              <Table.Cell>{materialsMap.get('final-proceedings-cover')[0].title}</Table.Cell>
+              <Table.Cell>
+                <Button
+                  icon
+                  onClick={() => onDelete(materialsMap.get('final-proceedings-cover')[0].id)}
+                >
+                  <Icon name="delete" />
+                </Button>
+              </Table.Cell>
+            </Table.Row>
+          ) : null}
+
+          {/* Poster */}
+          {materialsMap.get('at-a-glance-cover').length > 0 ? (
+            <Table.Row>
+              <Table.Cell>At-a-glance Volume Cover</Table.Cell>
+              <Table.Cell>{materialsMap.get('at-a-glance-cover')[0].title}</Table.Cell>
+              <Table.Cell>
+                <Button icon onClick={() => onDelete(materialsMap.get('at-a-glance-cover')[0].id)}>
                   <Icon name="delete" />
                 </Button>
               </Table.Cell>
@@ -658,6 +717,8 @@ export function AddMaterialForm({materials, formState, setFormState}) {
   const [sections] = useState(() => [
     {value: 'logo', text: 'Logo'},
     {value: 'poster', text: 'Poster'},
+    {value: 'final-proceedings-cover', text: 'Final Proceedings Volume Cover'},
+    {value: 'at-a-glance-cover', text: 'At-a-glance Volume Cover'},
     {value: 'volumes', text: 'Volumes'},
     {value: 'attachments', text: 'Attachments'},
   ]);
