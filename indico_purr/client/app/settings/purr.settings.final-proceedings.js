@@ -683,9 +683,9 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
           </Table.Row>
         </Table.Footer>
       </Table>
-      <Modal open={open} onClose={() => setOpen(false)} size="large">
+      <Modal open={open} onClose={() => setOpen(false)} size="small">
         <Modal.Header>Add material</Modal.Header>
-        <Modal.Content scrolling>
+        <Modal.Content>
           <AddMaterialForm
             materials={materials}
             formState={addFormState}
