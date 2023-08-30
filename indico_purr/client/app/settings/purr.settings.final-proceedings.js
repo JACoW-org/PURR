@@ -754,7 +754,7 @@ export function AddMaterialForm({materials, formState, setFormState}) {
   );
 
   return (
-    <Form error={!formState.valid && !!formState.errorMessage}>
+    <Form error={!formState.valid && !!formState.errorMessage} className='add-material-form'>
       <Form.Field>
         <label>File</label>
         <Select
