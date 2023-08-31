@@ -1,4 +1,5 @@
 from operator import attrgetter
+# from flask_pluginengine import current_plugin
 
 from pytz import timezone
 from sqlalchemy import Date, cast
@@ -7,7 +8,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.config import config
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.events.contributions.models.contributions import Contribution, PaperRevision
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.date_time import iterdays
@@ -202,6 +203,9 @@ class ABCExportEvent(ABCExportFile):
         }
 
     def _serialize_paper(self, contrib):
+        
+        # current_plugin.logger.debug(contrib.paper.title, contrib.paper.state) if contrib.paper else None
+        
         return {
             "title": contrib.paper.title,
             "state": contrib.paper.state,
@@ -264,10 +268,8 @@ class ABCExportEvent(ABCExportFile):
         )
 
     def _get_latest_revision(self, event, contrib, editable):
-        latest_revision = editable.revisions[-1]
-
         serialized_revision = self._serialize_editable_revision(
-            event, contrib, latest_revision, True
+            event, contrib, editable.latest_revision_with_files, True
         )
 
         return serialized_revision
@@ -275,7 +277,7 @@ class ABCExportEvent(ABCExportFile):
     def _get_all_revisions(self, event, contrib, editable):
         revisions = [
             self._serialize_editable_revision(event, contrib, revision, True)
-            for revision in editable.revisions
+            for revision in editable.valid_revisions
         ]
 
         return revisions
