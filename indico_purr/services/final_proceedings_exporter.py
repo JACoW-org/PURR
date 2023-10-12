@@ -1,4 +1,5 @@
 from indico_purr.services.exporter.abstract_event_exporter import ABCExportEvent
+# from flask_pluginengine import current_plugin
 
 
 class PurrFinalProceedingsExporter(ABCExportEvent):
@@ -8,6 +9,8 @@ class PurrFinalProceedingsExporter(ABCExportEvent):
         contributions = self.find_contributions_list(
             event=event, session_block_id=session_block_id, files=True
         )
+
+        # current_plugin.logger.debug("len: " + str(len(contributions)))
 
         contributions_data = [
             self._serialize_contribution(event, c) for c in contributions

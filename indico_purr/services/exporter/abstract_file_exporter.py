@@ -37,9 +37,10 @@ class ABCExportFile(ABC):
             "id": revision.id,
             "comment": revision.comment,
             "created_dt": revision.created_dt,
-            "reviewed_dt": revision.reviewed_dt,
-            "initial_state": revision.initial_state,
-            "final_state": revision.final_state,
+            "final_state": revision.type,
+            # "reviewed_dt": revision.reviewed_dt,
+            # "initial_state": revision.initial_state,
+            # "final_state": revision.final_state,
             "files": revision_files,
             "tags": revision_tags,
         }

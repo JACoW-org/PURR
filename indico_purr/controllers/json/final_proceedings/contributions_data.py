@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from werkzeug.exceptions import BadRequest
+# from flask_pluginengine import current_plugin
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
 
@@ -17,6 +18,8 @@ class RHPurrFinalProceedingsContributionsDataJson(RHManageEventBase, PurrFinalPr
 
         if not settings["connected"]:
             raise BadRequest
+
+        # current_plugin.logger.debug(f"session_block_id: {session_block_id}")
 
         return jsonify(
             {

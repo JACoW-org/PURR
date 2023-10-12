@@ -3,6 +3,8 @@ import { webSocket } from 'rxjs/webSocket';
 import { switchMap, catchError, map } from 'rxjs/operators';
 import { fromFetch } from 'rxjs/fetch';
 
+import { notificationShowMessage } from './utils/purr.utils'
+
 export function getEventId() {
   try {
     return JSON.parse(document.querySelector('#purr-event-id').textContent);
@@ -102,10 +104,12 @@ export function runPhase(head, body, actions, socket) {
   }
   
   if (head.code === 'task:end') {
+    notificationShowMessage();
     return socket.complete();
   }
 
   if (head.code === 'task:error') {
+    notificationShowMessage();
     return socket.complete();
   }
 }
