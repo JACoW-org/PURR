@@ -156,7 +156,7 @@ class ABCExportEvent(ABCExportFile):
         field_values = [self._serialize_field_value(f) for f in contrib.field_values]
 
         editables = self._serialize_editables(event, contrib)
-        
+
         paper = self._serialize_paper(contrib)
 
         session_code = ""
@@ -203,16 +203,20 @@ class ABCExportEvent(ABCExportFile):
         }
 
     def _serialize_paper(self, contrib):
-        
-        # current_plugin.logger.debug(contrib.paper.title, contrib.paper.state) if contrib.paper else None
-        
+
+        # if contrib.paper:
+        #     current_plugin.logger.debug(
+        #         f"code: {contrib.code} - title: {contrib.paper.title} - state: {contrib.paper.state}")
+        # else:
+        #     current_plugin.logger.debug(f"code: {contrib.code} - no paper")
+
         return {
             "title": contrib.paper.title,
             "state": contrib.paper.state,
             "verbose_title": contrib.paper.verbose_title,
             "last_revision": self._serialize_paper_revison(contrib.paper.last_revision),
         } if contrib.paper else None
-        
+
     def _serialize_paper_revison(self, paper_revision):
         return {
             "judgment_comment": paper_revision.judgment_comment,

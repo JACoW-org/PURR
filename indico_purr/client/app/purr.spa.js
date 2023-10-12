@@ -1,18 +1,25 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import {Container, Card, Icon, Message} from 'semantic-ui-react';
+import { Container, Card, Icon, Message } from 'semantic-ui-react';
 
-import {PurrSettingsCard} from './purr.sc';
-import {PurrAbstractBooklet} from './purr.ab';
-import {PurrPapersChecks} from './purr.pc';
-import {PurrFinalProceedings} from './purr.fp';
-import {catchError, concatMap, of, tap} from 'rxjs';
-import {fetchSettings} from './api/purr.api';
-import {getEventId, getEventTitle} from './purr.lib';
+import { PurrSettingsCard } from './purr.sc';
+import { PurrAbstractBooklet } from './purr.ab';
+import { PurrPapersChecks } from './purr.pc';
+import { PurrFinalProceedings } from './purr.fp';
+import { catchError, concatMap, of, tap } from 'rxjs';
+import { fetchSettings } from './api/purr.api';
+import { getEventId, getEventTitle } from './purr.lib';
+import { notificationRequestPermission } from './utils/purr.utils'
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
+
   const purrSpa = document.getElementById('purr-spa');
   if (purrSpa) {
+
+    notificationRequestPermission();
+
     const eventId = getEventId();
     const eventTitle = getEventTitle();
 
