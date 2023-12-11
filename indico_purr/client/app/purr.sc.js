@@ -170,9 +170,9 @@ export const PurrSettingsCard = ({
           }),
           filter(result => !!result),
           tap(result => {
-            if (result.status === 'success') {
-              setClearDialogOpen(false);
-              // TODO success card
+            if (result?.status === 'success') {
+              // setClearDialogOpen(false);
+              window.location.reload();
             }
           }),
           finalize(() => setClearing(false))
@@ -287,18 +287,18 @@ export const PurrSettingsCard = ({
         setOpen={setShowError}
       ></PurrErrorAlert>
       <Modal open={clearDialogOpen} onClose={() => setClearDialogOpen(false)}>
-              <Modal.Header>Clear MEOW folders</Modal.Header>
-              <Modal.Content>
-                <p>Are you really sure to clear all the folders for this event in MEOW?</p>
-              </Modal.Content>
-              <Modal.Actions>
-                <Button color='grey' onClick={() => setClearDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button color='red' onClick={() => setClearing(true)}>
-                  Clear
-                </Button>
-              </Modal.Actions>
+        <Modal.Header>Clear MEOW folders</Modal.Header>
+        <Modal.Content>
+          <p>Are you really sure to clear all the folders for this event in MEOW?</p>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button color='grey' onClick={() => setClearDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button color='red' onClick={() => setClearing(true)}>
+            Clear
+          </Button>
+        </Modal.Actions>
       </Modal>
     </>
   );

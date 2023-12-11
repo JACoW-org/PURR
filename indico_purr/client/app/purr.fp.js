@@ -1,11 +1,11 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {Button, Card, Icon} from 'semantic-ui-react';
-import {of} from 'rxjs';
-import {catchError, filter, finalize, switchMap, tap} from 'rxjs/operators';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button, Card, Icon } from 'semantic-ui-react';
+import { of } from 'rxjs';
+import { catchError, filter, finalize, switchMap, tap } from 'rxjs/operators';
 
-import {PurrErrorAlert} from './purr.error.alert';
+import { PurrErrorAlert } from './purr.error.alert';
 import FinalProcPanel from './final-proceedings/purr.fp.panel';
-import {fetchInfo} from './api/purr.api';
+import { fetchInfo } from './api/purr.api';
 import DoiPanel from './final-proceedings/purr.doi.panel';
 
 export const PurrFinalProceedings = ({
@@ -16,6 +16,7 @@ export const PurrFinalProceedings = ({
   processing,
   setProcessing,
 }) => {
+  const [error, setError] = useState(() => false);
   const [loading, setLoading] = useState(() => false);
   const [errorMessage, setErrorMessage] = useState(null);
   const [showError, setShowError] = useState(() => false);
@@ -30,30 +31,42 @@ export const PurrFinalProceedings = ({
 
   const fetchFPInfo = (apiUrl, eventId, apiKey) => {
     return of(null).pipe(
-      tap(() => setLoading(true)),
-      switchMap(() => fetchInfo(apiUrl, eventId, apiKey)),
+      tap(() => {
+        setLoading(true);
+      }),
+      switchMap(() => {
+        return fetchInfo(apiUrl, eventId, apiKey);
+      }),
       catchError(error => {
         console.log(error);
-        setErrorMessage('PURR could not retrieve final proceedings info. Please retry or contact an admin.');
-        showError(true);
+        setErrorMessage('PURR could not retrieve conference info. Please retry or contact an MEOW admin.');
+        setShowError(true);
+        setError(true)
         return of(null);
       }),
-      filter(result => !!result),
-      tap(result => setFPInfo(result.info)),
-      finalize(() => setLoading(false))
+      filter(result => {
+        return !!result;
+      }),
+      tap(result => {
+        setError(false)
+        setFPInfo(result.info)
+      }),
+      finalize(() => {
+        setLoading(false)
+      })
     );
   };
 
   useEffect(() => {
     const sub$ = fetchFPInfo(settings.api_url, eventId, settings.api_key).subscribe();
-
     return () => sub$.unsubscribe();
   }, []);
 
   useEffect(() => {
-    setProcessing(loading || fpPanelOpening || doiPanelOpening);
-    return () => {};
-  }, [loading, fpPanelOpening, doiPanelOpening]);
+    const processingValue = error || loading || fpPanelOpening || doiPanelOpening;
+    setProcessing(processingValue);
+    return () => { };
+  }, [error, loading, fpPanelOpening, doiPanelOpening]);
 
   // useEffect info API when opening FP or DOI panels
   useEffect(() => {
@@ -77,7 +90,7 @@ export const PurrFinalProceedings = ({
       return () => sub$.unsubscribe();
     }
 
-    return () => {};
+    return () => { };
   }, [fpPanelOpening, doiPanelOpening]);
 
   return (
@@ -110,7 +123,7 @@ export const PurrFinalProceedings = ({
                 icon="globe"
                 content="DOI"
                 onClick={onDOIPanelOpening}
-                disabled={!settingsValid || processing || !fpInfo?.datacite_json}
+                disabled={!settingsValid || error || processing || !fpInfo?.datacite_json}
                 color="facebook"
               />
               <Button.Or />
@@ -120,7 +133,7 @@ export const PurrFinalProceedings = ({
                 content="Site"
                 icon="sitemap"
                 onClick={onFPPanelOpening}
-                disabled={!settingsValid || processing}
+                disabled={!settingsValid || error || processing}
                 color="blue"
               />
             </Button.Group>
