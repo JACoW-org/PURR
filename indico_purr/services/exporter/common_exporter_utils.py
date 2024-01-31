@@ -1,11 +1,12 @@
-from pytz import timezone
+# from pytz import timezone
+# from indico.core.config import config
 
-from indico.core.config import config
 
-
-def export_serialize_date(date):
+def export_serialize_date(date, tz):
     if date:
-        date = date.astimezone(timezone(config.DEFAULT_TIMEZONE))
+        # tz_val = tz if tz else config.DEFAULT_TIMEZONE
+        # tz_val = config.DEFAULT_TIMEZONE
+        # date = date.astimezone(timezone(tz_val))
         return {
             'date': str(date.date()),
             'time': str(date.time()),

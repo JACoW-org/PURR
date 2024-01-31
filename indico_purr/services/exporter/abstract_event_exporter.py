@@ -1,17 +1,14 @@
 from operator import attrgetter
 # from flask_pluginengine import current_plugin
 
-from pytz import timezone
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
 
-from indico.core.config import config
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
 
 from indico_purr.services.exporter.abstract_file_exporter import ABCExportFile
@@ -33,7 +30,7 @@ class ABCExportEvent(ABCExportFile):
         sessions_data = []
 
         for session in event.sessions:
-            serialized = self._serialize_session(session)
+            serialized = self._serialize_session(event, session)
             serialized_sessions = [
                 self._serialize_session_block(event, block, serialized)
                 for block in session.blocks
@@ -97,8 +94,8 @@ class ABCExportEvent(ABCExportFile):
             "id": str(event.id),
             "title": event.title,
             "description": event.description,
-            "start_dt": export_serialize_date(event.start_dt),
-            "end_dt": export_serialize_date(event.end_dt),
+            "start_dt": export_serialize_date(event.start_dt, event.timezone),
+            "end_dt": export_serialize_date(event.end_dt, event.timezone),
             "timezone": event.timezone,
             "room": event.get_room_name(full=False),
             "location": event.venue_name,
@@ -106,7 +103,7 @@ class ABCExportEvent(ABCExportFile):
             "category": event.category.title,
             "room_name": event.room_name,
             "url": event.external_url,
-            "creation_dt": export_serialize_date(event.created_dt),
+            "creation_dt": export_serialize_date(event.created_dt, event.timezone),
             "creator": self._serialize_person(event.creator),
             "chairs": self._serialize_persons(event.person_links),
             # 'material': material_data,
@@ -121,24 +118,26 @@ class ABCExportEvent(ABCExportFile):
     def _serialize_person(self, person):
         return (
             {
+                "id": str(person.id),
+                "email": person.email,
                 "first_name": person.first_name,
                 "last_name": person.last_name,
-                "id": str(person.id),
                 "affiliation": person.affiliation,
-                "email": person.email,
             }
-            if person
-            else None
+            if person else None
         )
 
     def _serialize_institutes(self, persons):
-        return [self._serialize_person_affiliation(person) for person in persons]
+        return [self._serialize_person_affiliation(person)
+                for person in persons]
 
     def _serialize_persons(self, persons):
-        return [self._serialize_person(person) for person in persons]
+        return [self._serialize_person(person)
+                for person in persons]
 
     def _serialize_field_value(self, field):
-        return {"name": field.contribution_field.title, "value": field.friendly_data}
+        return {"name": field.contribution_field.title,
+                "value": field.friendly_data}
 
     def _serialize_contribution(self, event, contrib):
         institutes = self._serialize_institutes(contrib.primary_authors)
@@ -150,10 +149,12 @@ class ABCExportEvent(ABCExportFile):
         coauthors = self._serialize_persons(contrib.secondary_authors)
 
         sub_contributions = [
-            self._serialize_subcontribution(c) for c in contrib.subcontributions
+            self._serialize_subcontribution(c)
+            for c in contrib.subcontributions
         ]
 
-        field_values = [self._serialize_field_value(f) for f in contrib.field_values]
+        field_values = [self._serialize_field_value(f)
+                        for f in contrib.field_values]
 
         editables = self._serialize_editables(event, contrib)
 
@@ -177,10 +178,12 @@ class ABCExportEvent(ABCExportFile):
             "title": contrib.title,
             "paper": paper,
             # "revision": contrib._paper_last_revision,
-            "start_dt": export_serialize_date(contrib.start_dt)
+            "start_dt": export_serialize_date(contrib.start_dt,
+                                              event.timezone)
             if contrib.start_dt
             else None,
-            "end_dt": export_serialize_date(contrib.start_dt + contrib.duration)
+            "end_dt": export_serialize_date(contrib.start_dt + contrib.duration,
+                                            event.timezone)
             if contrib.start_dt
             else None,
             "duration": contrib.duration.seconds // 60,
@@ -214,7 +217,8 @@ class ABCExportEvent(ABCExportFile):
             "title": contrib.paper.title,
             "state": contrib.paper.state,
             "verbose_title": contrib.paper.verbose_title,
-            "last_revision": self._serialize_paper_revison(contrib.paper.last_revision),
+            "last_revision": self._serialize_paper_revison(
+                contrib.paper.last_revision),
         } if contrib.paper else None
 
     def _serialize_paper_revison(self, paper_revision):
@@ -260,7 +264,8 @@ class ABCExportEvent(ABCExportFile):
                     "id": str(editable.id),
                     "type": editable.type,
                     "state": editable.state,
-                    "all_revisions": self._get_all_revisions(event, contrib, editable),
+                    "all_revisions": self._get_all_revisions(
+                        event, contrib, editable),
                     "latest_revision": self._get_latest_revision(
                         event, contrib, editable
                     ),
@@ -314,19 +319,19 @@ class ABCExportEvent(ABCExportFile):
             "email": convener.person.email,
         }
 
-    def _serialize_session_block(
-        self, event, block, serialized_session, event_contributions=[]
-    ):
+    def _serialize_session_block(self, event, block, serialized_session,
+                                 event_contributions=[]):
+
         def _contribution_filter(contribution):
             return block.id == contribution.session_block_id
 
         contributions = filter(_contribution_filter, event_contributions)
 
         block_data = {
-            "start_dt": export_serialize_date(block.timetable_entry.start_dt)
+            "start_dt": export_serialize_date(block.timetable_entry.start_dt, event.timezone)
             if block.timetable_entry
             else None,
-            "end_dt": export_serialize_date(block.timetable_entry.end_dt)
+            "end_dt": export_serialize_date(block.timetable_entry.end_dt, event.timezone)
             if block.timetable_entry
             else None,
             # 'description': '',  # Session blocks don't have a description
@@ -352,48 +357,32 @@ class ABCExportEvent(ABCExportFile):
 
         return block_data
 
-    def _calculate_occurrences(self, event):
-        for day in iterdays(event.start_dt, event.end_dt):
-            first_start, last_end = self.find_event_day_bounds(event, day.date())
-            if first_start is not None:
-                yield {"start_dt": first_start, "end_dt": last_end}
-
-    def _serialize_event_occurrences(self, event):
-        tz = timezone(config.DEFAULT_TIMEZONE)
-        return [
-            {
-                "start_dt": period["start_dt"].astimezone(tz),
-                "end_dt": period["end_dt"].astimezone(tz),
-            }
-            for period in self._calculate_occurrences(event)
-        ]
-
-    def _serialize_session(self, session_):
+    def _serialize_session(self, event, session):
         return {
             "id": (
-                session_.legacy_mapping.legacy_session_id
-                if session_.legacy_mapping
-                else str(session_.friendly_id)
+                session.legacy_mapping.legacy_session_id
+                if session.legacy_mapping
+                else str(session.friendly_id)
             ),
             # 'db_id': session_.id,
-            "friendly_id": session_.friendly_id,
-            "code": session_.code,
-            "start_dt": export_serialize_date(session_.start_dt)
-            if session_.blocks
+            "friendly_id": session.friendly_id,
+            "code": session.code,
+            "start_dt": export_serialize_date(session.start_dt, event.timezone)
+            if session.blocks
             else None,
-            "end_dt": export_serialize_date(session_.end_dt)
-            if session_.blocks
+            "end_dt": export_serialize_date(session.end_dt, event.timezone)
+            if session.blocks
             else None,
             "session_conveners": [
-                self._serialize_convener(c) for c in session_.conveners
+                self._serialize_convener(c) for c in session.conveners
             ],
-            "title": session_.title,
-            "description": session_.description,
-            "is_poster": session_.is_poster,
-            "type": session_.type.name if session_.type else None,
-            "url": url_for("sessions.display_session", session_, _external=True),
-            "room_name": session_.room_name,
-            "location": session_.venue_name,
-            "address": session_.address,
-            "num_slots": len(session_.blocks),
+            "title": session.title,
+            "description": session.description,
+            "is_poster": session.is_poster,
+            "type": session.type.name if session.type else None,
+            "url": url_for("sessions.display_session", session, _external=True),
+            "room_name": session.room_name,
+            "location": session.venue_name,
+            "address": session.address,
+            "num_slots": len(session.blocks),
         }

@@ -24,7 +24,7 @@ def get_settings_util(event, settings):
     return (
         {
             **settings,
-            "timezone": str(config.DEFAULT_TIMEZONE),
+            # "timezone": str(config.DEFAULT_TIMEZONE),
             "contribution_fields": [{
                 "id": f.id,
                 "title": f.title,

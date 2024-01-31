@@ -1,5 +1,6 @@
 from abc import ABC
 
+from indico.modules.events.editing.models.comments import EditingRevisionComment
 from indico.modules.events.editing.models.revision_files import EditingRevisionFile
 
 
@@ -33,9 +34,12 @@ class ABCExportFile(ABC):
 
         revision_tags = self._get_tags(revision)
 
+        comments = EditingRevisionComment.query.with_parent(revision).filter_by(is_deleted=False).all()
+
         return {
             "id": revision.id,
-            "comment": revision.comment,
+            # "comment": revision.comment,
+            "comments": [self._serialize_comment(c) for c in comments],
             "created_dt": revision.created_dt,
             "final_state": revision.type,
             # "reviewed_dt": revision.reviewed_dt,
@@ -43,6 +47,23 @@ class ABCExportFile(ABC):
             # "final_state": revision.final_state,
             "files": revision_files,
             "tags": revision_tags,
+        }
+
+    def _serialize_comment(self, comment):
+        return {
+            "id": comment.id,
+            "text": comment.text,
+            "user": {
+                "id": comment.user.id,
+                "first_name": comment.user.first_name,
+                "last_name": comment.user.last_name,
+                "affiliation": comment.user.affiliation,
+                "is_admin": comment.user.is_admin,
+                "is_system": comment.user.is_system,
+            } if comment.user else None,
+            "internal": comment.internal,
+            "system": comment.system,
+            "created_dt": comment.created_dt,
         }
 
     def _serialize_file(self, event, contribution, revision, editing_revision_file):
