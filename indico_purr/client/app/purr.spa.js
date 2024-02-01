@@ -1,16 +1,15 @@
+import { Container, Card, Icon, Message } from 'semantic-ui-react';
+import { catchError, concatMap, of, tap, finalize } from 'rxjs';
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Container, Card, Icon, Message } from 'semantic-ui-react';
 
-import { PurrSettingsCard } from './purr.sc';
-import { PurrAbstractBooklet } from './purr.ab';
-import { PurrPapersChecks } from './purr.pc';
-import { PurrFinalProceedings } from './purr.fp';
-import { catchError, concatMap, of, tap } from 'rxjs';
-import { fetchSettings } from './api/purr.api';
-import { getEventId, getEventTitle } from './purr.lib';
 import { notificationRequestPermission } from './utils/purr.utils'
-
+import { getEventId, getEventTitle } from './purr.lib';
+import { PurrFinalProceedings } from './purr.fp';
+import { PurrAbstractBooklet } from './purr.ab';
+import { fetchSettings } from './api/purr.api';
+import { PurrSettingsCard } from './purr.sc';
+import { PurrPapersChecks } from './purr.pc';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const eventId = getEventId();
     const eventTitle = getEventTitle();
 
-    console.log('eventId -->', eventId);
-    console.log('eventTitle -->', eventTitle);
+    // console.log('eventId -->', eventId);
+    // console.log('eventTitle -->', eventTitle);
 
     const PurrHome = () => {
       const [settings, setSettings] = useState();
@@ -40,14 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
             concatMap(() => fetchSettings()),
             catchError(error => {
               console.log(error); // TODO display error card
-              return of(true);
+              return of(null);
             }),
             tap(result => {
-              setSettings(result.settings);
-              setSettingsValid(result.valid);
-              setConnected(!!result.settings.connected);
-              setLoading(false);
-            })
+              if (result) {
+                setSettings(result.settings);
+                setSettingsValid(result.valid);
+                setConnected(!!result.settings.connected);
+              }
+            }),
+            finalize(() => setLoading(false))
           )
           .subscribe();
 
