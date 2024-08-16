@@ -1,0 +1,43 @@
+[project]
+name = 'indico-plugin-purr'
+description = 'Indico plugin for PURR (Proceedings Utility Running Remotely)'
+readme = 'README.md'
+version = '3.3-dev'
+license = 'MIT'
+authors = [{ name = 'Akera srl', email = 'fabio.meneghetti@akera.it' }]
+classifiers = [
+    'Environment :: Plugins',
+    'Environment :: Web Environment',
+    'License :: OSI Approved :: MIT License',
+    'Programming Language :: Python :: 3.12',
+]
+requires-python = '>=3.12.2, <3.13'
+dependencies = ['indico>=3.3']
+
+[project.urls]
+GitHub = 'https://github.com/JACoW-org/PURR'
+
+[project.entry-points.'indico.plugins']
+purr = 'indico_purr.plugin:PurrPlugin'
+
+[build-system]
+requires = ['hatchling==1.25.0']
+build-backend = 'hatchling.build'
+
+[tool.hatch.build]
+packages = ['indico_purr']
+exclude = [
+    '*.no-header',
+    '.keep',
+    # exclude original client sources (they are all included in source maps anyway)
+    'indico_*/client/',
+    # no need for tests outside development
+    'test_snapshots/',
+    'tests/',
+    '*_test.py',
+]
+artifacts = [
+    'indico_*/translations/**/messages-react.json',
+    'indico_*/translations/**/*.mo',
+    'indico_*/static/dist/',
+]
