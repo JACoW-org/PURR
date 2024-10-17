@@ -1,6 +1,6 @@
 import { of, from } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
-import { switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map, concatMap } from 'rxjs/operators';
 import { fromFetch } from 'rxjs/fetch';
 
 import { notificationShowMessage } from './utils/purr.utils'
@@ -62,14 +62,14 @@ export function putJson(url, body) {
   const opts = getRequestOpts('POST', JSON.stringify(body));
 
   return fromFetch(url, opts).pipe(
-    switchMap(response => {
+    concatMap(response => {
       return (response.ok)
         ? from(response.json()).pipe(map(result => ({ error: false, result })))
-        : of({ error: true, message: `Error ${response.status}` })
+        : of({ error: true, status: response.status, message: `Error ${response.status}` })
     }),
     catchError(err => {
       console.error(err);
-      return of({ error: true, message: err.message })
+      return of({ error: true, status: err.status, message: err.message })
     })
   );
 }
@@ -87,11 +87,11 @@ export function fetchJson(url) {
     switchMap(response => {
       return response.ok
         ? from(response.json()).pipe(map(result => ({ error: false, result })))
-        : of({ error: true, message: `Error ${response.status}` });
+        : of({ error: true, status: response.status, message: `Error ${response.status}` });
     }),
     catchError(err => {
       console.error(err);
-      return of({ error: true, message: err.message });
+      return of({ error: true, status: err.status, message: err.message });
     })
   );
 }

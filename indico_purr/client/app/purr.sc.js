@@ -1,12 +1,13 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {isNil} from 'lodash';
-import {catchError, filter, finalize, of, switchMap, tap} from 'rxjs';
-import {Button, Card, Icon, Modal} from 'semantic-ui-react';
-import {clearFolders, connect, disconnect, fetchSettingsAndAttachements, saveSettings} from './api/purr.api';
-import {ConnectDialog} from './connect/purr.connect.dialog';
+import React, { useState, useEffect, useCallback } from 'react';
+import { isNil, result } from 'lodash';
+import { catchError, concatMap, filter, finalize, of, switchMap, tap } from 'rxjs';
+import { Button, Card, Icon, Modal } from 'semantic-ui-react';
+import { clearFolders, connect, disconnect, fetchPing, fetchSettingsAndAttachements, saveSettings } from './api/purr.api';
+import { ConnectDialog } from './connect/purr.connect.dialog';
 
-import {SettingsDialog} from './settings/purr.settings.dialog';
-import {PurrErrorAlert} from './purr.error.alert';
+import { SettingsDialog } from './settings/purr.settings.dialog';
+import { PurrErrorAlert } from './purr.error.alert';
+import { useError } from './contexts/ErrorProvider';
 
 export const PurrSettingsCard = ({
   eventId,
@@ -26,11 +27,9 @@ export const PurrSettingsCard = ({
   const [materials, setMaterials] = useState(null);
   const [connection, setConnection] = useState({});
   const [connDialogOpen, setConnDialogOpen] = useState(false);
-  const [formErrors, setFormErrors] = useState(() => {});
+  const [formErrors, setFormErrors] = useState(() => { });
   const [settingsErrorMessage, setSettingsErrorMessage] = useState(null);
   const [connErrorMessage, setConnErrorMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [showError, setShowError] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(() => false);
   const [clearing, setClearing] = useState(() => false);
 
@@ -44,10 +43,12 @@ export const PurrSettingsCard = ({
   const onDisconnect = useCallback(() => setDisconnecting(true), []);
   const onClear = useCallback(() => setClearDialogOpen(true), []);
 
+  const { handleError } = useError();
+
   // update value of processing
   useEffect(() => {
     setProcessing(connecting || disconnecting || settingsLoading || submitLoading);
-    return () => {};
+    return () => { };
   }, [connecting, disconnecting, settingsLoading, submitLoading]);
 
   useEffect(() => {
@@ -55,8 +56,25 @@ export const PurrSettingsCard = ({
       const sub$ = of(null)
         .pipe(
           tap(() => setConnErrorMessage(null)),
-          switchMap(() => connect({connection})),
-          catchError(error => {
+          concatMap(() => fetchPing(connection.api_url, connection.api_key)),
+          tap(result => {
+            if (!result.error) {
+              return;
+            }
+
+            const error = result;
+            if (error.status === 401) {
+              handleError({ message: 'Connection to MEOW failed. Please set a valid API key.' });
+            }
+            handleError({ message: 'Connection to MEOW failed. Please set a valid API URL' });
+            setConnDialogOpen(false);
+            setConnected(false);
+            throw new Error(error.message);
+          }),
+          catchError(() => of(null)),
+          filter(result => !!result),
+          concatMap(() => connect({ connection })),
+          catchError(() => {
             setConnErrorMessage('Could not connect to plugin.');
             return of(null);
           }),
@@ -84,8 +102,7 @@ export const PurrSettingsCard = ({
       const sub$ = disconnect()
         .pipe(
           catchError(error => {
-            setErrorMessage('Could not disconnect from plugin.');
-            setShowError(true);
+            handleError({ message: 'Could not disconnect from plugin.' });
             return of(null);
           }),
           filter(result => !isNil(result)),
@@ -105,8 +122,7 @@ export const PurrSettingsCard = ({
       const sub$ = fetchSettingsAndAttachements()
         .pipe(
           catchError(error => {
-            setErrorMessage('Could not fetch settings.');
-            setShowError(true);
+            handleError({ message: 'Could not fetch settings.' });
             return of(null);
           }),
           filter(result => !isNil(result)),
@@ -155,7 +171,7 @@ export const PurrSettingsCard = ({
       return () => sub$.unsubscribe();
     }
 
-    return () => {};
+    return () => { };
   }, [connecting, disconnecting, settingsLoading, submitLoading]);
 
   useEffect(() => {
@@ -182,7 +198,7 @@ export const PurrSettingsCard = ({
       return () => sub$.unsubscribe();
     }
 
-    return () => {};
+    return () => { };
   }, [clearing])
 
   return (
@@ -281,11 +297,6 @@ export const PurrSettingsCard = ({
         errors={formErrors}
         errorMessage={settingsErrorMessage}
       />
-      <PurrErrorAlert
-        message={errorMessage}
-        open={showError}
-        setOpen={setShowError}
-      ></PurrErrorAlert>
       <Modal open={clearDialogOpen} onClose={() => setClearDialogOpen(false)}>
         <Modal.Header>Clear MEOW folders</Modal.Header>
         <Modal.Content>

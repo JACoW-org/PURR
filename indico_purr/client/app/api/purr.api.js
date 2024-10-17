@@ -1,4 +1,4 @@
-import {concatMap, forkJoin, of} from 'rxjs';
+import {concatMap, forkJoin, map, of} from 'rxjs';
 import {fetchJson, putJson} from '../purr.lib';
 
 export function connect(connection) {
@@ -73,13 +73,24 @@ export function saveSettings(requestBody) {
   );
 }
 
+export function fetchPing(apiUrl, apiKey) {
+  const url = new URL(`/api/ping/${apiKey}`, apiUrl);
+
+  return fetchJson(url);
+}
+
 export function fetchInfo(apiUrl, eventId, apiKey) {
   const url = new URL(`/api/info/${eventId}/${apiKey}`, apiUrl);
 
   return fetchJson(url).pipe(
     concatMap(response => {
       if (response.error) {
-        throw new Error('error fetching MEOW info');
+        const error = new Error('error fetching MEOW info');
+        error.details = {
+          message: response.message,
+          status: response.status
+        };
+        throw error;
       }
 
       return of({info: response.result.params});
