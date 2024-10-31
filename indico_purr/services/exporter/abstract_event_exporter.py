@@ -167,6 +167,8 @@ class ABCExportEvent(ABCExportFile):
             else:
                 session_code = contrib.session_block.session.code
 
+        session_id = contrib.session_block.id
+
         return {
             "id": (
                 contrib.legacy_mapping.legacy_contribution_id
@@ -200,6 +202,7 @@ class ABCExportEvent(ABCExportFile):
             "track": self._serialize_track_data(contrib),
             "institutes": institutes,
             "code": contrib.code,
+            "session_id": session_id,
             "session_code": session_code,
             "sub_contributions": sub_contributions,
             "editables": editables,

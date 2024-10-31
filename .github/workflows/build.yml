@@ -1,0 +1,36 @@
+name: Build
+
+env:
+  PYTHON_VERSION: '3.12'
+  TZ: Europe/Zurich
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+  workflow_dispatch:
+    inputs:
+      add-version-suffix:
+        type: boolean
+        default: true
+        description: Append version suffix
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build plugin 🏗
+    uses: indico/indico-gh-actions/.github/workflows/build-plugins.yml@master
+    with:
+      directory: purr
+      artifact-retention-days: 7
+      add-version-suffix: ${{ github.event_name != 'workflow_dispatch' || inputs.add-version-suffix }}

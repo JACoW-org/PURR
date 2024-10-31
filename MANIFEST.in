@@ -1,6 +1,0 @@
-graft indico_purr/static
-graft indico_purr/migrations
-graft indico_purr/templates
-graft indico_purr/translations
-
-global-exclude *.pyc __pycache__ .keep

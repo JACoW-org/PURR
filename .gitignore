@@ -19,4 +19,7 @@ webpack-build-config.json
 node_modules/
 *.lock
 url_map.json
-venv
+.venv/
+webpack-build-config.json
+node_modules/
+__pycache__/
