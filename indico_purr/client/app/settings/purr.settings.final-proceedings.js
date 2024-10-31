@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Accordion,
   Button,
@@ -13,7 +13,7 @@ import {
   Table,
   TextArea,
 } from 'semantic-ui-react';
-import {has} from 'lodash';
+import { has } from 'lodash';
 
 export function FinalProceedingsSettings({
   finalProcSettings,
@@ -23,12 +23,12 @@ export function FinalProceedingsSettings({
   contributionFields,
 }) {
   const doiApiEnvOptions = [
-    {key: 'test', text: 'Test', value: 'test'},
-    {key: 'prod', text: 'Production', value: 'prod'},
+    { key: 'test', text: 'Test', value: 'test' },
+    { key: 'prod', text: 'Production', value: 'prod' },
   ];
   const tocOptions = [
-    {key: 'session', text: 'Session', value: 'session'},
-    {key: 'contribution', text: 'Contribution', value: 'contribution'},
+    { key: 'session', text: 'Session', value: 'session' },
+    { key: 'contribution', text: 'Contribution', value: 'contribution' },
   ];
 
   const [activeIndex, setActiveIndex] = useState(() => 0);
@@ -36,7 +36,7 @@ export function FinalProceedingsSettings({
 
   const onClick = useCallback(
     (e, titleProps) => {
-      const {index} = titleProps;
+      const { index } = titleProps;
       setActiveIndex(activeIndex === index ? -1 : index);
     },
     [activeIndex]
@@ -57,7 +57,7 @@ export function FinalProceedingsSettings({
       );
     }
 
-    return () => {};
+    return () => { };
   }, [contributionFields]);
 
   return (
@@ -130,7 +130,7 @@ export function FinalProceedingsSettings({
               </Form.Field>
             </Form.Group>
             <Form.Group>
-              <Form.Field error={hasError('series')} width="16">
+              <Form.Field error={hasError('pre_print')} width="16">
                 <label>Pre print</label>
                 <Input
                   name="pre_print"
@@ -139,6 +139,58 @@ export function FinalProceedingsSettings({
                   onChange={onFieldChange}
                 />
               </Form.Field>
+            </Form.Group>
+            <Form.Group>
+              <Form.Field error={hasError('copyright_year')} width="3">
+                <label>Copyright Year</label>
+                <Input
+                  name="copyright_year"
+                  value={finalProcSettings.copyright_year ?? ''}
+                  placeholder="Insert copyright year"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('site_license_text')} width="6">
+                <label>Site License Text</label>
+                <Input
+                  name="site_license_text"
+                  value={finalProcSettings.site_license_text ?? ''}
+                  placeholder="Insert home page license text"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+              <Form.Field error={hasError('site_license_url')} width="7">
+                <label>Site License URL</label>
+                <Input
+                  name="site_license_url"
+                  value={finalProcSettings.site_license_url ?? ''}
+                  placeholder="Insert home page license URL"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+            <Form.Group>
+              <Form.Field error={hasError('paper_license_icon_url')} width="16">
+                <label>Paper License Icon URL</label>
+                <Input
+                  name="paper_license_icon_url"
+                  value={finalProcSettings.paper_license_icon_url ?? ''}
+                  placeholder="Insert paper license icon URL"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+              <Form.Field error={hasError('paper_license_text')} width="16">
+                <label>Paper License Text</label>
+                <TextArea
+                  name="paper_license_text"
+                  value={finalProcSettings.paper_license_text ?? ''}
+                  placeholder="Insert paper license text"
+                  onChange={onFieldChange}
+                  rows={3}
+                />
+              </Form.Field>
+            <Form.Group>
             </Form.Group>
           </Accordion.Content>
 
@@ -378,7 +430,7 @@ export function FinalProceedingsSettings({
   );
 }
 
-export function Materials({materials, finalProcSettings, updateFinalProcSettings}) {
+export function Materials({ materials, finalProcSettings, updateFinalProcSettings }) {
   const [materialsMap, setMaterialsMap] = useState(
     () =>
       new Map([
@@ -394,8 +446,8 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
   const [open, setOpen] = useState(() => false);
   const [addFormState, setAddFormState] = useState(() => ({
     controls: {
-      fileID: {value: null, valid: false, dirty: false},
-      section: {value: null, valid: false, dirty: false},
+      fileID: { value: null, valid: false, dirty: false },
+      section: { value: null, valid: false, dirty: false },
     },
     valid: false,
     dirty: false,
@@ -406,8 +458,8 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
     () =>
       setAddFormState({
         controls: {
-          fileID: {value: null, valid: false, dirty: false},
-          section: {value: null, valid: false, dirty: false},
+          fileID: { value: null, valid: false, dirty: false },
+          section: { value: null, valid: false, dirty: false },
         },
         valid: false,
         dirty: false,
@@ -481,7 +533,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
     ) {
       if (materialsMap.get(section).length !== 0) {
         const message = `Cannot add more materials to section ${section}`;
-        setAddFormState(prevState => ({...prevState, valid: false, errorMessage: message}));
+        setAddFormState(prevState => ({ ...prevState, valid: false, errorMessage: message }));
 
         return;
       }
@@ -491,7 +543,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
     for (const material of materialsMap.get(section)) {
       if (material.id === fileID) {
         const message = `Impossible to add this material again in section ${section}`;
-        setAddFormState(prevState => ({...prevState, valid: false, errorMessage: message}));
+        setAddFormState(prevState => ({ ...prevState, valid: false, errorMessage: message }));
 
         return;
       }
@@ -501,7 +553,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
 
     updateFinalProcSettings('materials', [
       ...finalProcSettings.materials,
-      {id: fileID, section: section, index: sectionNextIndex},
+      { id: fileID, section: section, index: sectionNextIndex },
     ]);
 
     setOpen(false);
@@ -533,7 +585,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
 
     setMaterialsMap(map);
 
-    return () => {};
+    return () => { };
   }, [finalProcSettings.materials, materials]);
 
   useEffect(() => {
@@ -541,7 +593,7 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
       resetFormState();
     }
 
-    return () => {};
+    return () => { };
   }, [open]);
 
   return (
@@ -713,14 +765,14 @@ export function Materials({materials, finalProcSettings, updateFinalProcSettings
   );
 }
 
-export function AddMaterialForm({materials, formState, setFormState}) {
+export function AddMaterialForm({ materials, formState, setFormState }) {
   const [sections] = useState(() => [
-    {value: 'logo', text: 'Logo'},
-    {value: 'poster', text: 'Poster'},
-    {value: 'final-proceedings-cover', text: 'Final Proceedings Volume Cover'},
-    {value: 'at-a-glance-cover', text: 'At-a-glance Volume Cover'},
-    {value: 'volumes', text: 'Volumes'},
-    {value: 'attachments', text: 'Attachments'},
+    { value: 'logo', text: 'Logo' },
+    { value: 'poster', text: 'Poster' },
+    { value: 'final-proceedings-cover', text: 'Final Proceedings Volume Cover' },
+    { value: 'at-a-glance-cover', text: 'At-a-glance Volume Cover' },
+    { value: 'volumes', text: 'Volumes' },
+    { value: 'attachments', text: 'Attachments' },
   ]);
 
   const onChange = useCallback(
@@ -774,7 +826,7 @@ export function AddMaterialForm({materials, formState, setFormState}) {
         <label>Section</label>
         <Select
           placeholder="Select section"
-          options={sections.map((section, index) => ({key: `section${index}`, ...section}))}
+          options={sections.map((section, index) => ({ key: `section${index}`, ...section }))}
           value={formState.controls.section.value}
           error={!formState.controls.section.valid && formState.controls.section.dirty}
           name="section"

@@ -7,49 +7,14 @@ from indico.web.menu import SideMenuItem
 
 from indico_purr import _
 from indico_purr.blueprint import blueprint
+from indico_purr.settings import DEFAULT_SETTINGS
 
 
 class PurrPlugin(IndicoPlugin):
     """ PURR """
 
     configurable = False
-    default_event_settings = {
-        'connected': False,
-        'api_url': '',
-        'api_key': '',
-        'pdf_page_width': 595.0,
-        'pdf_page_height': 792.0,
-        'custom_fields': [],
-        'ab_session_h1': '{code} - {title}',
-        'ab_session_h2': '{start} / {end}',
-        'ab_contribution_h1': '| {code} | / | {start} |',
-        'ab_contribution_h2': '| {code} | / | {start} |',
-        'isbn': '',
-        'issn': '',
-        'booktitle_short': '',
-        'booktitle_long': '',
-        'series': '',
-        'series_number': '',
-        'pre_print': '',
-        'location': '',
-        'host_info': '',
-        'editorial_board': '',
-        'editorial_json': '',
-        'doi_env': 'test',
-        'doi_proto': 'https',
-        'doi_domain': 'doi.org',
-        'doi_context': '10.18429',
-        'doi_organization': 'JACoW',
-        'doi_conference': '',
-        'doi_user': '',
-        'doi_password': '',
-        'date': '',
-        'toc_grouping': ['contribution'],
-        'primary_color': '#F39433',
-        'materials': [],
-        'duplicate_of_alias': 'duplicate_of',
-        'cat_publish_alias': 'CAT_publish'
-    }
+    default_event_settings = DEFAULT_SETTINGS
 
     def init(self):
         super(PurrPlugin, self).init()

@@ -1,5 +1,19 @@
 from dataclasses import dataclass, field, asdict
+from typing import Optional
 
+from indico_purr.models.validation import Validation
+
+def materials_validator(materials: list[dict]) -> Optional[str]:
+    count_logos = 0
+    count_posters = 0
+    for material in materials:
+        if material.get('section') == 'logo':
+            count_logos += 1
+        if material.get('section') == 'poster':
+            count_posters += 1
+    if count_logos > 1 or count_posters > 1:
+        return 'error:bad-data'
+    return None
 
 @dataclass
 class PurrSettings:
@@ -20,6 +34,11 @@ class PurrSettings:
     series: str = field(default='')
     series_number: str = field(default='')
     pre_print: str = field(default='')
+    copyright_year: str = field(default='')
+    site_license_text: str = field(default='')
+    site_license_url: str = field(default='')
+    paper_license_icon_url: str = field(default='')
+    paper_license_text: str = field(default='')
     location: str = field(default='')
     host_info: str = field(default='')
     editorial_board: str = field(default='')
@@ -42,35 +61,79 @@ class PurrSettings:
         return asdict(self)
 
     def validate(self):
-        errors = dict()
 
-        self._validate_ab_session_h1(errors)
-        self._validate_ab_session_h2(errors)
-        self._validate_ab_contribution_h1(errors)
-        self._validate_ab_contribution_h2(errors)
-        self._validate_pdf_page_height(errors)
-        self._validate_pdf_page_width(errors)
-        self._validate_isbn(errors)
-        self._validate_issn(errors)
-        self._validate_booktitle_short(errors)
-        self._validate_booktitle_long(errors)
-        self._validate_series(errors)
-        self._validate_series_number(errors)
-        self._validate_pre_print(errors)
-        self._validate_location(errors)
-        self._validate_host_info(errors)
-        self._validate_editorial_board(errors)
-        self._validate_editorial_json(errors)
-        self._validate_doi(errors)
-        self._validate_doi_user(errors)
-        self._validate_doi_password(errors)
-        self._validate_primary_color(errors)
-        self._validate_toc_grouping(errors)
-        self._validate_materials(errors)
-        self._validate_duplicate_of_alias(errors)
-        self._validate_cat_publish_alias(errors)
+        return (Validation()
+                .required('ab_session_h1', self.ab_session_h1)
+                .required('ab_session_h2', self.ab_session_h2)
+                .required('ab_contribution_h1', self.ab_contribution_h1)
+                .required('ab_contribution_h2', self.ab_contribution_h2)
+                .required('pdf_page_height', self.pdf_page_height)
+                .required('pdf_page_width', self.pdf_page_width)
+                .required('isbn', self.isbn)
+                .required('issn', self.issn)
+                .required('booktitle_short', self.booktitle_short)
+                .required('booktitle_long', self.booktitle_long)
+                .required('series', self.series)
+                .required('series_number', self.series_number)
+                .required('pre_print', self.pre_print)
+                .required('copyright_year', self.copyright_year)
+                .required('site_license_text', self.site_license_text)
+                .required('site_license_url', self.site_license_url)
+                .required('paper_license_icon_url', self.paper_license_icon_url)
+                .required('paper_license_text', self.paper_license_text)
+                .required('location', self.location)
+                .required('host_info', self.host_info)
+                .required('editorial_board', self.editorial_board)
+                .required('editorial_json', self.editorial_json)
+                .required('doi_env', self.doi_env)
+                .required('doi_proto', self.doi_proto)
+                .required('doi_domain', self.doi_domain)
+                .required('doi_context', self.doi_context)
+                .required('doi_organization', self.doi_organization)
+                .required('doi_conference', self.doi_conference)
+                .required('doi_user', self.doi_user)
+                .required('doi_password', self.doi_password)
+                .required('primary_color', self.primary_color)
+                .not_empty('toc_grouping', self.toc_grouping)
+                .custom_validator('materials', self.materials, materials_validator)
+                .required('duplicate_of_alias', self.duplicate_of_alias)
+                .required('cat_publish_alias', self.cat_publish_alias)
+                .get_errors())
 
-        return errors
+        # errors = dict()
+
+        # self._validate_ab_session_h1(errors)
+        # self._validate_ab_session_h2(errors)
+        # self._validate_ab_contribution_h1(errors)
+        # self._validate_ab_contribution_h2(errors)
+        # self._validate_pdf_page_height(errors)
+        # self._validate_pdf_page_width(errors)
+        # self._validate_isbn(errors)
+        # self._validate_issn(errors)
+        # self._validate_booktitle_short(errors)
+        # self._validate_booktitle_long(errors)
+        # self._validate_series(errors)
+        # self._validate_series_number(errors)
+        # self._validate_pre_print(errors)
+        # self._validate_copyright_year(errors)
+        # self._validate_site_license_text(errors)
+        # self._validate_site_license_url(errors)
+        # self._validate_paper_license_icon_url(errors)
+        # self._validate_paper_license_text(errors)
+        # self._validate_location(errors)
+        # self._validate_host_info(errors)
+        # self._validate_editorial_board(errors)
+        # self._validate_editorial_json(errors)
+        # self._validate_doi(errors)
+        # self._validate_doi_user(errors)
+        # self._validate_doi_password(errors)
+        # self._validate_primary_color(errors)
+        # self._validate_toc_grouping(errors)
+        # self._validate_materials(errors)
+        # self._validate_duplicate_of_alias(errors)
+        # self._validate_cat_publish_alias(errors)
+
+        # return errors
 
     def _required_validator(self, key, value, errors):
         if not value:
@@ -127,6 +190,21 @@ class PurrSettings:
 
     def _validate_pre_print(self, errors):
         self._required_validator('pre_print', self.pre_print, errors)
+
+    def _validate_copyright_year(self, errors):
+        self._required_validator('copyright_year', self.copyright_year, errors)
+
+    def _validate_site_license_text(self, errors):
+        self._required_validator('site_license_text', self.copyright_year, errors)
+
+    def _validate_site_license_url(self, errors):
+        self._required_validator('site_license_url', self.site_license_url, errors)
+
+    def _validate_paper_license_icon_url(self, errors):
+        self._required_validator('paper_license_icon_url', self.paper_license_icon_url, errors)
+
+    def _validate_paper_license_text(self, errors):
+        self._required_validator('paper_license_text', self.paper_license_text, errors)
 
     def _validate_location(self, errors):
         self._required_validator('location', self.location, errors)

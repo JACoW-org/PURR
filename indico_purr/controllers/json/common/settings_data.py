@@ -1,6 +1,8 @@
 """
 This module provides the handler for fetching and saving PURR settings
 """
+from operator import ge
+from webbrowser import get
 from flask import jsonify, request, session
 
 from indico.modules.events.management.controllers.base import RHManageEventBase
@@ -14,7 +16,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
     """Handler to fetch and save settings"""
 
     def _process(self):
-        settings = get_purr_settings(self.event)
+        settings: dict = get_purr_settings(self.event)
 
         contribution_fields = [{
             "id": f.id,
@@ -70,6 +72,11 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             series=settings.get('series', ''),
             series_number=settings.get('series_number', ''),
             pre_print=settings.get('pre_print', ''),
+            copyright_year=settings.get('copyright_year', ''),
+            site_license_text=settings.get('site_license_text', ''),
+            site_license_url=settings.get('site_license_url', ''),
+            paper_license_icon_url=settings.get('paper_license_icon_url', ''),
+            paper_license_text=settings.get('paper_license_text', ''),
             location=settings.get('location', ''),
             host_info=settings.get('host_info', ''),
             editorial_board=settings.get('editorial_board', ''),

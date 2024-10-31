@@ -1,0 +1,60 @@
+[project]
+name = "indico-plugin-purr"
+dynamic = []
+version = "3.3-dev"
+description = "Proceedings Utility Running Remotely"
+readme = "README.md"
+# readme-content-type = "text/markdown; charset=UTF-8; variant=GFM"
+# url = "https://github.com/JACoW-org/PURR"
+license = 'MIT'
+authors = [
+    { name = "Fabio Meneghetti (Akera SRL)", email = "fabio.meneghetti@akera.it" },
+    { name = "Christian Obetti (Akera SRL)", email = "christian.obetti@akera.it" }
+]
+classifiers = [
+    "Environment :: Plugins",
+    "Environment :: Web Environment",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = '>=3.12.2, <3.13'
+dependencies = [
+    "indico>=3.3"
+]
+
+[project.urls]
+GitHub = "https://github.com/JACoW-org/PURR"
+
+[build-system]
+requires = ['hatchling==1.25.0']
+build-backend = 'hatchling.build'
+
+# [tool.setuptools]
+# packages = { find = {} }
+# zip-safe = false
+# include-package-data = true
+# python-requires = ">=3.9.0, <3.13"
+
+[project.entry-points.'indico.plugins']
+purr = "indico_purr.plugin:PurrPlugin"
+
+[tool.hatch.build]
+packages = ['indico_purr']
+exclude = [
+    # '*.no-header',
+    # '.keep',
+    # 'module.json',
+    # # exclude original client sources (they are all included in source maps anyway)
+    # 'indico/web/client/',
+    # 'indico/modules/*/client/',
+    # 'indico/modules/events/*/client/',
+    # 'indico/modules/rb/event/client/',
+    # # no need for tests outside development
+    # 'test_snapshots/',
+    # 'tests/',
+    # '*_test.py',
+]
+artifacts = []
+
+# [tool.pydocstyle]
+# ignore = ["D100", "D101", "D102", "D103", "D104", "D105", "D107", "D203", "D213"]
