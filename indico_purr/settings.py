@@ -37,6 +37,6 @@ DEFAULT_SETTINGS = {
     'toc_grouping': ['contribution'],
     'primary_color': '#F39433',
     'materials': [],
-    'duplicate_of_alias': 'duplicate_of',
+    'duplicate_of_alias': 'CAT_duplicate_of',
     'cat_publish_alias': 'CAT_publish'
 }
