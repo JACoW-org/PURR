@@ -159,9 +159,11 @@ export const PurrSettingsCard = ({
               setOpen(false);
               setSettings(result.settings);
               setSettingsValid(true);
+              setFormErrors(null);
               // TODO show success card
             } else {
               setFormErrors(result.errors);
+              handleError({message: 'Invalid settings. Please correct the errors and try again.'});
             }
           }),
           finalize(() => setSubmitLoading(false))
