@@ -1,14 +1,18 @@
 from operator import attrgetter
-# from flask_pluginengine import current_plugin
+from flask_pluginengine import current_plugin
 
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload
 
+from indico.modules.events.models.events import Event
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.editing.models.editable import Editable
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.web.flask.util import url_for
 
 from indico_purr.services.exporter.abstract_file_exporter import ABCExportFile
@@ -29,6 +33,14 @@ class ABCExportEvent(ABCExportFile):
     def _export_event_sessions_data(self, event):
         sessions_data = []
 
+        # sd = (Session.query
+        #          .options(
+        #              joinedload("conveners").joinedload("jacow_affiliations")
+        #          )
+        #          .filter_by(event_id=event.id)
+        #         #  .order_by()
+        #          .all())
+
         for session in event.sessions:
             serialized = self._serialize_session(event, session)
             serialized_sessions = [
@@ -39,6 +51,14 @@ class ABCExportEvent(ABCExportFile):
             sessions_data.extend(serialized_sessions)
 
         return sessions_data
+    
+    # def get_conveners(session_id):
+
+    #     return (SessionBlockPersonLink.query
+    #             .join(SessionBlock)
+    #             .filter(SessionBlock.session_id == session_id)
+    #             .distinct(SessionBlockPersonLink.person_id)
+    #             .all())
 
     def find_attachments_list(self, event):
         event_folders = AttachmentFolder.query.filter_by(
@@ -58,6 +78,12 @@ class ABCExportEvent(ABCExportFile):
 
         if files:
             query.options(joinedload("editables"))
+
+        query.options(
+            joinedload("speakers").joinedload("jacow_affiliations"),
+            joinedload("primary_authors").joinedload("jacow_affiliations"),
+            joinedload("secondary_authors").joinedload("jacow_affiliations")
+        )
 
         event_contributions = (
             (
@@ -90,32 +116,63 @@ class ABCExportEvent(ABCExportFile):
         return first, last
 
     def _build_event_api_data_base(self, event):
-        return {
-            "id": str(event.id),
-            "title": event.title,
-            "description": event.description,
-            "start_dt": export_serialize_date(event.start_dt, event.timezone),
-            "end_dt": export_serialize_date(event.end_dt, event.timezone),
-            "timezone": event.timezone,
-            "room": event.get_room_name(full=False),
-            "location": event.venue_name,
-            "address": event.address,
-            "category": event.category.title,
-            "room_name": event.room_name,
-            "url": event.external_url,
-            "creation_dt": export_serialize_date(event.created_dt, event.timezone),
-            "creator": self._serialize_person(event.creator),
-            "chairs": self._serialize_persons(event.person_links),
-            # 'material': material_data,
-            "keywords": event.keywords,
-            "organizer": event.organizer_info,
-            "references": list(map(export_serialize_reference, event.references)),
-        }
+        
+      event_data = self._get_event_data(event.id)
+
+      return {
+          "id": str(event.id),
+          "title": event.title,
+          "description": event.description,
+          "start_dt": export_serialize_date(event.start_dt, event.timezone),
+          "end_dt": export_serialize_date(event.end_dt, event.timezone),
+          "timezone": event.timezone,
+          "room": event.get_room_name(full=False),
+          "location": event.venue_name,
+          "address": event.address,
+          "category": event.category.title,
+          "room_name": event.room_name,
+          "url": event.external_url,
+          "creation_dt": export_serialize_date(event.created_dt, event.timezone),
+          "creator": self._serialize_person(event_data.creator),
+          "chairs": self._serialize_persons(event_data.person_links),
+          # 'material': material_data,
+          "keywords": event.keywords,
+          "organizer": event.organizer_info,
+          "references": list(map(export_serialize_reference, event.references)),
+      }
+    
+    def _get_event_data(self, event_id):
+      # retrieve affiliations for creator and chairs
+      query = Event.query
+
+      query.options(
+          joinedload("creator").joinedload("jacow_affiliations"),
+          joinedload("person_links").joinedload("jacow_affiliations")
+      )
+
+      event_data = query.get(event_id)
+
+      return event_data
 
     def _serialize_person_affiliation(self, person):
-        return {"name": person.affiliation} if person else None
+        if not person:
+            return None
+        
+        return {"name": person.affiliation}
+    
+    def _serialize_person_affiliations(self, person):
+        if not person:
+            return None
+        
+        return [{"name": jacow_affiliation.affiliation.name} for jacow_affiliation in person.jacow_affiliations]
 
     def _serialize_person(self, person):
+
+        multiple_affiliations = []
+        if person and hasattr(person, "jacow_affiliations"):
+            for aff in person.jacow_affiliations:
+                multiple_affiliations.append(aff.affiliation.name)
+
         return (
             {
                 "id": str(person.id),
@@ -123,13 +180,20 @@ class ABCExportEvent(ABCExportFile):
                 "first_name": person.first_name,
                 "last_name": person.last_name,
                 "affiliation": person.affiliation,
+                "multiple_affiliations": multiple_affiliations
             }
             if person else None
         )
 
     def _serialize_institutes(self, persons):
-        return [self._serialize_person_affiliation(person)
-                for person in persons]
+        
+        institutes = []
+        for person in persons:
+            if hasattr(person, "jacow_affiliations"):
+                institutes.extend(self._serialize_person_affiliations(person))
+            institutes.append(self._serialize_person_affiliation(person))
+        
+        return institutes
 
     def _serialize_persons(self, persons):
         return [self._serialize_person(person)
@@ -320,6 +384,7 @@ class ABCExportEvent(ABCExportFile):
             "address": convener.address,
             "phone": convener.phone,
             "email": convener.person.email,
+            "multiple_affiliations": [],  # TODO
         }
 
     def _serialize_session_block(self, event, block, serialized_session,
@@ -361,6 +426,7 @@ class ABCExportEvent(ABCExportFile):
         return block_data
 
     def _serialize_session(self, event, session):
+
         return {
             "id": (
                 session.legacy_mapping.legacy_session_id
