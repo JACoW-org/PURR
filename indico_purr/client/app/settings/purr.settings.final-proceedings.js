@@ -180,16 +180,16 @@ export function FinalProceedingsSettings({
                 />
               </Form.Field>
             </Form.Group>
-              <Form.Field error={hasError('paper_license_text')} width="16">
-                <label>Paper License Text</label>
-                <TextArea
-                  name="paper_license_text"
-                  value={finalProcSettings.paper_license_text ?? ''}
-                  placeholder="Insert paper license text"
-                  onChange={onFieldChange}
-                  rows={3}
-                />
-              </Form.Field>
+            <Form.Field error={hasError('paper_license_text')} width="16">
+              <label>Paper License Text</label>
+              <TextArea
+                name="paper_license_text"
+                value={finalProcSettings.paper_license_text ?? ''}
+                placeholder="Insert paper license text"
+                onChange={onFieldChange}
+                rows={3}
+              />
+            </Form.Field>
             <Form.Group>
             </Form.Group>
           </Accordion.Content>
@@ -468,15 +468,22 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
     []
   );
 
-  const onDelete = useCallback(
-    fileID => {
-      updateFinalProcSettings(
-        'materials',
-        finalProcSettings.materials.filter(material => material.id !== fileID)
-      );
-    },
+  const onDelete = useCallback(({ id, section }) => {
+
+    const fileIndex = finalProcSettings.materials.findIndex(material => material.id === id && material.section === section);
+    if (fileIndex < 0) {
+      console.error(`Could not find file of id '${id}' and section '${section}'`);
+      return;
+    }
+
+    const updatedMaterials = [...finalProcSettings.materials];
+    updatedMaterials.splice(fileIndex, 1);
+    updateFinalProcSettings('materials', updatedMaterials);
+  },
     [finalProcSettings]
   );
+
+  const onDeleteAllMaterials = useCallback(() => updateFinalProcSettings('materials', []), [finalProcSettings]);
 
   const onMoveUp = useCallback(
     (section, index) => {
@@ -563,11 +570,16 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
     setIsEmpty(finalProcSettings.materials.length === 0);
 
     const map = finalProcSettings.materials
-      .map(material => ({
-        ...materials.find(_material => _material.id === material.id),
-        section: material.section,
-        index: material.index,
-      })) // map to object with all properties
+      .map(material => {
+        const fetchedMaterial = materials.find(_material => _material.id === material.id);
+        return {
+          ...fetchedMaterial,
+          id: material.id,
+          section: material.section,
+          index: material.index,
+          error: !fetchedMaterial,
+        }
+      }) // map to object with all properties
       .filter(material => !!material) // filter undefined
       .reduce((acc, material) => {
         if (acc.has(material.section)) {
@@ -596,6 +608,14 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
     return () => { };
   }, [open]);
 
+  const renderTitleCellContent = (element) => {
+    if (element.error) {
+      return <><Icon name='attention' /> This file has been deleted.</>
+    }
+
+    return element.title;
+  }
+
   return (
     <>
       <Table celled structured striped>
@@ -610,11 +630,11 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
         <Table.Body>
           {/* Logo */}
           {materialsMap.get('logo').length > 0 ? (
-            <Table.Row>
+            <Table.Row error={materialsMap.get('logo')[0].error}>
               <Table.Cell>Logo</Table.Cell>
-              <Table.Cell>{materialsMap.get('logo')[0].title}</Table.Cell>
+              <Table.Cell>{renderTitleCellContent(materialsMap.get('logo')[0])}</Table.Cell>
               <Table.Cell>
-                <Button icon onClick={() => onDelete(materialsMap.get('logo')[0].id)}>
+                <Button icon onClick={() => onDelete(materialsMap.get('logo')[0])}>
                   <Icon name="delete" />
                 </Button>
               </Table.Cell>
@@ -623,11 +643,11 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
 
           {/* Poster */}
           {materialsMap.get('poster').length > 0 ? (
-            <Table.Row>
+            <Table.Row error={materialsMap.get('poster')[0].error}>
               <Table.Cell>Poster</Table.Cell>
-              <Table.Cell>{materialsMap.get('poster')[0].title}</Table.Cell>
+              <Table.Cell>{renderTitleCellContent(materialsMap.get('poster')[0])}</Table.Cell>
               <Table.Cell>
-                <Button icon onClick={() => onDelete(materialsMap.get('poster')[0].id)}>
+                <Button icon onClick={() => onDelete(materialsMap.get('poster')[0])}>
                   <Icon name="delete" />
                 </Button>
               </Table.Cell>
@@ -636,13 +656,13 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
 
           {/* Final Proceedings Cover */}
           {materialsMap.get('final-proceedings-cover').length > 0 ? (
-            <Table.Row>
+            <Table.Row error={materialsMap.get('final-proceedings-cover')[0].error}>
               <Table.Cell>Final Proceedings Volume Cover</Table.Cell>
-              <Table.Cell>{materialsMap.get('final-proceedings-cover')[0].title}</Table.Cell>
+              <Table.Cell>{renderTitleCellContent(materialsMap.get('final-proceedings-cover')[0])}</Table.Cell>
               <Table.Cell>
                 <Button
                   icon
-                  onClick={() => onDelete(materialsMap.get('final-proceedings-cover')[0].id)}
+                  onClick={() => onDelete(materialsMap.get('final-proceedings-cover')[0])}
                 >
                   <Icon name="delete" />
                 </Button>
@@ -652,11 +672,11 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
 
           {/* Poster */}
           {materialsMap.get('at-a-glance-cover').length > 0 ? (
-            <Table.Row>
+            <Table.Row error={materialsMap.get('at-a-glance-cover')[0].error}>
               <Table.Cell>At-a-glance Volume Cover</Table.Cell>
-              <Table.Cell>{materialsMap.get('at-a-glance-cover')[0].title}</Table.Cell>
+              <Table.Cell>{renderTitleCellContent(materialsMap.get('at-a-glance-cover')[0])}</Table.Cell>
               <Table.Cell>
-                <Button icon onClick={() => onDelete(materialsMap.get('at-a-glance-cover')[0].id)}>
+                <Button icon onClick={() => onDelete(materialsMap.get('at-a-glance-cover')[0])}>
                   <Icon name="delete" />
                 </Button>
               </Table.Cell>
@@ -668,9 +688,9 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
             .get('volumes')
             .sort((a, b) => a.index - b.index)
             .map((volume, index, array) => (
-              <Table.Row key={`volumes${index}`}>
+              <Table.Row key={`volumes${index}`} error={volume.error}>
                 {index === 0 ? <Table.Cell rowSpan={array.length}>Volumes</Table.Cell> : null}
-                <Table.Cell>{volume.title}</Table.Cell>
+                <Table.Cell>{renderTitleCellContent(volume)}</Table.Cell>
                 <Table.Cell>
                   {index < array.length - 1 ? (
                     <Button icon onClick={() => onMoveDown('volumes', index)}>
@@ -682,7 +702,7 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
                       <Icon name="arrow alternate circle up outline" />
                     </Button>
                   ) : null}
-                  <Button icon onClick={() => onDelete(volume.id)}>
+                  <Button icon onClick={() => onDelete(volume)}>
                     <Icon name="delete" />
                   </Button>
                 </Table.Cell>
@@ -694,9 +714,9 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
             .get('attachments')
             .sort((a, b) => a.index - b.index)
             .map((attachment, index, array) => (
-              <Table.Row key={`attachments${index}`}>
+              <Table.Row key={`attachments${index}`} error={attachment.error}>
                 {index === 0 ? <Table.Cell rowSpan={array.length}>Attachments</Table.Cell> : null}
-                <Table.Cell>{attachment.title}</Table.Cell>
+                <Table.Cell>{renderTitleCellContent(attachment)}</Table.Cell>
                 <Table.Cell>
                   {index < array.length - 1 ? (
                     <Button icon onClick={() => onMoveDown('attachments', index)}>
@@ -708,7 +728,7 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
                       <Icon name="arrow alternate circle up outline" />
                     </Button>
                   ) : null}
-                  <Button icon onClick={() => onDelete(attachment.id)}>
+                  <Button icon onClick={() => onDelete(attachment)}>
                     <Icon name="delete" />
                   </Button>
                 </Table.Cell>
@@ -730,6 +750,10 @@ export function Materials({ materials, finalProcSettings, updateFinalProcSetting
               <Button icon labelPosition="left" primary size="small" onClick={() => setOpen(true)}>
                 <Icon name="add" />
                 Add
+              </Button>
+              <Button icon labelPosition="left" secondary size="small" onClick={() => onDeleteAllMaterials()}>
+                <Icon name="trash alternate outline" />
+                Delete All
               </Button>
             </Table.HeaderCell>
           </Table.Row>
