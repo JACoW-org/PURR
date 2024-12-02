@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { isNil, result } from 'lodash';
+import { isNil } from 'lodash';
 import { catchError, concatMap, filter, finalize, of, switchMap, tap } from 'rxjs';
 import { Button, Card, Icon, Modal } from 'semantic-ui-react';
 import { clearFolders, connect, disconnect, fetchPing, fetchSettingsAndAttachements, saveSettings } from './api/purr.api';
 import { ConnectDialog } from './connect/purr.connect.dialog';
 
 import { SettingsDialog } from './settings/purr.settings.dialog';
-import { PurrErrorAlert } from './purr.error.alert';
 import { useError } from './contexts/ErrorProvider';
 
 export const PurrSettingsCard = ({

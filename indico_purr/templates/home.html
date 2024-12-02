@@ -7,10 +7,8 @@
 {% block content %}
     {{ template_hook('event-actions', event=event) }}
 
-    {% if connected %}
-        <script id="purr-event-id" type="application/json">{{ event.id | tojson }}</script>
-        <script id="purr-event-title" type="application/json">{{ event.title | tojson }}</script>
-    {% endif %}
+    <script id="purr-event-id" type="application/json">{{ event.id | tojson }}</script>
+    <script id="purr-event-title" type="application/json">{{ event.title | tojson }}</script>
 
     <div id="purr-spa"></div>
 {% endblock %}
