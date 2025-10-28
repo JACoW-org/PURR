@@ -98,6 +98,25 @@ export function fetchInfo(apiUrl, eventId, apiKey) {
   );
 }
 
+export function fetchStatus(apiUrl, apiKey) {
+  const url = new URL(`/api/df/${apiKey}`, apiUrl);
+
+  return fetchJson(url).pipe(
+    concatMap(response => {
+      if (response.error) {
+        const error = new Error('error fetching MEOW status');
+        error.details = {
+          message: response.message,
+          status: response.status
+        };
+        throw error;
+      }
+
+      return of({status: response.result.params});
+    })
+  );
+}
+
 export function clearFolders(apiUrl, eventId, apiKey) {
   const url = new URL(`/api/clear/${eventId}/${apiKey}`, apiUrl);
 

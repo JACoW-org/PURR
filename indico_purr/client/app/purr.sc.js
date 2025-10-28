@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { isNil } from 'lodash';
 import { catchError, concatMap, filter, finalize, of, switchMap, tap } from 'rxjs';
-import { Button, Card, Icon, Modal } from 'semantic-ui-react';
-import { clearFolders, connect, disconnect, fetchPing, fetchSettingsAndAttachements, saveSettings } from './api/purr.api';
+import { Button, Card, Icon, Modal, Progress, Loader } from 'semantic-ui-react';
+import { clearFolders, connect, disconnect, fetchPing, fetchStatus, fetchSettingsAndAttachements, saveSettings } from './api/purr.api';
 import { ConnectDialog } from './connect/purr.connect.dialog';
 
 import { SettingsDialog } from './settings/purr.settings.dialog';
@@ -20,24 +20,35 @@ export const PurrSettingsCard = ({
 }) => {
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(() => false);
   const [open, setOpen] = useState(() => false);
   const [materials, setMaterials] = useState(null);
   const [connection, setConnection] = useState({});
+  const [serverStatus, setServerStatus] = useState({});
   const [connDialogOpen, setConnDialogOpen] = useState(false);
   const [formErrors, setFormErrors] = useState(() => { });
   const [settingsErrorMessage, setSettingsErrorMessage] = useState(null);
   const [connErrorMessage, setConnErrorMessage] = useState(null);
+
   const [clearDialogOpen, setClearDialogOpen] = useState(() => false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(() => false);
+
   const [clearing, setClearing] = useState(() => false);
 
   const onClose = useCallback(() => setOpen(false), []);
+  const onStatusOpen = useCallback(() => {
+    setStatusDialogOpen(true);
+    setStatusLoading(true);
+  });
+
   const onDialogOpen = useCallback(() => setSettingsLoading(true));
   const onSubmit = useCallback(formData => {
     setSettings(formData);
     setSubmitLoading(true);
   }, []);
+
   const onConnect = useCallback(() => setConnecting(true), [connection]);
   const onDisconnect = useCallback(() => setDisconnecting(true), []);
   const onClear = useCallback(() => setClearDialogOpen(true), []);
@@ -117,6 +128,25 @@ export const PurrSettingsCard = ({
       return () => sub$.unsubscribe();
     }
 
+    if (statusLoading) {
+      const sub$ = fetchStatus(settings.api_url, settings.api_key)
+        .pipe(
+          catchError(error => {
+            handleError({ message: 'Could not fetch meow status.' });
+            return of(null);
+          }),
+          filter(result => !isNil(result)),
+          tap(result => {
+            console.log("serverStatus", result);
+            setServerStatus(result.status);
+          }),
+          finalize(() => setStatusLoading(false))
+        )
+        .subscribe();
+
+      return () => sub$.unsubscribe();
+    }
+
     if (settingsLoading) {
       const sub$ = fetchSettingsAndAttachements()
         .pipe(
@@ -162,7 +192,7 @@ export const PurrSettingsCard = ({
               // TODO show success card
             } else {
               setFormErrors(result.errors);
-              handleError({message: 'Invalid settings. Please correct the errors and try again.'});
+              handleError({ message: 'Invalid settings. Please correct the errors and try again.' });
             }
           }),
           finalize(() => setSubmitLoading(false))
@@ -173,7 +203,7 @@ export const PurrSettingsCard = ({
     }
 
     return () => { };
-  }, [connecting, disconnecting, settingsLoading, submitLoading]);
+  }, [connecting, disconnecting, statusLoading, settingsLoading, submitLoading]);
 
   useEffect(() => {
     if (clearing) {
@@ -201,13 +231,30 @@ export const PurrSettingsCard = ({
 
     return () => { };
   }, [clearing])
+               
+  // <Button
+  //   onClick={onClear}
+  //   loading={clearing}
+  //   disabled={processing}
+  //   primary
+  //   compact
+  //   size="mini"
+  //   title='Clear MEOW folders'
+  //   negative
+  // >
+  //   <Icon name="erase" />
+  // </Button>
 
   return (
     <>
       <Card fluid>
         <Card.Content>
-          <Card.Header>{connected ? 'Plugin connected' : 'Plugin disconnected'}</Card.Header>
-          <Card.Meta>{connected ? settings.api_url : ''}</Card.Meta>
+          <Card.Header>
+            {connected ? 'Plugin connected' : 'Plugin disconnected'}
+          </Card.Header>
+          <Card.Meta>
+            {connected ? settings.api_url : ''}
+          </Card.Meta>
         </Card.Content>
 
         <Card.Content extra>
@@ -229,6 +276,16 @@ export const PurrSettingsCard = ({
               <>
                 {' '}
                 <Button
+                  onClick={onStatusOpen}
+                  disabled={processing || clearing}
+                  primary
+                  compact
+                  size="mini"
+                  title='Show info'
+                >
+                  <Icon name="disk" />
+                </Button>
+                <Button
                   onClick={onDialogOpen}
                   loading={settingsLoading}
                   disabled={processing || clearing}
@@ -239,18 +296,7 @@ export const PurrSettingsCard = ({
                 >
                   <Icon name="settings" />
                 </Button>
-                <Button
-                  onClick={onClear}
-                  loading={clearing}
-                  disabled={processing}
-                  primary
-                  compact
-                  size="mini"
-                  title='Clear MEOW folders'
-                  negative
-                >
-                  <Icon name="erase" />
-                </Button>
+                
                 <Button
                   disabled={processing || clearing}
                   onClick={onDisconnect}
@@ -287,6 +333,7 @@ export const PurrSettingsCard = ({
           </div>
         </Card.Content>
       </Card>
+
       <SettingsDialog
         settings={settings}
         materials={materials}
@@ -298,6 +345,34 @@ export const PurrSettingsCard = ({
         errors={formErrors}
         errorMessage={settingsErrorMessage}
       />
+
+      <Modal open={statusDialogOpen} onClose={() => setStatusDialogOpen(false)}>
+        <Modal.Header>Disk space</Modal.Header>
+        <Modal.Content>
+          { statusLoading ? <div><Loader /></div> :           
+            <section>
+              <div>
+                <center>
+                  <b>Used space</b> {serverStatus.used_gb} GB of {serverStatus.total_gb} GB
+                </center>
+              </div>
+
+              <div className='disk-space'>
+                  <Progress color='teal' percent={parseFloat(serverStatus.used_pct)} progress indicating autoSuccess />
+              </div>           
+            </section>             
+          }
+        </Modal.Content>
+        <Modal.Actions>
+          <Button primary onClick={() => setStatusDialogOpen(false)}>
+            Close
+          </Button>
+          <Button color='red' onClick={() => onClear()}>
+            Clear
+          </Button>
+        </Modal.Actions>
+      </Modal>
+
       <Modal open={clearDialogOpen} onClose={() => setClearDialogOpen(false)}>
         <Modal.Header>Clear MEOW folders</Modal.Header>
         <Modal.Content>
@@ -312,6 +387,7 @@ export const PurrSettingsCard = ({
           </Button>
         </Modal.Actions>
       </Modal>
+
     </>
   );
 };

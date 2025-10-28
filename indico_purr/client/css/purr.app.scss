@@ -37,7 +37,7 @@ a.purr-btn.disabled {
   display: none;
 }
 
-.action-box > .section > .icon.icon-small {
+.action-box>.section>.icon.icon-small {
   font-size: 1rem;
   padding-right: 0.5rem;
   flex-shrink: 0;
@@ -89,7 +89,8 @@ a.purr-btn.disabled {
   width: 100%;
   border: 1px solid #dfdfdf;
 }
-.meter > span {
+
+.meter>span {
   display: block;
   height: 100%;
   border-radius: 2px;
@@ -99,24 +100,23 @@ a.purr-btn.disabled {
   position: relative;
   overflow: hidden;
 }
-.meter > span:after,
-.animate > span > span {
+
+.meter>span:after,
+.animate>span>span {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, 0.2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.2) 75%,
-    transparent 75%,
-    transparent
-  );
+  background-image: linear-gradient(-45deg,
+      rgba(255, 255, 255, 0.2) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.2) 75%,
+      transparent 75%,
+      transparent);
   z-index: 1;
   background-size: 50px 50px;
   animation: move 2s linear infinite;
@@ -127,7 +127,7 @@ a.purr-btn.disabled {
   overflow: hidden;
 }
 
-.animate > span:after {
+.animate>span:after {
   display: none;
 }
 
@@ -135,6 +135,7 @@ a.purr-btn.disabled {
   0% {
     background-position: 0 0;
   }
+
   100% {
     background-position: 50px 50px;
   }
@@ -167,7 +168,7 @@ a.purr-btn.disabled {
 }
 
 .fp-panel.ui.modal {
-  > .content {
+  >.content {
     min-height: 45vh;
     display: flex;
     align-items: stretch;
@@ -175,17 +176,17 @@ a.purr-btn.disabled {
     flex-flow: row nowrap;
     gap: 1em;
 
-    > .operations {
+    >.operations {
       flex: 1 1 40%;
     }
 
-    > .logs {
+    >.logs {
       flex: 1 1 60%;
     }
   }
 
-  > .description {
-    > .info {
+  >.description {
+    >.info {
       margin: 1rem;
 
       .ui.progress {
@@ -195,7 +196,7 @@ a.purr-btn.disabled {
           .bar {
             visibility: hidden;
 
-            > .progress {
+            >.progress {
               color: black;
             }
           }
@@ -204,7 +205,7 @@ a.purr-btn.disabled {
     }
   }
 
-  > .actions {
+  >.actions {
     display: flex;
     justify-content: space-between;
   }
@@ -226,16 +227,16 @@ a.purr-btn.disabled {
 }
 
 .doi-panel.ui.modal {
-  > .actions {
+  >.actions {
     display: flex;
     justify-content: space-between;
   }
 
-  > .content {
+  >.content {
 
     padding-top: 0;
 
-    > .list-header {
+    >.list-header {
       display: flex;
       position: sticky;
       top: 0;
@@ -243,7 +244,7 @@ a.purr-btn.disabled {
       padding-top: 1.5rem;
       background-color: white;
 
-      > h3 {
+      >h3 {
         flex-basis: 50%;
         margin-top: 0;
       }
@@ -255,7 +256,7 @@ a.purr-btn.disabled {
   display: flex !important;
   justify-content: space-between;
 
-  > div,
+  >div,
   h3 {
     flex-basis: 50%;
   }
@@ -265,3 +266,38 @@ a.purr-btn.disabled {
   color: gray;
 }
 
+.disk-space {
+  margin-top: 20px;
+
+  .ui.progress .bar > .progress {
+    color: white;
+  }
+
+  .ui.indicating.progress[data-percent^="1"] .bar,
+  .ui.indicating.progress[data-percent^="2"] .bar {
+    background-color: #66DA81;
+  }
+
+  .ui.indicating.progress[data-percent^="3"] .bar {
+    background-color: #B4D95C;
+  }
+
+  .ui.indicating.progress[data-percent^="4"] .bar,
+  .ui.indicating.progress[data-percent^="5"] .bar {
+    background-color: #DDC928;
+  }
+
+  .ui.indicating.progress[data-percent^="6"] .bar {
+    background-color: #E6BB48;
+  }
+
+  .ui.indicating.progress[data-percent^="7"] .bar,
+  .ui.indicating.progress[data-percent^="8"] .bar {
+    background-color: #EFBC72;
+  }
+
+  .ui.indicating.progress[data-percent^="9"] .bar,
+  .ui.indicating.progress[data-percent^="100"] .bar {
+    background-color: #D95C5C;
+  }
+}

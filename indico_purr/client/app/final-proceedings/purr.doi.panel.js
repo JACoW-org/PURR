@@ -7,6 +7,7 @@ import {PurrErrorAlert} from '../purr.error.alert';
 
 const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
   const [processing, setProcessing] = useState(() => false);
+  const [loggingIn, setLoggingIn] = useState(() => false);
   const [fetching, setFetching] = useState(() => false);
   const [creating, setCreating] = useState(() => false);
   const [deleting, setDeleting] = useState(() => false);
@@ -24,6 +25,10 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
   const onClose = useCallback(() => setOpen(false), []);
   const onAbort = useCallback(() => {
     setProgressStatus('aborted');
+
+    if (loggingIn) {
+      setLoggingIn(false)
+    }
 
     if (fetching) {
       setFetching(false);
@@ -46,18 +51,19 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
     }
   }, [fetching, creating, deleting, publishing, hiding]);
 
-  const onFetch = useCallback(() => setFetching(true));
+  const onLoggingIn = useCallback(() => setLoggingIn(true));
+  const onRefresh = useCallback(() => setFetching(true));
   const onCreate = useCallback(() => setCreating(true), []);
   const onDelete = useCallback(() => setDeleting(true), []);
   const onPublish = useCallback(() => setPublishing(true), []);
   const onHide = useCallback(() => setHiding(true), []);
 
   useEffect(() => {
-    setProcessing(fetching || creating || deleting || publishing || hiding);
-  }, [fetching, creating, deleting, publishing, hiding]);
+    setProcessing(loggingIn || fetching || creating || deleting || publishing || hiding);
+  }, [loggingIn ||fetching, creating, deleting, publishing, hiding]);
 
   useEffect(() => {
-    if (fetching || creating || deleting || publishing || hiding) {
+    if (loggingIn || fetching || creating || deleting || publishing || hiding) {
       setTotal(0); // reset params
 
       setProgressStatus('active');
@@ -139,7 +145,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
         }
       };
     }
-  }, [fetching, creating, deleting, publishing, hiding]);
+  }, [loggingIn, fetching, creating, deleting, publishing, hiding]);
 
   useEffect(() => {
     if (open) {
@@ -151,7 +157,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
 
         return () => {};
       }
-      setFetching(true);
+      //setLoggingIn(true);
     } else {
       setPartials([]);
     }
@@ -235,6 +241,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
   };
 
   const resolveMethod = () => {
+    if (loggingIn) return 'event_doi_login';
     if (fetching) return 'event_doi_info';
     if (creating) return 'event_doi_draft';
     if (deleting) return 'event_doi_delete';
@@ -243,6 +250,7 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
   };
 
   const stopTasks = () => {
+    if (loggingIn) setLoggingIn(false);
     if (fetching) setFetching(false);
     if (creating) setCreating(false);
     if (deleting) setDeleting(false);
@@ -286,9 +294,18 @@ const DoiPanel = ({open, setOpen, settings, eventTitle, fpInfo}) => {
         )}
         <Button.Group size="mini">
           <Button
+            content="Login"
+            title="Check Credentials"
+            onClick={onLoggingIn}
+            disabled={processing}
+            loading={loggingIn}
+            icon="user secret"
+            color="orange"
+          />
+          <Button
             content="Refresh"
             title="Refresh conference DOIs"
-            onClick={onFetch}
+            onClick={onRefresh}
             disabled={processing}
             loading={fetching}
             icon="refresh"
