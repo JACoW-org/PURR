@@ -11,7 +11,7 @@ from indico_purr.settings import DEFAULT_SETTINGS
 
 
 class PurrPlugin(IndicoPlugin):
-    """ PURR """
+    """CAT"""
 
     configurable = False
     default_event_settings = DEFAULT_SETTINGS
@@ -24,7 +24,7 @@ class PurrPlugin(IndicoPlugin):
 
     def purr_sidemenu_items(self, sender, event, **kwargs):
         if event.can_manage(session.user):
-            yield SideMenuItem('purr', _('PURR'),
+            yield SideMenuItem('purr', _('CAT'),
                                url_for_plugin('purr.purr_home', event),
                                0, section='workflows', icon='pdf')
 
