@@ -179,7 +179,7 @@ export const PurrSettingsCard = ({
           tap(() => setSettingsErrorMessage(null)),
           switchMap(() => saveSettings(body)),
           catchError(error => {
-            setSettingsErrorMessage('An error occured while attempting to save the settings!');
+            setSettingsErrorMessage('An error occurred while attempting to save the settings!');
             return of(null);
           }),
           filter(result => !isNil(result)),
@@ -212,7 +212,7 @@ export const PurrSettingsCard = ({
           switchMap(() => clearFolders(settings.api_url, eventId, settings.api_key)),
           catchError(error => {
             setClearDialogOpen(false);
-            setSettingsErrorMessage('An error occured while attempting to clear MEOW folders');
+            setSettingsErrorMessage('An error occurred while attempting to clear MEOW folders');
             return of(null);
           }),
           filter(result => !!result),
