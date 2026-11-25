@@ -16,6 +16,7 @@ DEFAULT_SETTINGS = {
     'series': 'Full JACoW Conference Name',
     'series_number': '32',
     'pre_print': 'pre print statement for Light Peer Review papers',
+    'initials_style': 'Style for initials (experimental) either single or multiple',
     'copyright_year': '2038',
     'site_license_text': 'Creative Commons Attribution 4.0',
     'site_license_url': 'https://creativecommons.org/licenses/by/4.0/',

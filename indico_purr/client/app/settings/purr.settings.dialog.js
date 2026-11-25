@@ -49,6 +49,7 @@ export function SettingsDialog({
     'series',
     'series_number',
     'pre_print',
+    'initials_style',
     'copyright_year',
     'site_license_text',
     'site_license_url',
