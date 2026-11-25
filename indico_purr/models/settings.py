@@ -34,6 +34,7 @@ class PurrSettings:
     series: str = field(default='')
     series_number: str = field(default='')
     pre_print: str = field(default='')
+    initials_style: str = field(default='single')
     copyright_year: str = field(default='')
     site_license_text: str = field(default='')
     site_license_url: str = field(default='')
@@ -76,6 +77,7 @@ class PurrSettings:
                 .required('series', self.series)
                 .required('series_number', self.series_number)
                 .required('pre_print', self.pre_print)
+                .required('initials_style', self.initials_style)
                 .required('copyright_year', self.copyright_year)
                 .required('site_license_text', self.site_license_text)
                 .required('site_license_url', self.site_license_url)
@@ -190,6 +192,9 @@ class PurrSettings:
 
     def _validate_pre_print(self, errors):
         self._required_validator('pre_print', self.pre_print, errors)
+
+    def _validate_initials_style(self, errors):
+        self._required_validator('initials_style', self.initials_style, errors)
 
     def _validate_copyright_year(self, errors):
         self._required_validator('copyright_year', self.copyright_year, errors)

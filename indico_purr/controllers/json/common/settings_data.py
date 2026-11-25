@@ -72,6 +72,7 @@ class RHPurrSettingsDataJson(RHManageEventBase):
             series=settings.get('series', ''),
             series_number=settings.get('series_number', ''),
             pre_print=settings.get('pre_print', ''),
+            initials_style=settings.get('initials_style', ''),
             copyright_year=settings.get('copyright_year', ''),
             site_license_text=settings.get('site_license_text', ''),
             site_license_url=settings.get('site_license_url', ''),

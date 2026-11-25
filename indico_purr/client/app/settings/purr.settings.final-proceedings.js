@@ -141,6 +141,17 @@ export function FinalProceedingsSettings({
               </Form.Field>
             </Form.Group>
             <Form.Group>
+              <Form.Field error={hasError('initials_style')} width="16">
+                <label>initials style</label>
+                <Input
+                  name="Initials style (single or multiple)"
+                  value={finalProcSettings.initials_style || ''}
+                  placeholder="single or multiple"
+                  onChange={onFieldChange}
+                />
+              </Form.Field>
+            </Form.Group>
+            <Form.Group>
               <Form.Field error={hasError('copyright_year')} width="3">
                 <label>Copyright Year</label>
                 <Input

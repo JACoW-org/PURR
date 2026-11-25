@@ -55,6 +55,7 @@ class RHPurrConnectDataJson(RHManageEventBase):
             series=settings.get("series"),
             series_number=settings.get("series_number"),
             pre_print=settings.get("pre_print"),
+            initials_style=settings.get("initials_style"),
             location=settings.get("location"),
             host_info=settings.get("host_info"),
             editorial_board=settings.get("editorial_board"),
